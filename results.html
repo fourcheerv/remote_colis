@@ -70,7 +70,7 @@
 
             // Tentative de synchronisation
             localDB.sync(remoteDB, {
-                live: true,  // Activer la synchronisation en temps réel
+                //live: true,  // Activer la synchronisation en temps réel
                 retry: true
             }).on('change', (info) => {
                 console.log("Synchronisation réussie:", info);
