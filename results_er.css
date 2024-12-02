@@ -15,32 +15,11 @@ body {
 
 /* En-tête */
 header {
-    background-color: #003d66; /* Couleur de fond du header */
+    background-color: #003d66; /* Couleur de fond */
     color: white;
     padding: 20px;
     text-align: center;
     font-size: 1.5em;
-}
-
-/* Barres de navigation */
-nav {
-    background-color: #0071b8; /* Bleu clair */
-    display: flex;
-    justify-content: center;
-    padding: 10px;
-}
-
-nav a {
-    color: white;
-    text-decoration: none;
-    padding: 10px 15px;
-    margin: 0 5px;
-    font-size: 1em;
-}
-
-nav a:hover {
-    background-color: #005f87; /* Couleur au survol */
-    border-radius: 5px;
 }
 
 /* Section principale */
@@ -48,75 +27,83 @@ main {
     margin-top: 20px;
 }
 
-/* Section de recherche et tableau */
-section {
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+/* Style pour les formulaires */
+form {
+    max-width: 600px;
+    margin: 0 auto;
+    background: #fff;
     padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Espacement entre les champs */
 }
 
-input[type="text"] {
+label {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+input, textarea, select, button, canvas {
     width: 100%;
     padding: 10px;
-    margin: 10px 0;
-    font-size: 1em;
+    font-size: 16px;
     border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-/* Boutons différenciés par couleur */
-button {
-    padding: 10px 20px;
-    border: none;
     border-radius: 5px;
-    font-size: 1em;
+}
+
+input[type="file"] {
+    padding: 5px; /* Ajuster le style du champ fichier */
+}
+
+.radio-group {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.radio-group label {
+    flex: 1;
+    text-align: center;
+}
+
+.error-message {
+    color: red;
+    font-size: 14px;
+    display: none; /* Affiché dynamiquement si une erreur survient */
+}
+
+#imagePreview img {
+    max-width: 100px;
+    margin: 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+button {
+    background-color: #0071b8;
+    color: white;
+    border: none;
     cursor: pointer;
-    margin: 10px;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 16px;
 }
 
-/* Couleurs spécifiques aux boutons */
-#searchBtn{
-    background-color: purple; /* Vert pour Charger les données */
-    color: white;
-}
-
-#loadDataBtn {
-    background-color: #4CAF50; /* Vert pour Charger les données */
-    color: white;
-}
-
-#exportBtn {
-    background-color: #2196F3; /* Bleu pour Exporter vers Excel */
-    color: white;
-}
-
-#exportZipBtn {
-    background-color: #FF9800; /* Orange pour Exporter en ZIP */
-    color: white;
-}
-
-#deleteSelectedBtn {
-    background-color: #F44336; /* Rouge pour Supprimer les éléments */
-    color: white;
-}
-
-/* Effet au survol des boutons */
 button:hover {
-    opacity: 0.8;
+    background-color: #005f87;
 }
 
-/* Désactivation du bouton */
-button:disabled {
-    background-color: #aaa;
-    cursor: not-allowed;
-}
-
-/* Tableau */
+/* Tableaux pour la page des résultats */
 table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 table th,
@@ -138,17 +125,84 @@ table td {
 }
 
 table td img {
-    width: 50px;
+    max-width: 50px;
     height: auto;
+    border-radius: 5px;
+    cursor: pointer;
 }
 
 table tr:hover {
     background-color: #f1f1f1;
 }
 
-input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
+/* Boutons spécifiques pour les actions */
+button {
+    cursor: pointer;
+}
+
+button:disabled {
+    background-color: #aaa;
+    cursor: not-allowed;
+}
+
+#searchBtn {
+    background-color: purple;
+    color: white;
+}
+
+#loadDataBtn {
+    background-color: #4CAF50; /* Vert pour Charger les données */
+    color: white;
+}
+
+#exportBtn {
+    background-color: #2196F3; /* Bleu pour Exporter vers Excel */
+    color: white;
+}
+
+#exportZipBtn {
+    background-color: #FF9800; /* Orange pour Exporter en ZIP */
+    color: white;
+}
+
+#deleteSelectedBtn {
+    background-color: #F44336; /* Rouge pour Supprimer */
+    color: white;
+}
+
+/* Pop-up pour afficher les images */
+#imagePopup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+#popupContent {
+    position: relative;
+    text-align: center;
+}
+
+#popupContent img {
+    max-width: 90%;
+    max-height: 90%;
+    border: 3px solid white;
+    border-radius: 5px;
+}
+
+#closePopup {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    color: white;
+    cursor: pointer;
 }
 
 /* Footer */
@@ -164,67 +218,26 @@ footer {
 }
 
 /* Responsive Design */
-@media (max-width: 1200px) {
-    body {
-        padding: 15px;
-    }
-
-    header {
-        font-size: 1.3em;
-    }
-
-    nav a {
-        font-size: 0.9em;
-        padding: 8px 12px;
-    }
-
-    button {
-        font-size: 0.9em;
-        padding: 8px 16px;
-    }
-
-    table th, table td {
-        padding: 10px;
-    }
-}
-
 @media (max-width: 768px) {
-    /* Adaptation pour les tablettes */
     body {
-        padding: 10px;
-    }
-
-    header {
-        font-size: 1.2em;
-    }
-
-    nav {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    nav a {
-        margin: 5px 0;
-        font-size: 1em;
-        padding: 10px;
-    }
-
-    section {
         padding: 15px;
     }
 
-    input[type="text"] {
-        font-size: 0.9em;
-        padding: 8px;
+    form, table {
+        padding: 15px;
     }
 
-    table th, table td {
-        font-size: 0.9em;
-        padding: 8px;
+    input, button, textarea {
+        font-size: 14px;
+    }
+
+    .radio-group {
+        flex-direction: column;
+        gap: 10px;
     }
 
     table td img {
-        width: 40px;
+        max-width: 40px;
     }
 
     footer {
@@ -233,171 +246,29 @@ footer {
 }
 
 @media (max-width: 480px) {
-    /* Adaptation pour les petits écrans (smartphones) */
     body {
-        padding: 5px;
+        padding: 10px;
     }
 
     header {
-        font-size: 1.1em;
+        font-size: 1.3em;
         padding: 10px;
     }
 
-    nav {
-        flex-direction: column;
+    form, table {
         padding: 10px;
     }
 
-    nav a {
-        font-size: 1em;
-        padding: 12px 20px;
-        width: 100%;
-        text-align: center;
-    }
-
-    table {
-        font-size: 0.8em;
-    }
-
-    input[type="text"] {
-        font-size: 0.8em;
-        padding: 7px;
-    }
-
-    button {
-        font-size: 0.8em;
-        padding: 8px 16px;
+    input, button, textarea {
+        font-size: 12px;
     }
 
     table th, table td {
-        padding: 6px;
+        font-size: 0.9em;
+        padding: 8px;
     }
 
     footer {
         font-size: 0.7em;
     }
 }
-
-     /* Superposition pour l'affichage en grand */
-     #imagePopup {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.8);
-        display: none;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-    }
-
-    #popupContent {
-        position: relative;
-        text-align: center;
-    }
-
-    #popupContent img {
-        max-width: 90%;
-        max-height: 90%;
-        border: 3px solid white;
-        border-radius: 5px;
-    }
-
-    #closePopup {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        font-size: 24px;
-        color: white;
-        cursor: pointer;
-    }
-
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f4f4;
-        color: #333;
-        margin: 0;
-        padding: 0;
-    }
-
-    h1 {
-        text-align: center;
-        margin: 20px 0;
-        color: #003d66;
-    }
-
-    form {
-        max-width: 500px;
-        margin: 0 auto;
-        background: #fff;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        display: flex;
-        flex-direction: column;
-        gap: 15px; /* Espacement entre les champs */
-    }
-    
-    label {
-        font-weight: bold;
-        margin-bottom: 5px;
-    }
-    
-    input, textarea, select, button, canvas {
-        width: 100%;
-        padding: 10px;
-        font-size: 16px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-    }
-    
-    .radio-group {
-        display: flex;
-        justify-content: space-between;
-        gap: 10px;
-    }
-    
-    .radio-group label {
-        flex: 1;
-        text-align: center;
-    }
-    
-    #error-message {
-        color: red;
-        font-size: 14px;
-    }
-    
-    #imagePreview img {
-        max-width: 100px;
-        margin: 5px;
-    }
-
-    @media (max-width: 768px) {
-        form {
-            padding: 15px;
-        }
-
-        input, textarea, button {
-            font-size: 14px;
-        }
-
-        #signaturePad {
-            height: 150px;
-        }
-
-        .radio-group {
-            flex-direction: column;
-            gap: 10px;
-        }
-    }
-
-    @media (max-width: 480px) {
-        form {
-            padding: 10px;
-        }
-
-        input, textarea, button {
-            font-size: 12px;
-        }
-    }
