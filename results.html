@@ -70,7 +70,7 @@
 
             // Tentative de synchronisation
             localDB.sync(remoteDB, {
-                live: false,
+                live: true,  // Activer la synchronisation en temps réel
                 retry: true
             }).on('change', (info) => {
                 console.log("Synchronisation réussie:", info);
@@ -162,12 +162,13 @@
             try {
                 for (const id of idsToDelete) {
                     const doc = await localDB.get(id);
-                    await localDB.remove(doc);
+                    await localDB.remove(doc);  // Supprimer le document de localDB
                 }
                 alert("Éléments supprimés avec succès !");
-                loadData();
+                loadData();  // Recharge les données après suppression
             } catch (error) {
                 console.error("Erreur lors de la suppression :", error);
+                alert("Une erreur s'est produite lors de la suppression.");
             }
         };
 
@@ -242,6 +243,21 @@
                 console.error("Erreur lors de l'exportation ZIP :", error);
             }
         };
+
+        // Fonction pour ouvrir une image dans le pop-up
+        function openImagePopup(src) {
+            const popup = document.getElementById("imagePopup");
+            const popupImage = document.getElementById("popupImage");
+            popupImage.src = src;
+            popup.style.display = "flex";  // Affiche le pop-up
+        }
+
+        // Fonction pour fermer le pop-up
+        document.getElementById("closePopup").addEventListener("click", () => {
+            const popup = document.getElementById("imagePopup");
+            popup.style.display = "none";  // Ferme le pop-up
+        });
+
     </script>
 </body>
 </html>
