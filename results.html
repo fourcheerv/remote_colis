@@ -3,53 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interface de gestion des résultats</title>
+    <title>Interface d'export et de visualisation des colis</title>
+    <!-- Inclure la feuille de style -->
     <link rel="stylesheet" href="results_er.css">
+    <!-- Bibliothèques nécessaires -->
+    <script src="https://cdn.jsdelivr.net/npm/pouchdb@7.3.1/dist/pouchdb.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/pouchdb@7.3.1/dist/pouchdb.min.js"></script>
 </head>
 <body>
-    <header>
-        <div class="header-content">
-            <img src="logo.png" alt="Logo" class="logo">
-            <h1>Gestion des Données</h1>
-        </div>
-    </header>
+    <h1>Gestion des Données sur CouchDB</h1>
+    <input type="text" id="searchInput" placeholder="Rechercher par nom, email ou ID" />
+    <button id="searchBtn">Rechercher</button>
+    <button id="loadDataBtn">Charger les données</button>
+    <button id="exportBtn">Exporter vers Excel</button>
+    <button id="exportZipBtn">Exporter sous forme de ZIP</button>
+    <button id="deleteSelectedBtn">Supprimer les éléments sélectionnés</button>
 
-    <main>
-        <section>
-            <input type="text" id="searchInput" placeholder="Rechercher par nom, email ou ID" />
-            <button id="searchBtn">Rechercher</button>
-            <button id="loadDataBtn">Charger les données</button>
-            <button id="exportBtn">Exporter vers Excel</button>
-            <button id="exportZipBtn">Exporter sous forme de ZIP</button>
-            <button id="deleteSelectedBtn">Supprimer les éléments sélectionnés</button>
-            <button id="syncBtn">Synchroniser avec CouchDB</button> <!-- Nouveau bouton de synchronisation -->
-
-            <!-- Tableau pour afficher les données -->
-            <table id="dataTable">
-                <thead>
-                    <tr>
-                        <th><input type="checkbox" id="selectAll"></th>
-                        <th>ID</th>
-                        <th>Nom du destinataire</th>
-                        <th>Nom du réceptionnaire</th>
-                        <th>Email du réceptionnaire</th>
-                        <th>Nombre de colis</th>
-                        <th>Date de réception</th>
-                        <th>Signature</th>
-                        <th>Photos</th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
-
-            <div><a href="index.html">Retour à la page d'accueil</a></div>
-        </section>
-    </main>
+    <!-- Tableau pour afficher les données -->
+    <table id="dataTable">
+        <thead>
+            <tr>
+                <th><input type="checkbox" id="selectAll"></th>
+                <th>ID</th>
+                <th>Nom du destinataire</th>
+                <th>Nom du réceptionnaire</th>
+                <th>Email du réceptionnaire</th>
+                <th>Nombre de colis</th>
+                <th>Date de réception</th>
+                <th>Signature</th>
+                <th>Photos</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <div><a href="index.html">Retour à la page d'accueil</a></div>
 
     <!-- Pop-up pour afficher l'image -->
     <div id="imagePopup">
@@ -62,38 +52,14 @@
     <script>
         // Initialisation de PouchDB
         const localDB = new PouchDB('receptions');
-        const remoteDB = new PouchDB('https://apikey-v2-237azo7t1nwttyu787vl2zuxfh5ywxrddnfhcujd2nbu:b7ce3f8c0a99a10c0825a4c1ff68fe62@ca3c9329-df98-4982-a3dd-ba2b294b02ef-bluemix.cloudantnosqldb.appdomain.cloud/receptions');
+        const remoteDB = new PouchDB('http://username:password@remote-couchdb-url:5984/receptions');
 
-        // Synchroniser avec CouchDB lorsqu'on clique sur le bouton
-        document.getElementById('syncBtn').addEventListener('click', () => {
-            console.log("Démarrage de la synchronisation avec CouchDB...");
-
-            // Tentative de synchronisation
-            localDB.sync(remoteDB, {
-                //live: true,  // Activer la synchronisation en temps réel
-                retry: true
-            }).on('change', (info) => {
-                console.log("Synchronisation réussie:", info);
-                alert("Synchronisation réussie !");
-            }).on('paused', (err) => {
-                console.log("La synchronisation est en pause.", err);
-                alert("La synchronisation est en pause. Cela peut être dû à une perte de connexion réseau.");
-            }).on('active', () => {
-                console.log("La synchronisation a redémarré.");
-            }).on('denied', (err) => {
-                console.error("Un document a été refusé lors de la synchronisation:", err);
-                alert("Un document a été refusé lors de la synchronisation. Vérifiez les erreurs.");
-            }).on('error', (err) => {
-                // Gestion d'erreur détaillée
-                console.error("Erreur de synchronisation :", err);
-                if (err.name === "not_found") {
-                    alert("Erreur : La base de données n'a pas été trouvée sur CouchDB. Vérifiez l'URL et la configuration.");
-                } else if (err.name === "unauthorized") {
-                    alert("Erreur d'autorisation : Vérifiez vos identifiants ou la configuration du serveur CouchDB.");
-                } else {
-                    alert("Erreur de synchronisation générale ! Vérifiez la configuration de votre serveur CouchDB.");
-                }
-            });
+        // Synchronisation avec CouchDB
+        localDB.sync(remoteDB, {
+            live: true,
+            retry: true
+        }).on('error', (err) => {
+            console.error("Erreur de synchronisation :", err);
         });
 
         // Charger les données et les afficher dans le tableau
@@ -162,13 +128,12 @@
             try {
                 for (const id of idsToDelete) {
                     const doc = await localDB.get(id);
-                    await localDB.remove(doc);  // Supprimer le document de localDB
+                    await localDB.remove(doc);
                 }
                 alert("Éléments supprimés avec succès !");
-                loadData();  // Recharge les données après suppression
+                loadData();
             } catch (error) {
                 console.error("Erreur lors de la suppression :", error);
-                alert("Une erreur s'est produite lors de la suppression.");
             }
         };
 
@@ -244,20 +209,30 @@
             }
         };
 
-        // Fonction pour ouvrir une image dans le pop-up
-        function openImagePopup(src) {
+        // Gestion des événements
+        document.getElementById("loadDataBtn").addEventListener("click", loadData);
+        document.getElementById("searchBtn").addEventListener("click", searchData);
+        document.getElementById("deleteSelectedBtn").addEventListener("click", deleteSelected);
+        document.getElementById("exportBtn").addEventListener("click", exportToExcel);
+        document.getElementById("exportZipBtn").addEventListener("click", exportToZip);
+
+        // Pop-up pour les images
+        const openImagePopup = (src) => {
             const popup = document.getElementById("imagePopup");
             const popupImage = document.getElementById("popupImage");
             popupImage.src = src;
-            popup.style.display = "flex";  // Affiche le pop-up
-        }
+            popup.style.display = "flex";
+        };
 
-        // Fonction pour fermer le pop-up
-        document.getElementById("closePopup").addEventListener("click", () => {
+        const closeImagePopup = () => {
             const popup = document.getElementById("imagePopup");
-            popup.style.display = "none";  // Ferme le pop-up
-        });
+            popup.style.display = "none";
+        };
 
+        document.getElementById("closePopup").addEventListener("click", closeImagePopup);
+        document.getElementById("imagePopup").addEventListener("click", (event) => {
+            if (event.target.id === "imagePopup") closeImagePopup();
+        });
     </script>
 </body>
 </html>
