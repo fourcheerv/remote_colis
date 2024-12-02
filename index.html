@@ -8,62 +8,71 @@
     <script src="https://cdn.jsdelivr.net/npm/pouchdb@7.3.1/dist/pouchdb.min.js"></script>
 </head>
 <body>
-    <h1>Formulaire de remise des colis</h1>
-    <form id="packageForm">
-        <label for="recipientName">Nom du destinataire :</label>
-        <input type="text" id="recipientName" name="recipientName" required>
-        <span id="recipientNameError" class="error-message"></span>
+    <header>
+        <h1>Formulaire de remise des colis</h1>
+    </header>
+    <main>
+        <section>
+            <form id="packageForm">
+                <label for="recipientName">Nom du destinataire :</label>
+                <input type="text" id="recipientName" name="recipientName" required>
+                <span id="recipientNameError" class="error-message"></span>
 
-        <label for="receiverName">Nom du réceptionnaire :</label>
-        <input type="text" id="receiverName" name="receiverName" required>
-        <span id="receiverNameError" class="error-message"></span>
+                <label for="receiverName">Nom du réceptionnaire :</label>
+                <input type="text" id="receiverName" name="receiverName" required>
+                <span id="receiverNameError" class="error-message"></span>
 
-        <label for="packageCount">Nombre de colis :</label>
-        <input type="number" id="packageCount" name="packageCount" min="1" required>
-        <span id="packageCountError" class="error-message"></span>
+                <label for="packageCount">Nombre de colis :</label>
+                <input type="number" id="packageCount" name="packageCount" min="1" required>
+                <span id="packageCountError" class="error-message"></span>
 
-        <label for="email">Adresse email du réceptionnaire :</label>
-        <input type="email" id="email" name="email" required>
-        <span id="emailError" class="error-message"></span>
+                <label for="email">Adresse email du réceptionnaire :</label>
+                <input type="email" id="email" name="email" required>
+                <span id="emailError" class="error-message"></span>
 
-        <label for="deliveryDate">Date et Heure de réception :</label>
-        <input type="datetime-local" id="deliveryDate" name="deliveryDate" required>
-        <span id="deliveryDateError" class="error-message"></span>
+                <label for="deliveryDate">Date et Heure de réception :</label>
+                <input type="datetime-local" id="deliveryDate" name="deliveryDate" required>
+                <span id="deliveryDateError" class="error-message"></span>
 
-        <label for="fileUpload">Prendre une photo :</label>
-        <input type="file" id="fileUpload" accept="image/*" capture="camera">
-        <div id="imagePreview"></div>
+                <label for="fileUpload">Prendre une photo :</label>
+                <input type="file" id="fileUpload" accept="image/*" capture="camera">
+                <div id="imagePreview"></div>
 
-        <label>Signature :</label>
-        <canvas id="signaturePad" width="500" height="200" style="border: 1px solid #000;"></canvas>
-        <button type="button" id="clearSignature">Effacer la signature</button>
-        <span id="signatureError" class="error-message"></span>
+                <label>Signature :</label>
+                <canvas id="signaturePad" width="500" height="200" style="border: 1px solid #000;"></canvas>
+                <button type="button" id="clearSignature" class="button-clear">Effacer la signature</button>
+                <span id="signatureError" class="error-message"></span>
 
-        <p>Colis Livré :</p>
-        <div class="radio-group">
-            <label>
-                <input type="radio" id="trueRadio" name="delivered" value="true" required />
-                Oui
-            </label>
-            <label>
-                <input type="radio" id="falseRadio" name="delivered" value="false" />
-                Non
-            </label>
-        </div>
-        <span id="deliveredError" class="error-message"></span>
+                <p>Colis Livré :</p>
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" id="trueRadio" name="delivered" value="true" required>
+                        Oui
+                    </label>
+                    <label>
+                        <input type="radio" id="falseRadio" name="delivered" value="false">
+                        Non
+                    </label>
+                </div>
+                <span id="deliveredError" class="error-message"></span>
 
-        <button type="submit">Sauvegarder en ligne</button>
-        <button type="button" id="clearForm">Vider les champs</button>
-        <div><a href="https://fourcheerv.github.io/colis/results.html">Voir les résultats</a></div>
-    </form>
+                <button type="submit" id="saveDataBtn" class="button-save">Sauvegarder en ligne</button>
+                <button type="button" id="clearForm" class="button-clear">Vider les champs</button>
+                <div><a href="results.html" id="viewResultsLink">Voir les résultats</a></div>
+            </form>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 Gestion des Colis</p>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
     <script>
-        // Initialiser PouchDB et la synchronisation CouchDB
+        // Initialisation de PouchDB
         const localDB = new PouchDB('receptions');
         const remoteDB = new PouchDB('http://username:password@remote-couchdb-url:5984/receptions');
 
-        // Synchroniser automatiquement avec CouchDB
+        // Synchronisation avec CouchDB
         localDB.sync(remoteDB, {
             live: true,
             retry: true
