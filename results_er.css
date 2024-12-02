@@ -1,3 +1,4 @@
+
 /* Style global */
 * {
     margin: 0;
@@ -13,50 +14,31 @@ body {
     padding: 20px;
 }
 
-/* Conteneur pour le logo et le titre */
+/* En-tête */
+header {
+    background-color: #003d66; /* Couleur de fond du header */
+    color: white;
+    padding: 20px;
+    text-align: center;
+    font-size: 1.5em;
+}
+
 .header-content {
     display: flex;
     align-items: center;
-    justify-content: center; /* Centrer horizontalement */
+    justify-content: center;
     gap: 15px; /* Espace entre le logo et le titre */
 }
 
 .logo {
-    width: 60px; /* Taille du logo */
-    height: auto; /* Conserver les proportions */
+    width: 60px;
+    height: auto;
 }
 
 header h1 {
     font-size: 1.8em;
     margin: 0;
     color: white;
-    text-align: center;
-}
-
-/* Responsive pour petits écrans */
-@media (max-width: 768px) {
-    .header-content {
-        flex-direction: column; /* Logo et titre empilés */
-        gap: 10px;
-    }
-
-    .logo {
-        width: 50px; /* Réduire la taille du logo */
-    }
-
-    header h1 {
-        font-size: 1.5em;
-    }
-}
-
-
-/* En-tête */
-header {
-    background-color: #003d66; /* Couleur de fond */
-    color: white;
-    padding: 20px;
-    text-align: center;
-    font-size: 1.5em;
 }
 
 /* Section principale */
@@ -64,83 +46,78 @@ main {
     margin-top: 20px;
 }
 
-/* Style pour les formulaires */
-form {
-    max-width: 600px;
-    margin: 0 auto;
-    background: #fff;
+/* Section de recherche et tableau */
+section {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    gap: 15px; /* Espacement entre les champs */
 }
 
-label {
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-input, textarea, select, button, canvas {
+input[type="text"] {
     width: 100%;
     padding: 10px;
-    font-size: 16px;
+    margin: 10px 0;
+    font-size: 1em;
     border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Boutons fixes pour results.html */
+#searchBtn,
+#loadDataBtn,
+#exportBtn,
+#exportZipBtn,
+#deleteSelectedBtn {
+    width: 180px; /* Largeur fixe */
+    height: 40px; /* Hauteur fixe */
+    font-size: 14px; /* Taille de texte fixe */
+    padding: 5px 10px; /* Espacement interne */
     border-radius: 5px;
-}
-
-input[type="file"] {
-    padding: 5px; /* Ajuster le style du champ fichier */
-}
-
-.radio-group {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-}
-
-.radio-group label {
-    flex: 1;
+    cursor: pointer;
     text-align: center;
 }
 
-.error-message {
-    color: red;
-    font-size: 14px;
-    display: none; /* Affiché dynamiquement si une erreur survient */
-}
-
-#imagePreview img {
-    max-width: 100px;
-    margin: 5px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-}
-
-button {
-    background-color: #0071b8;
+/* Couleurs spécifiques aux boutons */
+#searchBtn {
+    background-color: purple;
     color: white;
-    border: none;
-    cursor: pointer;
-    margin-top: 10px;
-    padding: 10px;
-    border-radius: 5px;
-    font-size: 16px;
 }
 
-button:hover {
-    background-color: #005f87;
+#loadDataBtn {
+    background-color: #4CAF50;
+    color: white;
 }
 
-/* Tableaux pour la page des résultats */
+#exportBtn {
+    background-color: #2196F3;
+    color: white;
+}
+
+#exportZipBtn {
+    background-color: #FF9800;
+    color: white;
+}
+
+#deleteSelectedBtn {
+    background-color: #F44336;
+    color: white;
+}
+
+/* Effet au survol */
+#searchBtn:hover,
+#loadDataBtn:hover,
+#exportBtn:hover,
+#exportZipBtn:hover,
+#deleteSelectedBtn:hover {
+    opacity: 0.9;
+}
+
+/* Tableau */
 table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 table th,
@@ -170,41 +147,6 @@ table td img {
 
 table tr:hover {
     background-color: #f1f1f1;
-}
-
-/* Boutons spécifiques pour les actions */
-button {
-    cursor: pointer;
-}
-
-button:disabled {
-    background-color: #aaa;
-    cursor: not-allowed;
-}
-
-#searchBtn {
-    background-color: purple;
-    color: white;
-}
-
-#loadDataBtn {
-    background-color: #4CAF50; /* Vert pour Charger les données */
-    color: white;
-}
-
-#exportBtn {
-    background-color: #2196F3; /* Bleu pour Exporter vers Excel */
-    color: white;
-}
-
-#exportZipBtn {
-    background-color: #FF9800; /* Orange pour Exporter en ZIP */
-    color: white;
-}
-
-#deleteSelectedBtn {
-    background-color: #F44336; /* Rouge pour Supprimer */
-    color: white;
 }
 
 /* Pop-up pour afficher les images */
@@ -260,17 +202,21 @@ footer {
         padding: 15px;
     }
 
-    form, table {
-        padding: 15px;
+    header h1 {
+        font-size: 1.5em;
+    }
+
+    .header-content {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .logo {
+        width: 50px;
     }
 
     input, button, textarea {
         font-size: 14px;
-    }
-
-    .radio-group {
-        flex-direction: column;
-        gap: 10px;
     }
 
     table td img {
@@ -287,7 +233,7 @@ footer {
         padding: 10px;
     }
 
-    header {
+    header h1 {
         font-size: 1.3em;
         padding: 10px;
     }
