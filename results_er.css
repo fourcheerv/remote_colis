@@ -211,6 +211,25 @@ button:disabled {
     color: white;
 }
 
+/* Style pour le bouton de synchronisation */
+#syncBtn {
+    width: 180px; /* Largeur fixe */
+    height: 40px; /* Hauteur fixe */
+    font-size: 14px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #2196F3; /* Bleu pour le bouton de synchronisation */
+    color: white;
+    text-align: center;
+    margin-top: 10px;
+}
+
+#syncBtn:hover {
+    background-color: #1764b5; /* Couleur plus foncée au survol */
+}
+
+
 /* Pop-up pour afficher les images */
 #imagePopup {
     position: fixed;
