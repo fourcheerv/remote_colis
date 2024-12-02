@@ -62,7 +62,7 @@
     <script>
         // Initialisation de PouchDB
         const localDB = new PouchDB('receptions');
-        const remoteDB = new PouchDB('http://username:password@remote-couchdb-url:5984/receptions');
+        const remoteDB = new PouchDB('https://spokorski@gmail.com:M,jvcmHSdl77!@account.cloudant.com/receptions');
 
         // Synchroniser avec CouchDB lorsqu'on clique sur le bouton
         document.getElementById('syncBtn').addEventListener('click', () => {
