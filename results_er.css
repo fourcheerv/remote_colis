@@ -82,12 +82,16 @@ label {
     margin-bottom: 5px;
 }
 
-input, textarea, select, button, canvas {
+input, textarea, select, canvas {
     width: 100%;
     padding: 10px;
     font-size: 16px;
     border: 1px solid #ccc;
     border-radius: 5px;
+}
+
+button {
+    width: 25;
 }
 
 input[type="file"] {
