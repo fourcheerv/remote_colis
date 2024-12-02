@@ -76,6 +76,35 @@
             alert("Erreur de synchronisation ! Vérifiez la configuration de votre serveur CouchDB.");
         });
 
+        // a remplacer si bouton synchronisation
+        // Initialisation de PouchDB
+        //const localDB = new PouchDB('receptions');
+        //const remoteDB = new PouchDB('http://username:password@remote-couchdb-url:5984/receptions');
+
+        // Synchroniser avec CouchDB lorsqu'on clique sur le bouton
+        //document.getElementById('syncBtn').addEventListener('click', () => {
+        //    console.log("Démarrage de la synchronisation...");
+        //
+          //  localDB.sync(remoteDB, {
+           //     live: true,
+            //    retry: true
+           // }).on('change', (info) => {
+           //    console.log("Synchronisation réussie:", info);
+           //     alert("Synchronisation réussie !");
+           //}).on('paused', (err) => {
+           //     console.log("La synchronisation est en pause (cela peut être dû à une perte de connexion réseau).", err);
+           //     alert("La synchronisation est en pause. Vérifiez votre connexion.");
+            //}).on('active', () => {
+            //    console.log("La synchronisation a redémarré.");
+            //}).on('denied', (err) => {
+            //    console.error("Un document a été refusé lors de la synchronisation:", err);
+            //    alert("Un document a été refusé. Vérifiez les erreurs.");
+            //}).on('error', (err) => {
+            //    console.error("Erreur de synchronisation :", err);
+            //    alert("Erreur de synchronisation ! Vérifiez la configuration de votre serveur CouchDB.");
+           // });
+        //});
+
         // Charger les données et les afficher dans le tableau
         const loadData = async () => {
             try {
