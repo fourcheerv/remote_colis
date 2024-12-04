@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interface d'export et de visualisation des colis</title>
+    <!-- Inclure la feuille de style -->
+    <link rel="stylesheet" href="results_er.css">
+    <!-- Bibliothèques nécessaires -->
+    <script src="https://cdn.jsdelivr.net/npm/pouchdb@7.3.1/dist/pouchdb.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+</head>
+<body>
+    <div><img src="logo.png" alt="Logo" class="logo"></div>
+    <p></p>
+    <h1>Gestion des Données sur CouchDB</h1>
+    <input type="text" id="searchInput" placeholder="Rechercher par nom, email ou ID" />
+    <button id="searchBtn">Rechercher</button>
+    <!-- Retiré le bouton Charger les données -->
+    <button id="exportBtn">Exporter vers Excel</button>
+    <button id="exportZipBtn">Exporter sous forme de ZIP</button>
+    <button id="deleteSelectedBtn">Supprimer les éléments sélectionnés</button>
+
+    <!-- Tableau pour afficher les données -->
+    <table id="dataTable">
+        <thead>
+            <tr>
+                <th><input type="checkbox" id="selectAll"></th>
+                <th>ID</th>
+                <th>Nom du destinataire</th>
+                <th>Nom du réceptionnaire</th>
+                <th>Email du réceptionnaire</th>
+                <th>Nombre de colis</th>
+                <th>Date de réception</th>
+                <th>Signature</th>
+                <th>Photos</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <div><a href="index.html">Retour à la page d'accueil</a></div>
+    
+    <!-- Pop-up pour afficher l'image -->
+    <div id="imagePopup">
+        <div id="popupContent">
+            <span id="closePopup">&times;</span>
+            <img id="popupImage" src="" alt="Aperçu de l'image">
+        </div>
+    </div>
+    <footer>
+        <p>&copy; 2024 Gestion des Colis Interface d'administration</p>
+    </footer>
+
+    <script>
+        // Initialisation de PouchDB
+        const localDB = new PouchDB('receptions');
+        const remoteDB = new PouchDB('https://apikey-v2-237azo7t1nwttyu787vl2zuxfh5ywxrddnfhcujd2nbu:b7ce3f8c0a99a10c0825a4c1ff68fe62@ca3c9329-df98-4982-a3dd-ba2b294b02ef-bluemix.cloudantnosqldb.appdomain.cloud/receptions');
+
+        // Synchronisation avec CouchDB
+        localDB.sync(remoteDB, {
+            live: true,
+            retry: true
+        }).on('error', (err) => {
+            console.error("Erreur de synchronisation :", err);
+        });
+
+        // Charger les données et les afficher dans le tableau
+        const loadData = async () => {
+            try {
+                const result = await localDB.allDocs({ include_docs: true });
+                const tbody = document.getElementById("dataTable").querySelector("tbody");
+                tbody.innerHTML = "";
+
+                result.rows.forEach((row) => {
+                    const item = row.doc;
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td><input type="checkbox" class="selectRow" data-id="${item._id}"></td>
+                        <td>${item._id}</td>
+                        <td>${item.recipientName}</td>
+                        <td>${item.receiverName}</td>
+                        <td>${item.email}</td>
+                        <td>${item.packageCount}</td>
+                        <td>${item.deliveryDate}</td>
+                        <td><img src="${item.signature || ''}" alt="Signature" onclick="openImagePopup('${item.signature || ''}')" style="cursor: pointer; max-width: 50px; max-height: 50px;"></td>
+                        <td>${(item.photos || []).map(photo => `
+                                <img src="${photo}" alt="Photo" 
+                                    onclick="openImagePopup('${photo}')"
+                                    style="cursor: pointer; max-width: 50px; max-height: 50px;">
+                            `).join(" ")}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                alert("Données chargées avec succès !");
+            } catch (error) {
+                console.error("Erreur lors du chargement des données :", error);
+            }
+        };
+
+        // Fonction de recherche
+        const searchData = () => {
+            const searchValue = document.getElementById("searchInput").value.toLowerCase();
+            const rows = document.querySelectorAll("#dataTable tbody tr");
+            rows.forEach((row) => {
+                const cells = row.getElementsByTagName("td");
+                const id = cells[1].innerText.toLowerCase();
+                const recipientName = cells[2].innerText.toLowerCase();
+                const receiverName = cells[3].innerText.toLowerCase();
+                const email = cells[4].innerText.toLowerCase();
+
+                if (id.includes(searchValue) || recipientName.includes(searchValue) || receiverName.includes(searchValue) || email.includes(searchValue)) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        };
+
+        // Supprimer les éléments sélectionnés
+        const deleteSelected = async () => {
+            const checkboxes = document.querySelectorAll(".selectRow:checked");
+            if (checkboxes.length === 0) {
+                alert("Aucun élément sélectionné !");
+                return;
+            }
+
+            const idsToDelete = Array.from(checkboxes).map(checkbox => checkbox.dataset.id);
+
+            try {
+                for (const id of idsToDelete) {
+                    const doc = await localDB.get(id);
+                    await localDB.remove(doc);
+                }
+                alert("Éléments supprimés avec succès !");
+                loadData();
+            } catch (error) {
+                console.error("Erreur lors de la suppression :", error);
+            }
+        };
+
+        // Exporter les données au format Excel
+        const exportToExcel = async () => { /* Reste du code inchangé */ };
+
+        // Exporter les données au format ZIP
+        const exportToZip = async () => { /* Reste du code inchangé */ };
+
+        // Pop-up pour les images
+        const openImagePopup = (src) => { /* Reste du code inchangé */ };
+        const closeImagePopup = () => { /* Reste du code inchangé */ };
+
+        // Appeler loadData lors du chargement de la page
+        document.addEventListener("DOMContentLoaded", loadData);
+
+        // Gestion des événements
+        document.getElementById("searchBtn").addEventListener("click", searchData);
+        document.getElementById("deleteSelectedBtn").addEventListener("click", deleteSelected);
+        document.getElementById("exportBtn").addEventListener("click", exportToExcel);
+        document.getElementById("exportZipBtn").addEventListener("click", exportToZip);
+    </script>
+</body>
+</html>
