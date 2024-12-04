@@ -99,6 +99,52 @@ const exportToExcel = async () => {
     }
 };
 
+        // Exporter les données au format ZIP
+        const exportToZip = async () => {
+            try {
+                const result = await localDB.allDocs({ include_docs: true });
+                const data = result.rows.map(row => row.doc);
+                if (data.length === 0) {
+                    alert("Aucune donnée à exporter !");
+                    return;
+                }
+
+                const zip = new JSZip();
+
+                for (const item of data) {
+                    const folder = zip.folder(`ligne_${item._id}`);
+                    const jsonContent = {
+                        id: item._id,
+                        recipientName: item.recipientName,
+                        receiverName: item.receiverName,
+                        email: item.email,
+                        packageCount: item.packageCount,
+                        deliveryDate: item.deliveryDate,
+                    };
+                    folder.file("info.json", JSON.stringify(jsonContent, null, 2));
+
+                    if (item.signature) {
+                        const signatureBlob = await fetch(item.signature).then(res => res.blob());
+                        folder.file("signature.png", signatureBlob);
+                    }
+
+                    if (item.photos) {
+                        for (let i = 0; i < item.photos.length; i++) {
+                            const photoBlob = await fetch(item.photos[i]).then(res => res.blob());
+                            folder.file(`photo_${i + 1}.png`, photoBlob);
+                        }
+                    }
+                }
+
+                zip.generateAsync({ type: "blob" }).then((content) => {
+                    saveAs(content, "Receptions.zip");
+                    alert("Fichier ZIP exporté avec succès !");
+                });
+            } catch (error) {
+                console.error("Erreur lors de l'exportation ZIP :", error);
+            }
+        };
+
 // Afficher une image dans une pop-up
 const showImage = (src) => {
     const popup = document.getElementById("imagePopup");
