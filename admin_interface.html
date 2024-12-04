@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interface d'export et de visualisation des colis</title>
+    <!-- Inclure la feuille de style -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Bibliothèques nécessaires -->
+    <script src="https://cdn.jsdelivr.net/npm/pouchdb@7.3.1/dist/pouchdb.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+</head>
+<body>
+    <!-- En-tête avec logo et titre -->
+    <header class="header">
+        <img src="logo.png" alt="Logo" class="logo">
+        <h1>Gestion des Données sur CouchDB</h1>
+    </header>
+
+    <!-- Barre d'outils avec les actions principales -->
+    <section class="toolbar">
+        <input type="text" id="searchInput" placeholder="Rechercher par nom, email ou ID" />
+        <button id="searchBtn">Rechercher</button>
+        <button id="exportBtn">Exporter vers Excel</button>
+        <button id="exportZipBtn">Exporter sous forme de ZIP</button>
+        <button id="deleteSelectedBtn">Supprimer les éléments sélectionnés</button>
+    </section>
+
+    <!-- Tableau de données -->
+    <main>
+        <table id="dataTable">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="selectAll"></th>
+                    <th>ID</th>
+                    <th>Nom du destinataire</th>
+                    <th>Nom du réceptionnaire</th>
+                    <th>Email du réceptionnaire</th>
+                    <th>Nombre de colis</th>
+                    <th>Date de réception</th>
+                    <th>Signature</th>
+                    <th>Photos</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </main>
+
+    <!-- Retour et footer -->
+    <footer class="footer">
+        <a href="index.html">Retour à la page d'accueil</a>
+        <p>&copy; 2024 Gestion des Colis Interface d'administration</p>
+    </footer>
+
+    <!-- Pop-up pour afficher les images -->
+    <div id="imagePopup" class="popup">
+        <div id="popupContent" class="popup-content">
+            <span id="closePopup" class="popup-close">&times;</span>
+            <img id="popupImage" src="" alt="Aperçu de l'image">
+        </div>
+    </div>
+
+    <!-- Script JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
