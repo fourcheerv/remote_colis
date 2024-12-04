@@ -28,14 +28,12 @@
                 <input type="number" id="packageCount" name="packageCount" min="1" required>
                 <span id="packageCountError" class="error-message"></span>
                 <p></p>
-                <!-- <label for="email">Adresse email du réceptionnaire :</label>
-                <input type="email" id="email" name="email" required>
-                <span id="emailError" class="error-message"></span>
-                <p></p>-->
+
                 <label for="deliveryDate">Date et Heure de réception :</label>
                 <input type="datetime-local" id="deliveryDate" name="deliveryDate" required>
                 <span id="deliveryDateError" class="error-message"></span>
                 <p></p>
+
                 <label for="fileUpload">Prendre une photo :</label>
                 <input type="file" id="fileUpload" accept="image/*" capture="camera">
                 <div id="imagePreview"></div>
@@ -138,6 +136,12 @@
         document.getElementById("packageForm").addEventListener("submit", async (event) => {
             event.preventDefault();
 
+            // Vérification si au moins une photo a été ajoutée
+            if (imageFiles.length === 0) {
+                alert("Veuillez ajouter au moins une photo avant de sauvegarder !");
+                return;
+            }
+
             const formData = new FormData(event.target);
 
             const data = {
@@ -152,11 +156,13 @@
                 photos: [],
             };
 
+            // Vérification si une signature est présente
             if (!data.signature) {
                 alert("Veuillez fournir une signature !");
                 return;
             }
 
+            // Conversion des fichiers d'images en base64
             for (let file of imageFiles) {
                 const dataURL = await new Promise((resolve) => {
                     const reader = new FileReader();
@@ -166,6 +172,7 @@
                 data.photos.push(dataURL);
             }
 
+            // Sauvegarde des données dans la base de données locale
             try {
                 await localDB.put(data);
                 alert("Données sauvegardées et synchronisées !");
