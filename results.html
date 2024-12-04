@@ -41,13 +41,6 @@
     </table>
     <div><a href="index.html">Retour à la page d'accueil</a></div>
     
-    <!-- Pop-up pour afficher la signature -->
-    <div id="imagePopupSign">
-        <div id="popupContentSign">
-            <span id="closePopupSign">&times;</span>
-            <img id="popupImageSign" src="" alt="Aperçu de la signature">
-        </div>
-    </div>
     <!-- Pop-up pour afficher l'image -->
     <div id="imagePopup">
         <div id="popupContent">
@@ -90,7 +83,7 @@
                         <td>${item.email}</td>
                         <td>${item.packageCount}</td>
                         <td>${item.deliveryDate}</td>
-                        <td><img src="${item.signature || ''}" alt="Signature" onclick="openImagePopupSign('${item.signature || ''}')" style="cursor: pointer; max-width: 50px; max-height: 50px;"></td>
+                        <td><img src="${item.signature || ''}" alt="Signature" onclick="openImagePopup('${item.signature || ''}')" style="cursor: pointer; max-width: 50px; max-height: 50px;"></td>
                         <td>${(item.photos || []).map(photo => `
                                 <img src="${photo}" alt="Photo" 
                                     onclick="openImagePopup('${photo}')"
