@@ -1,6 +1,7 @@
 // Initialisation de PouchDB pour la synchronisation avec CouchDB
 const localDB = new PouchDB('receptions');
-const remoteDB = new PouchDB('https://your-database-url');
+
+const remoteDB = new PouchDB('https://apikey-v2-237azo7t1nwttyu787vl2zuxfh5ywxrddnfhcujd2nbu:b7ce3f8c0a99a10c0825a4c1ff68fe62@ca3c9329-df98-4982-a3dd-ba2b294b02ef-bluemix.cloudantnosqldb.appdomain.cloud/receptions');
 
 // Synchronisation avec CouchDB
 localDB.sync(remoteDB, { live: true, retry: true }).on('error', console.error);
