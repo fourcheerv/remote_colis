@@ -168,6 +168,7 @@ document.getElementById("selectAll").addEventListener("change", (event) => {
 document.getElementById("searchBtn").addEventListener("click", searchData);
 document.getElementById("deleteSelectedBtn").addEventListener("click", deleteSelected);
 document.getElementById("exportBtn").addEventListener("click", exportToExcel);
+document.getElementById("exportZipBtn").addEventListener("click", exportToZip);
 
 // Charger les données au démarrage
 window.addEventListener("DOMContentLoaded", loadData);
