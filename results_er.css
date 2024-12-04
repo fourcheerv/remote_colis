@@ -22,7 +22,7 @@ body {
 }
 
 .logo {
-    width: 60px; /* Taille du logo */
+    width: 200px; /* Taille du logo */
     height: auto; /* Conserver les proportions */
 }
 
