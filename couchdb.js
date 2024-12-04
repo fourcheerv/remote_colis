@@ -99,8 +99,8 @@ const exportToExcel = async () => {
     }
 };
 
-        // Exporter les données au format ZIP
-        const exportToZip = async () => {
+// Exporter les données au format ZIP
+const exportToZip = async () => {
             try {
                 const result = await localDB.allDocs({ include_docs: true });
                 const data = result.rows.map(row => row.doc);
@@ -143,7 +143,8 @@ const exportToExcel = async () => {
             } catch (error) {
                 console.error("Erreur lors de l'exportation ZIP :", error);
             }
-        };
+ 
+};
 
 // Afficher une image dans une pop-up
 const showImage = (src) => {
