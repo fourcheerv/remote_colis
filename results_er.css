@@ -166,7 +166,7 @@ table td {
 }
 
 table td img {
-    max-width: 50px;
+    max-width: 1080px;
     height: auto;
     border-radius: 5px;
     cursor: pointer;
