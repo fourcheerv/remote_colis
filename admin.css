@@ -82,6 +82,7 @@ button:hover {
 .btn-export-zip {
     background-color: #ffc107; /* Jaune */
     color: #212529;
+    color:white;
 }
 
 .btn-export-zip:hover {
