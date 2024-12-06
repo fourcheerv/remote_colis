@@ -121,11 +121,11 @@ button {
 button:hover {
     background-color: #0c81b4;
 }
-.button-clear {
+#clearSignature {
     background-color: red;
 }
 
-.button-clear:hover {
+#clearSignature:hover {
     background-color: orangered;
 }
 
