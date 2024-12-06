@@ -22,9 +22,9 @@ body {
 }
 
 .logo {
-    width: 800px; /* Taille du logo */
+    width: 300px; /* Taille du logo */
     height: auto; /* Conserver les proportions */
-    margin-left; 50%;
+  
 }
 
 header h1 {
@@ -42,7 +42,7 @@ header h1 {
     }
 
     .logo {
-        width: 800px; /* Réduire la taille du logo */
+        width: 200px; /* Réduire la taille du logo */
     }
 
     header h1 {
