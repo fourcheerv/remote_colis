@@ -76,14 +76,13 @@ button:hover {
     background-color: orangered;
 }
 
-
-
 #deleteSelectedBtn {
     background-color: #dc3545;
 }
 
 #deleteSelectedBtn:hover {
     background-color: #a71d2a;
+    color: white;
 }
 
 
