@@ -65,12 +65,12 @@ button:hover {
 
 /* Bouton d'export Excel */
 .btn-export-excel {
-    background-color: #007BFF; /* Bleu */
+    background-color: grey; /* gris */
     color: #fff;
 }
 
 .btn-export-excel:hover {
-    background-color: #0056b3; /* Bleu foncé */
+    background-color: black; /* noir foncé */
 }
 
 /* Bouton d'export ZIP */
