@@ -59,6 +59,25 @@ button:hover {
     background-color: #0056b3;
 }
 
+.searchBt {
+    background-color: greenyellow;
+
+}
+.searchBt:hover {
+    background-color: green;
+
+}
+
+.exportBtn .exportZipBtn{
+    background-color: orange;
+}
+
+.exportBtn:hover .exportZipBtn:hover{
+    background-color: orangered;
+}
+
+
+
 #deleteSelectedBtn {
     background-color: #dc3545;
 }
