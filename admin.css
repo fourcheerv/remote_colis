@@ -33,16 +33,26 @@ h1 {
     border-radius: 5px;
 }
 
+.toolbar {
+    text-align: center; /* Centrer tout le contenu dans la barre d'outils */
+}
+
+.toolbar-buttons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap; /* Permet aux boutons de s'ajuster si l'espace est limité */
+    gap: 10px; /* Espacement entre les boutons */
+    margin-top: 10px;
+}
+
 button {
     padding: 10px 15px;
-    margin: 10px 5px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     background-color: #007BFF;
     color: #fff;
     font-size: 14px;
-    display: inline-block;
 }
 
 button:hover {
@@ -56,6 +66,7 @@ button:hover {
 #deleteSelectedBtn:hover {
     background-color: #a71d2a;
 }
+
 
 /* Tableau */
 table {
