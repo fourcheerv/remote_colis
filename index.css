@@ -16,15 +16,15 @@ body {
 /* Conteneur pour le logo et le titre */
 .header-content {
     display: flex;
-    align-items: center;
-    justify-content: center; /* Centrer horizontalement */
-    gap: 15px; /* Espace entre le logo et le titre */
+    flex-direction: column; /* Logo et titre empilés */
+    align-items: center; /* Centrer horizontalement */
+    justify-content: center; /* Centrer verticalement */
+    text-align: center;
+    gap: 15px; /* Espacement entre le logo et le titre */
 }
 
 .logo {
-    width: 300px; /* Taille du logo */
-    height: auto; /* Conserver les proportions */
-  
+    margin: 0 auto; /* S'assurer que le logo est centré */
 }
 
 header h1 {
