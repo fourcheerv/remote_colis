@@ -125,7 +125,7 @@ input[type="file"] {
 }
 
 button {
-    background-color: #0071b8;
+    background-color: #003d66;
     color: white;
     border: none;
     cursor: pointer;
@@ -136,118 +136,9 @@ button {
 }
 
 button:hover {
-    background-color: #005f87;
+    background-color: #0c81b4;
 }
 
-/* Tableaux pour la page des résultats */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-table th,
-table td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-}
-
-table th {
-    background-color: #003d66;
-    color: white;
-    font-size: 1.1em;
-}
-
-table td {
-    background-color: #fff;
-    font-size: 1em;
-}
-
-table td img {
-    max-width: 50px;
-    height: auto;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-table tr:hover {
-    background-color: #f1f1f1;
-}
-
-/* Boutons spécifiques pour les actions */
-button {
-    cursor: pointer;
-}
-
-button:disabled {
-    background-color: #aaa;
-    cursor: not-allowed;
-}
-
-#searchBtn {
-    background-color: purple;
-    color: white;
-}
-
-#loadDataBtn {
-    background-color: #4CAF50; /* Vert pour Charger les données */
-    color: white;
-}
-
-#exportBtn {
-    background-color: #2196F3; /* Bleu pour Exporter vers Excel */
-    color: white;
-}
-
-#exportZipBtn {
-    background-color: #FF9800; /* Orange pour Exporter en ZIP */
-    color: white;
-}
-
-#deleteSelectedBtn {
-    background-color: #F44336; /* Rouge pour Supprimer */
-    color: white;
-}
-
-
-/* Pop-up pour afficher les images */
-#imagePopup {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-#popupContent {
-    position: relative;
-    text-align: center;
-}
-
-#popupContent img {
-    max-width: 90%;
-    max-height: 90%;
-    border: 3px solid white;
-    border-radius: 5px;
-}
-
-#closePopup {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 24px;
-    color: white;
-    cursor: pointer;
-}
 
 /* Footer */
 footer {
