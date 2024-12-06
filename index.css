@@ -5,9 +5,9 @@
     box-sizing: border-box;
 }
 
-body footer{
+body {
     overflow-x: hidden;
-padding: 0px;
+padding: 10px;
 margin: 0px;
 }
 
@@ -15,8 +15,7 @@ body{
     font-family: 'Arial', sans-serif;
     background-color: #f4f4f4;
     color: #333;
-    line-height: 1.6;
-    
+    line-height: 1.6; 
 }
 
 /* Conteneur pour le logo et le titre */
