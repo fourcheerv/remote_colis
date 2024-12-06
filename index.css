@@ -47,6 +47,7 @@ header {
 /* Section principale */
 main {
     margin-top: 20px;
+flex: 1;
 }
 
 /* Style pour les formulaires */
