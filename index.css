@@ -132,13 +132,22 @@ button:hover {
 
 
 
-/* Footer */
+/* Footer
 footer {
     display: flex;
     justify-content: center; /* Centrer le contenu horizontalement */
     align-items: center; /* Centrer le contenu verticalement */
     position: fixed;
     bottom: 0;
+    width: 100%;
+    background-color: #003d66;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    font-size: 0.9em;
+}
+*/
+footer {
     width: 100%;
     background-color: #003d66;
     color: white;
