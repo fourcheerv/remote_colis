@@ -133,7 +133,7 @@ button:hover {
 
 /* Footer */
 footer {
-    display: fixed;
+    display: flex;
     justify-content: center; /* Centrer le contenu horizontalement */
     align-items: center; /* Centrer le contenu verticalement */
     position: fixed;
