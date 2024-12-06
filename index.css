@@ -5,17 +5,14 @@
     box-sizing: border-box;
 }
 
-body {
-    overflow-x: hidden;
-padding: 10px;
-margin: 0px;
-}
-
 body{
     font-family: 'Arial', sans-serif;
     background-color: #f4f4f4;
     color: #333;
     line-height: 1.6; 
+    overflow-x: hidden;
+    padding: 10px;
+    margin: 0px;
 }
 
 /* Conteneur pour le logo et le titre */
