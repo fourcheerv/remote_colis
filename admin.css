@@ -59,20 +59,20 @@ button:hover {
     background-color: #0056b3;
 }
 
-.searchBt {
+#searchBt {
     background-color: greenyellow;
 
 }
-.searchBt:hover {
+#searchBt:hover {
     background-color: green;
 
 }
 
-.exportBtn .exportZipBtn{
+#exportBtn #exportZipBtn {
     background-color: orange;
 }
 
-.exportBtn:hover .exportZipBtn:hover{
+#exportBtn:hover #exportZipBtn:hover {
     background-color: orangered;
 }
 
