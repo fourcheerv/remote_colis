@@ -59,32 +59,39 @@ button:hover {
     background-color: #0056b3;
 }
 
-#searchBt {
-    background-color: greenyellow;
-
-}
-#searchBt:hover {
-    background-color: green;
-
+.btn-search:hover {
+    background-color: #218838; /* Vert foncé */
 }
 
-#exportBtn #exportZipBtn {
-    background-color: orange;
+/* Bouton d'export Excel */
+.btn-export-excel {
+    background-color: #007BFF; /* Bleu */
+    color: #fff;
 }
 
-#exportBtn:hover #exportZipBtn:hover {
-    background-color: orangered;
+.btn-export-excel:hover {
+    background-color: #0056b3; /* Bleu foncé */
 }
 
-#deleteSelectedBtn {
-    background-color: #dc3545;
+/* Bouton d'export ZIP */
+.btn-export-zip {
+    background-color: #ffc107; /* Jaune */
+    color: #212529;
 }
 
-#deleteSelectedBtn:hover {
-    background-color: #a71d2a;
-    color: white;
+.btn-export-zip:hover {
+    background-color: #e0a800; /* Jaune foncé */
 }
 
+/* Bouton de suppression */
+.btn-delete {
+    background-color: #dc3545; /* Rouge */
+    color: #fff;
+}
+
+.btn-delete:hover {
+    background-color: #a71d2a; /* Rouge foncé */
+}
 
 /* Tableau */
 table {
