@@ -58,6 +58,11 @@ button {
 button:hover {
     background-color: #0056b3;
 }
+/* Bouton de recherche */
+.btn-search {
+    background-color: #28a745; /* Vert */
+    color: #fff;
+}
 
 .btn-search:hover {
     background-color: #218838; /* Vert foncé */
