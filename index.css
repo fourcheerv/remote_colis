@@ -48,7 +48,7 @@ header {
 
 /* Section principale */
 main {
-    margin: 20px;
+    margin: 0;
 flex: 1;
 }
 
@@ -147,7 +147,6 @@ footer {
     text-align: center;
     padding: 10px;
     font-size: 0.9em;
-margin: 0;
 }
 
 
