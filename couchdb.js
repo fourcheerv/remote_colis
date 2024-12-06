@@ -2,18 +2,29 @@
 const localDB = new PouchDB('receptions');
 
 const remoteDB = new PouchDB('https://apikey-v2-237azo7t1nwttyu787vl2zuxfh5ywxrddnfhcujd2nbu:b7ce3f8c0a99a10c0825a4c1ff68fe62@ca3c9329-df98-4982-a3dd-ba2b294b02ef-bluemix.cloudantnosqldb.appdomain.cloud/receptions');
+//initialisation pagination
+let currentPage = 1;
+const rowsPerPage = 10; // Nombre de lignes par page
+let totalRows = 0; // Total des lignes disponibles
+
 
 // Synchronisation avec CouchDB
 localDB.sync(remoteDB, { live: true, retry: true }).on('error', console.error);
 
 // Charger les données dans le tableau
-const loadData = async () => {
+const loadData = async (page = 1) => {
     const tbody = document.querySelector("#dataTable tbody");
     tbody.innerHTML = ""; // Vider le tableau avant de recharger les données
 
     try {
         const result = await localDB.allDocs({ include_docs: true });
-        result.rows.forEach(row => {
+        totalRows = result.rows.length;
+        const startIndex = (page - 1) * rowsPerPage;
+        const endIndex = startIndex + rowsPerPage;
+
+        const paginatedRows = result.rows.slice(startIndex, endIndex);
+
+        paginatedRows.forEach(row => {
             const { _id, recipientName, receiverName, email, packageCount, deliveryDate, signature, photos } = row.doc;
 
             const tr = document.createElement("tr");
@@ -36,10 +47,21 @@ const loadData = async () => {
             `;
             tbody.appendChild(tr);
         });
+
+        updatePaginationInfo();
     } catch (error) {
         console.error("Erreur lors du chargement des données :", error);
     }
 };
+
+const updatePaginationInfo = () => {
+    const totalPages = Math.ceil(totalRows / rowsPerPage);
+    document.getElementById("pageInfo").textContent = `Page ${currentPage} sur ${totalPages}`;
+    
+    document.getElementById("prevPageBtn").disabled = currentPage === 1;
+    document.getElementById("nextPageBtn").disabled = currentPage === totalPages;
+};
+
 
 // Recherche dans le tableau
 const searchData = () => {
@@ -170,5 +192,21 @@ document.getElementById("deleteSelectedBtn").addEventListener("click", deleteSel
 document.getElementById("exportBtn").addEventListener("click", exportToExcel);
 document.getElementById("exportZipBtn").addEventListener("click", exportToZip);
 
+document.getElementById("prevPageBtn").addEventListener("click", () => {
+    if (currentPage > 1) {
+        currentPage--;
+        loadData(currentPage);
+    }
+});
+
+document.getElementById("nextPageBtn").addEventListener("click", () => {
+    const totalPages = Math.ceil(totalRows / rowsPerPage);
+    if (currentPage < totalPages) {
+        currentPage++;
+        loadData(currentPage);
+    }
+});
+
+
 // Charger les données au démarrage
-window.addEventListener("DOMContentLoaded", loadData);
+window.addEventListener("DOMContentLoaded", () => loadData(currentPage));

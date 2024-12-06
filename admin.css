@@ -140,6 +140,34 @@ a:hover {
     font-weight: bold;
 }
 
+/*pagination*/
+.pagination {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.pagination button {
+    padding: 10px 15px;
+    margin: 0 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #007BFF;
+    color: #fff;
+    font-size: 14px;
+}
+
+.pagination button:hover {
+    background-color: #0056b3;
+}
+
+.pagination span {
+    margin: 0 10px;
+    font-size: 14px;
+    color: #444;
+}
+
+
 /* Footer */
 footer {
     text-align: center;
