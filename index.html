@@ -239,7 +239,7 @@
                     alert(data.message || "Email envoyé avec succès !");
                 })
                 .catch((error) => {
-                    console.error("Erreur lors de l'envoi de l'email :", error.message);
+                    alert("Erreur lors de l'envoi de l'email :", error.message);
                     alert("Une erreur est survenue lors de l'envoi de l'email.");
                 });
             } else if (notDelivered && !email) {
