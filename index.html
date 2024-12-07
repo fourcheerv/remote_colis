@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="index.css">
     <script src="https://cdn.jsdelivr.net/npm/pouchdb@7.3.1/dist/pouchdb.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+    <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
 </head>
 <body>
     <div class="header-content">
@@ -32,6 +33,9 @@
                     <div class="email-list">
                         <label for="serviceEmails">Emails Référents par service :</label>
                         <select id="serviceEmails">
+                            <optgroup label="test seb">
+                                <option value="sebastien.pokorski@estrepublicain.fr">sebastien.pokorski@estrepublicain.fr</option>
+                            </optgroup>
                             <optgroup label="Publicité Ebra Médias">
                                 <option value="charline.visca@ebramedia.fr">charline.visca@ebramedia.fr</option>
                             </optgroup>
@@ -210,6 +214,26 @@
             imageFiles = [];
             signaturePad.clear();
         });
+        const sendEmail = async (email, docId) => {
+    try {
+        const doc = await localDB.get(docId);
+        const { subject, body } = await loadEmailTemplate(doc);
+
+        // Configurer EmailJS
+        emailjs.init("YOUR_USER_ID"); // Remplacez par votre ID utilisateur EmailJS
+        const params = {
+            to_email: email,
+            subject: subject,
+            message: body,
+        };
+
+        emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", params)
+            .then(() => alert("Email envoyé avec succès !"))
+            .catch(error => console.error("Erreur lors de l'envoi de l'email :", error));
+    } catch (error) {
+        console.error("Erreur lors de la préparation de l'email :", error);
+    }
+};
 
 
     </script>
