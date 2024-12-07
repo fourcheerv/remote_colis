@@ -180,7 +180,7 @@
                 packageCount: formData.get("packageCount"),
                 serviceEmail: document.getElementById("serviceEmails").value, // Email sélectionné
                 deliveryDate: formData.get("deliveryDate"),
-                delivered: deliveredRadio.value === "true", // Assurez-vous que la valeur est un booléen
+                delivered: deliveredRadio.value, // Assurez-vous que la valeur est un booléen 
                 signature: signaturePad.isEmpty() ? null : signaturePad.toDataURL("image/jpeg"),
                 photos: [],
             };
