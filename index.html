@@ -27,15 +27,7 @@
                 <input type="number" id="packageCount" name="packageCount" min="1" required>
                 <span id="packageCountError" class="error-message"></span>
                 <p></p>
-
-                <section class="toolbar">
-                    <input type="text" id="searchInput" placeholder="Rechercher par nom, email ou ID" />
-                    <div class="toolbar-buttons">
-                        <button id="searchBtn" class="btn-search">Rechercher</button>
-                        <button id="exportBtn" class="btn-export-excel">Exporter vers Excel</button>
-                        <button id="exportZipBtn" class="btn-export-zip">Exporter sous forme de ZIP</button>
-                        <button id="deleteSelectedBtn" class="btn-delete">Supprimer les éléments sélectionnés</button>
-                    </div>
+                
                     <div class="email-list">
                         <label for="serviceEmails">Emails Référents par service :</label>
                         <select id="serviceEmails">
@@ -53,8 +45,6 @@
                             </optgroup>
                         </select>
                     </div>
-                </section>
-                
 
                 <label for="deliveryDate">Date et Heure de réception :</label>
                 <input type="datetime-local" id="deliveryDate" name="deliveryDate" required>
