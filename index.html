@@ -136,6 +136,11 @@
         document.getElementById("packageForm").addEventListener("submit", async (event) => {
             event.preventDefault();
 
+            if (imageFiles.length === 0) {
+                alert("Veuillez ajouter au moins une photo avant de soumettre le formulaire !");
+                return;
+            }
+
             if (signaturePad.isEmpty()) {
                 alert("Veuillez fournir une signature !");
                 return;
@@ -143,7 +148,7 @@
 
             const delivered = document.querySelector('input[name="delivered"]:checked')?.value;
             if (!delivered) {
-                alert("Veuillez sélectionner si le colis a été livré ou non !");
+                alert("Veuillez sélectionner si le colis est livré ou non !");
                 return;
             }
 
