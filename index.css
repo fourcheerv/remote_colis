@@ -146,7 +146,7 @@ button:hover {
 }
 
 #serviceEmails {
-    width: 90%;
+    width: auto;
     max-width: 400px;
     padding: 10px;
     border: 1px solid #ddd;
