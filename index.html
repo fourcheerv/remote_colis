@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="index.css">
     <script src="https://cdn.jsdelivr.net/npm/pouchdb@7.3.1/dist/pouchdb.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
-    <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+    <script src="https://smtpjs.com/v3/smtp.js"></script>
 </head>
 <body>
     <div class="header-content">
@@ -223,11 +223,6 @@
             signaturePad.clear();
         });
         
-//Initialisation d'EmailJS avec la clé publique (publicKey)
-emailjs.init({
-  publicKey: 'UFlNoLfp7PdWyrBak', // Remplacez par votre propre clé publique
-});
-
 // Gestion de l'envoi d'email lorsque l'utilisateur interagit avec le formulaire
 document.getElementById("packageForm").addEventListener("change", () => {
     const email = document.getElementById("serviceEmails").value; // Récupère l'email sélectionné
@@ -238,20 +233,24 @@ document.getElementById("packageForm").addEventListener("change", () => {
         const params = {
             to_email: email,
             subject: "Notification : Colis non livré", // Sujet de l'email
-            message: "Un colis destiné à votre service n'a pas été livré.", // Contenu du message
+            message: "Un colis destiné à votre service n'a pas été livré." // Contenu du message
         };
 
-        // Envoi de l'email via EmailJS avec le service ID et le template ID
-        emailjs.send("service_email_colis", "template_email_colis", params)
-            .then(() => {
-                alert("Email envoyé avec succès !");
-            })
-            .catch((error) => {
-                console.error("Erreur lors de l'envoi de l'email :", error);
-                alert(`Erreur lors de l'envoi de l'email : ${error.text || error.message}`);
-            });
+        // Envoi de l'email
+        Email.send({
+            Host: "smtp.elasticemail.com",
+            Username: "fourches.erv@gmail.com", // Remplacer par le nom d'utilisateur
+            Password: "54AA08F61906A09EA6F19E1FF52CECC37CB3", // Remplacer par le mot de passe
+            To: params.to_email,
+            From: "fourches.erv@gmail.com", // Remplacer par l'email de l'expéditeur
+            Subject: params.subject,
+            Body: params.message
+        }).then(
+            message => alert(message) // Affiche le message de confirmation ou d'erreur
+        );
     }
 });
+
 
     </script>
 </body>
