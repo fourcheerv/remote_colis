@@ -28,33 +28,31 @@
                 <label for="packageCount">Nombre de colis :</label>
                 <input type="number" id="packageCount" name="packageCount" min="1" required>
                 <span id="packageCountError" class="error-message"></span>
-                <p></p>
-                
-                    <div class="email-list">
-                        <label for="serviceEmails">Emails Référents par service :</label>
-                        <select id="serviceEmails">
-                            <optgroup label="test seb">
-                                <option value="spokorski@gmail.com">spokorski@gmail.com</option>
-                            </optgroup>
-                            <optgroup label="Publicité Ebra Médias">
-                                <option value="charline.visca@ebramedia.fr">charline.visca@ebramedia.fr</option>
-                            </optgroup>
-                            <optgroup label="Rédaction">
-                                <option value="sandrine.florentin@estrepublicain.fr">sandrine.florentin@estrepublicain.fr</option>
-                            </optgroup>
-                            <optgroup label="Ventes">
-                                <option value="celia.dubois@estrepublicain.fr">celia.dubois@estrepublicain.fr</option>
-                            </optgroup>
-                            <optgroup label="Ebra Services">
-                                <option value="myriam.lefebvre@ebraservices.fr">myriam.lefebvre@ebraservices.fr</option>
-                            </optgroup>
-                        </select>
-                    </div>
+
+                <div class="email-list">
+                    <label for="serviceEmails">Emails Référents par service :</label>
+                    <select id="serviceEmails">
+                        <optgroup label="Test Seb">
+                            <option value="spokorski@gmail.com">spokorski@gmail.com</option>
+                        </optgroup>
+                        <optgroup label="Publicité Ebra Médias">
+                            <option value="charline.visca@ebramedia.fr">charline.visca@ebramedia.fr</option>
+                        </optgroup>
+                        <optgroup label="Rédaction">
+                            <option value="sandrine.florentin@estrepublicain.fr">sandrine.florentin@estrepublicain.fr</option>
+                        </optgroup>
+                        <optgroup label="Ventes">
+                            <option value="celia.dubois@estrepublicain.fr">celia.dubois@estrepublicain.fr</option>
+                        </optgroup>
+                        <optgroup label="Ebra Services">
+                            <option value="myriam.lefebvre@ebraservices.fr">myriam.lefebvre@ebraservices.fr</option>
+                        </optgroup>
+                    </select>
+                </div>
 
                 <label for="deliveryDate">Date et Heure de réception :</label>
                 <input type="datetime-local" id="deliveryDate" name="deliveryDate" required>
                 <span id="deliveryDateError" class="error-message"></span>
-                <p></p>
 
                 <label for="fileUpload">Prendre une photo :</label>
                 <input type="file" id="fileUpload" accept="image/*" capture="camera">
@@ -86,14 +84,13 @@
     </main>
     <footer>
         <p>&copy; 2024 Gestion des Colis</p>
- </footer>
+    </footer>
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
     <script>
         // Initialisation de PouchDB
         const localDB = new PouchDB('receptions');
         const remoteDB = new PouchDB('https://apikey-v2-237azo7t1nwttyu787vl2zuxfh5ywxrddnfhcujd2nbu:b7ce3f8c0a99a10c0825a4c1ff68fe62@ca3c9329-df98-4982-a3dd-ba2b294b02ef-bluemix.cloudantnosqldb.appdomain.cloud/receptions');
 
-        // Synchronisation avec CouchDB
         localDB.sync(remoteDB, {
             live: true,
             retry: true
@@ -108,9 +105,9 @@
             backgroundColor: '#fff',
         });
 
-        let imageFiles = []; // Stockage temporaire des images compressées
+        let imageFiles = [];
 
-        // Compression des images avant stockage
+        // Compression des images
         function compresserImage(file, callback) {
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -157,20 +154,17 @@
         document.getElementById("packageForm").addEventListener("submit", async (event) => {
             event.preventDefault();
 
-            // Vérification si au moins une photo a été ajoutée
             if (imageFiles.length === 0) {
                 alert("Veuillez ajouter au moins une photo avant de sauvegarder !");
                 return;
             }
 
             const formData = new FormData(event.target);
-
-            const deliveredRadio = document.querySelector('input[name="delivered"]:checked'); // Récupère l'option sélectionnée (Oui/Non)
-
+            const deliveredRadio = document.querySelector('input[name="delivered"]:checked');
 
             if (!deliveredRadio) {
-        alert("Veuillez sélectionner si le colis a été livré (Oui/Non) !");
-        return;
+                alert("Veuillez sélectionner si le colis a été livré !");
+                return;
             }
 
             const data = {
@@ -178,20 +172,18 @@
                 recipientName: formData.get("recipientName"),
                 receiverName: formData.get("receiverName"),
                 packageCount: formData.get("packageCount"),
-                serviceEmail: document.getElementById("serviceEmails").value, // Email sélectionné
+                serviceEmail: document.getElementById("serviceEmails").value,
                 deliveryDate: formData.get("deliveryDate"),
-                delivered: deliveredRadio.value, 
+                delivered: deliveredRadio.value,
                 signature: signaturePad.isEmpty() ? null : signaturePad.toDataURL("image/jpeg"),
                 photos: [],
             };
-            
-            // Vérification si une signature est présente
+
             if (!data.signature) {
                 alert("Veuillez fournir une signature !");
                 return;
             }
 
-            // Conversion des fichiers d'images en base64
             for (let file of imageFiles) {
                 const dataURL = await new Promise((resolve) => {
                     const reader = new FileReader();
@@ -201,7 +193,6 @@
                 data.photos.push(dataURL);
             }
 
-            // Sauvegarde des données dans la base de données locale
             try {
                 await localDB.put(data);
                 alert("Données sauvegardées et synchronisées !");
@@ -222,55 +213,36 @@
             imageFiles = [];
             signaturePad.clear();
         });
-        
-        document.addEventListener("DOMContentLoaded", () => {
 
-// Fonction pour envoyer un email via SendGrid
+        document.getElementById("packageForm").addEventListener("change", () => {
+            const email = document.getElementById("serviceEmails").value;
+            const notDelivered = document.getElementById("falseRadio").checked;
 
-document.getElementById("packageForm").addEventListener("change", () => {
-    const email = document.getElementById("serviceEmails").value; // Récupère l'email sélectionné
-    const notDelivered = document.getElementById("falseRadio").checked; // Vérifie si "Colis non livré" est coché
+            if (email && notDelivered) {
+                const emailData = {
+                    toEmail: email,
+                    subject: "Notification : Colis non livré",
+                    message: "Un colis destiné à votre service n'a pas été livré.",
+                };
 
-    if (email && notDelivered) {
-        // Préparer les données pour envoyer à la Cloud Function
-        const emailData = {
-            toEmail: email,
-            subject: "Notification : Colis non livré",
-            message: "Un colis destiné à votre service n'a pas été livré.",
-        };
-
-        // Appeler la Cloud Function
-        fetch("https://europe-west9-asymmetric-cove-308719.cloudfunctions.net/sendEmailFunction", {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json",
-    },
-    body: JSON.stringify(emailData),
-})
-    .then((response) => {
-        if (!response.ok) {
-            throw new Error(`Erreur HTTP ${response.status}: ${response.statusText}`);
-        }
-        return response.json();
-    })
-    .then((data) => {
-        alert(data.message || "Email envoyé avec succès !");
-    })
-    .catch((error) => {
-        console.error("Erreur lors de l'envoi de l'email :", error);
-        alert("Une erreur réseau est survenue ou l'email n'a pas pu être envoyé.");
-    });
-
-
-    // Gestion du bouton "Soumettre" (par exemple pour d'autres validations)
-    packageForm.addEventListener("submit", (event) => {
-        event.preventDefault(); // Empêche l'envoi classique du formulaire
-        alert("Formulaire soumis !");
-    });
-});
-
-
-
+                fetch("https://europe-west9-asymmetric-cove-308719.cloudfunctions.net/sendEmailFunction", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(emailData),
+                })
+                .then((response) => {
+                    if (!response.ok) throw new Error(`Erreur HTTP ${response.status}: ${response.statusText}`);
+                    return response.json();
+                })
+                .then((data) => {
+                    alert(data.message || "Email envoyé avec succès !");
+                })
+                .catch((error) => {
+                    console.error("Erreur lors de l'envoi de l'email :", error);
+                    alert("Une erreur est survenue lors de l'envoi de l'email.");
+                });
+            }
+        });
     </script>
 </body>
 </html>
