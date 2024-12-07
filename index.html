@@ -226,47 +226,41 @@
         document.addEventListener("DOMContentLoaded", () => {
 
 // Fonction pour envoyer un email via SendGrid
-async function sendEmailWithSendGrid(toEmail, subject, message) {
-    const ""; // Remplacez par votre clé API SendGrid
-    const url = "https://api.sendgrid.com/v3/mail/send";
 
-    // Préparer les données de l'email
-    const emailData = {
-        personalizations: [{
-            to: [{ email: toEmail }],
-            subject: subject
-        }],
-        from: { email: "spokorski@gmail.com" }, // Remplacez par votre adresse email d'envoi validée sur SendGrid
-        content: [{
-            type: "text/plain",
-            value: message
-        }]
-    };
+document.getElementById("packageForm").addEventListener("change", () => {
+    const email = document.getElementById("serviceEmails").value; // Récupère l'email sélectionné
+    const notDelivered = document.getElementById("falseRadio").checked; // Vérifie si "Colis non livré" est coché
 
-    try {
-        // Envoyer la requête POST à l'API SendGrid
-        const response = await fetch(url, {
+    if (email && notDelivered) {
+        // Préparer les données pour envoyer à la Cloud Function
+        const emailData = {
+            toEmail: email,
+            subject: "Notification : Colis non livré",
+            message: "Un colis destiné à votre service n'a pas été livré.",
+        };
+
+        // Appeler la Cloud Function
+        fetch("https://<URL_DE_LA_CLOUD_FUNCTION>", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${apiKey}`
             },
-            body: JSON.stringify(emailData)
-        });
-
-        // Gérer la réponse
-        if (response.ok) {
-            alert("Email envoyé avec succès !");
-        } else {
-            const errorText = await response.text();
-            console.error("Erreur lors de l'envoi de l'email :", errorText);
-            alert("Une erreur est survenue lors de l'envoi de l'email.");
-        }
-    } catch (error) {
-        console.error("Erreur réseau :", error);
-        alert("Erreur réseau lors de l'envoi de l'email.");
+            body: JSON.stringify(emailData),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.message) {
+                    alert(data.message);
+                } else {
+                    alert("Erreur lors de l'envoi de l'email.");
+                }
+            })
+            .catch((error) => {
+                console.error("Erreur réseau :", error);
+                alert("Une erreur réseau est survenue.");
+            });
     }
-}
+});
 
 // Gestion de l'envoi d'email lorsque l'utilisateur interagit avec le formulaire
 document.getElementById("packageForm").addEventListener("change", () => {
