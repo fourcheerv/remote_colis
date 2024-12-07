@@ -165,6 +165,14 @@
 
             const formData = new FormData(event.target);
 
+            const deliveredRadio = document.querySelector('input[name="delivered"]:checked'); // Récupère l'option sélectionnée (Oui/Non)
+
+
+            if (!deliveredRadio) {
+        alert("Veuillez sélectionner si le colis a été livré (Oui/Non) !");
+        return;
+            }
+
             const data = {
                 _id: new Date().toISOString(),
                 recipientName: formData.get("recipientName"),
@@ -172,11 +180,11 @@
                 packageCount: formData.get("packageCount"),
                 serviceEmail: document.getElementById("serviceEmails").value, // Email sélectionné
                 deliveryDate: formData.get("deliveryDate"),
-                delivered: formData.get("delivered"),
+                delivered: deliveredRadio.value === "true", // Assurez-vous que la valeur est un booléen
                 signature: signaturePad.isEmpty() ? null : signaturePad.toDataURL("image/jpeg"),
                 photos: [],
             };
-
+            
             // Vérification si une signature est présente
             if (!data.signature) {
                 alert("Veuillez fournir une signature !");

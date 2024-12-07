@@ -25,7 +25,7 @@ const loadData = async (page = 1) => {
         const paginatedRows = result.rows.slice(startIndex, endIndex);
 
         paginatedRows.forEach(row => {
-            const { _id, recipientName, receiverName, serviceEmail, packageCount, deliveryDate, signature, photos } = row.doc;
+            const { _id, recipientName, receiverName, serviceEmail, packageCount, deliveryDate, signature, photos, delivered } = row.doc;
 
             const tr = document.createElement("tr");
             tr.innerHTML = `
@@ -44,6 +44,8 @@ const loadData = async (page = 1) => {
                         .map(photo => `<img src="${photo}" alt="Photo" class="table-img" onclick="showImage('${photo}')">`)
                         .join("") || "Aucune"}
                 </td>
+                <td>${delivered ? (delivered === "true" ? "Oui" : "Non") : "Non défini"}</td>
+
             `;
             tbody.appendChild(tr);
         });
@@ -142,6 +144,7 @@ const exportToExcel = async () => {
                         serviceEmail: item.serviceEmail,
                         packageCount: item.packageCount,
                         deliveryDate: item.deliveryDate,
+                        delivered: item.delivered,
                     };
                     folder.file("info.json", JSON.stringify(jsonContent, null, 2));
 
