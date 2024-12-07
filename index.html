@@ -223,6 +223,7 @@
                     subject: "Notification : Colis non livré",
                     message: "Un colis destiné à votre service n'a pas été livré.",
                 };
+                console.log("Données de l'email envoyées :", emailData);
 
                 fetch("https://europe-west9-asymmetric-cove-308719.cloudfunctions.net/sendEmailFunction", {
                     method: "POST",
