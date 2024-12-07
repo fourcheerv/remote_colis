@@ -240,27 +240,27 @@ document.getElementById("packageForm").addEventListener("change", () => {
         };
 
         // Appeler la Cloud Function
-        fetch("https://europe-west9-asymmetric-cove-308719.cloudfunctions.net/sendEmailFunction", {
+         fetch("https://europe-west9-asymmetric-cove-308719.cloudfunctions.net/sendEmailFunction", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify(emailData),
         })
-            .then((response) => response.json())
-            .then((data) => {
-                if (data.message) {
-                    alert(data.message);
-                } else {
-                    alert("Erreur lors de l'envoi de l'email.");
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`Erreur HTTP ${response.status}: ${response.statusText}`);
                 }
+                return response.json();
+            })
+            .then((data) => {
+                alert(data.message || "Email envoyé avec succès !");
             })
             .catch((error) => {
-                console.error("Erreur réseau :", error);
-                alert("Une erreur réseau est survenue.");
+                console.error("Erreur lors de l'envoi de l'email :", error);
+                alert("Une erreur réseau est survenue ou l'email n'a pas pu être envoyé.");
             });
-    }
-});
+
 
     // Gestion du bouton "Soumettre" (par exemple pour d'autres validations)
     packageForm.addEventListener("submit", (event) => {
