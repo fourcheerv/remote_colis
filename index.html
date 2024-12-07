@@ -173,7 +173,7 @@
                 packageCount: document.getElementById("packageCount").value,
                 serviceEmail: document.getElementById("serviceEmails").value,
                 deliveryDate: document.getElementById("deliveryDate").value,
-                delivered: deliveredRadio.value, 
+                delivered,
                 signature: signaturePad.toDataURL("image/jpeg"),
                 photos: imageFiles.map((file) => URL.createObjectURL(file)),
             };
