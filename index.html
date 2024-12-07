@@ -215,59 +215,6 @@
             signaturePad.clear();
         });
 
-// Gestion de l'envoi d'email avec SendGrid
-/*async function sendEmailWithSendGrid(toEmail, subject, message) {
-            const apiKey = ""; // Remplacez par votre clé API SendGrid
-            const url = "https://api.sendgrid.com/v3/mail/send";
-
-            const emailData = {
-                personalizations: [{
-                    to: [{ email: toEmail }],
-                    subject: subject
-                }],
-                from: { email: "sebastien.pokorski@estrepublicain.fr" }, // Remplacez par votre adresse d'envoi
-                content: [{
-                    type: "text/plain",
-                    value: message
-                }]
-            };
-
-            try {
-                const response = await fetch(url, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${apiKey}`
-                    },
-                    body: JSON.stringify(emailData)
-                });
-
-                if (response.ok) {
-                    alert("Email envoyé avec succès !");
-                } else {
-                    console.error("Erreur lors de l'envoi de l'email :", await response.text());
-                    alert("Une erreur est survenue lors de l'envoi de l'email.");
-                }
-            } catch (error) {
-                console.error("Erreur réseau :", error);
-                alert("Erreur réseau lors de l'envoi de l'email.");
-            }
-        }
-
-        document.getElementById("packageForm").addEventListener("change", () => {
-            const email = document.getElementById("serviceEmails").value;
-            const notDelivered = document.getElementById("falseRadio").checked;
-
-            if (email && notDelivered) {
-                sendEmailWithSendGrid(
-                    email,
-                    "Notification : Colis non livré",
-                    "Un colis destiné à votre service n'a pas été livré."
-                );
-            }
-        });
-*/
-
 // Gestion d'email avec EmailJS
 emailjs.init("luubZPEqp5DJPadPW"); // Remplacez par votre User ID EmailJS
 
