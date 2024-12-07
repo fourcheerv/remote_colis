@@ -217,12 +217,13 @@
             const email = document.getElementById("serviceEmails").value;
             const notDelivered = document.getElementById("falseRadio").checked;
 
-            if (email && notDelivered) {
+            if (notDelivered && email) {
                 const emailData = {
                     toEmail: email,
                     subject: "Notification : Colis non livré",
                     message: "Un colis destiné à votre service n'a pas été livré.",
                 };
+
                 console.log("Données de l'email envoyées :", emailData);
 
                 fetch("https://europe-west9-asymmetric-cove-308719.cloudfunctions.net/sendEmailFunction", {
@@ -238,9 +239,11 @@
                     alert(data.message || "Email envoyé avec succès !");
                 })
                 .catch((error) => {
-                    console.error("Erreur lors de l'envoi de l'email :", error);
+                    console.error("Erreur lors de l'envoi de l'email :", error.message);
                     alert("Une erreur est survenue lors de l'envoi de l'email.");
                 });
+            } else if (notDelivered && !email) {
+                alert("Veuillez sélectionner un email pour envoyer la notification.");
             }
         });
     </script>
