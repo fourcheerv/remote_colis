@@ -5,12 +5,14 @@
     box-sizing: border-box;
 }
 
-body {
+body{
     font-family: 'Arial', sans-serif;
     background-color: #f4f4f4;
     color: #333;
-    line-height: 1.6;
-    padding: 20px;
+    line-height: 1.6; 
+    overflow-x: hidden;
+    padding: 0px;
+    margin: 0px;
 }
 
 /* Conteneur pour le logo et le titre */
@@ -46,7 +48,8 @@ header {
 
 /* Section principale */
 main {
-    margin-top: 20px;
+    margin: 0;
+flex: 1;
 }
 
 /* Style pour les formulaires */
@@ -151,7 +154,7 @@ button:hover {
     font-size: 14px;
 }
 
-/* Footer */
+/* Footer*/
 footer {
     display: flex;
     justify-content: center; /* Centrer le contenu horizontalement */
@@ -165,6 +168,7 @@ footer {
     padding: 10px;
     font-size: 0.9em;
 }
+
 
 /* Responsive Design */
 
