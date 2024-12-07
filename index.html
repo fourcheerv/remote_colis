@@ -165,7 +165,7 @@
                 recipientName: formData.get("recipientName"),
                 receiverName: formData.get("receiverName"),
                 packageCount: formData.get("packageCount"),
-                email: formData.get("email"),
+                serviceEmail: document.getElementById("serviceEmails").value, // Email sélectionné
                 deliveryDate: formData.get("deliveryDate"),
                 delivered: formData.get("delivered"),
                 signature: signaturePad.isEmpty() ? null : signaturePad.toDataURL("image/jpeg"),
