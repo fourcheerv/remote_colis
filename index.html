@@ -26,12 +26,26 @@
                 <label for="packageCount">Nombre de colis :</label>
                 <input type="number" id="packageCount" name="packageCount" min="1" required>
 
-                <label for="serviceEmails">Emails Référents par service :</label>
-                <select id="serviceEmails" required>
-                    <option value="" disabled selected>Sélectionnez un email</option>
-                    <option value="spokorski@gmail.com">spokorski@gmail.com</option>
-                    <option value="charline.visca@ebramedia.fr">charline.visca@ebramedia.fr</option>
-                </select>
+                <div class="email-list">
+                    <label for="serviceEmails">Emails Référents par service :</label>
+                    <select id="serviceEmails">
+                        <optgroup label="test seb">
+                            <option value="spokorski@gmail.com">spokorski@gmail.com</option>
+                        </optgroup>
+                        <optgroup label="Publicité Ebra Médias">
+                            <option value="charline.visca@ebramedia.fr">charline.visca@ebramedia.fr</option>
+                        </optgroup>
+                        <optgroup label="Rédaction">
+                            <option value="sandrine.florentin@estrepublicain.fr">sandrine.florentin@estrepublicain.fr</option>
+                        </optgroup>
+                        <optgroup label="Ventes">
+                            <option value="celia.dubois@estrepublicain.fr">celia.dubois@estrepublicain.fr</option>
+                        </optgroup>
+                        <optgroup label="Ebra Services">
+                            <option value="myriam.lefebvre@ebraservices.fr">myriam.lefebvre@ebraservices.fr</option>
+                        </optgroup>
+                    </select>
+                </div>
 
                 <label for="deliveryDate">Date et Heure de réception :</label>
                 <input type="datetime-local" id="deliveryDate" name="deliveryDate" required>
