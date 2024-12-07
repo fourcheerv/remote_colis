@@ -223,33 +223,59 @@
             signaturePad.clear();
         });
         
-// Gestion de l'envoi d'email lorsque l'utilisateur interagit avec le formulaire
-document.getElementById("packageForm").addEventListener("change", () => {
-    const email = document.getElementById("serviceEmails").value; // Récupère l'email sélectionné
-    const notDelivered = document.getElementById("falseRadio").checked; // Vérifie si "Colis non livré" est coché
+        document.addEventListener("DOMContentLoaded", () => {
+    // Récupérer les éléments nécessaires
+    const packageForm = document.getElementById("packageForm");
+    const serviceEmails = document.getElementById("serviceEmails");
+    const falseRadio = document.getElementById("falseRadio");
 
-    if (email && notDelivered) {
-        // Préparer les paramètres pour l'envoi de l'email
-        const params = {
-            to_email: email,
-            subject: "Notification : Colis non livré", // Sujet de l'email
-            message: "Un colis destiné à votre service n'a pas été livré." // Contenu du message
-        };
+    // Gestion du changement dans le formulaire
+    packageForm.addEventListener("change", () => {
+        const email = serviceEmails.value; // Récupère l'email sélectionné
+        const notDelivered = falseRadio.checked; // Vérifie si "Colis non livré" est coché
 
-        // Envoi de l'email
-        Email.send({
-            Host: "smtp.elasticemail.com",
-            Username: "fourches.erv@gmail.com", // Remplacer par le nom d'utilisateur
-            Password: "54AA08F61906A09EA6F19E1FF52CECC37CB3", // Remplacer par le mot de passe
-            To: params.to_email,
-            From: "fourches.erv@gmail.com", // Remplacer par l'email de l'expéditeur
-            Subject: params.subject,
-            Body: params.message
-        }).then(
-            message => alert(message) // Affiche le message de confirmation ou d'erreur
-        );
-    }
+        if (email && notDelivered) {
+            // Préparer les paramètres pour l'envoi de l'email
+            const params = {
+                to_email: email,
+                subject: "Notification : Colis non livré",
+                message: "Un colis destiné à votre service n'a pas été livré."
+            };
+
+            // Envoi de l'email via SMTP.js
+            Email.send({
+                Host: "smtp.elasticemail.com", // Hôte SMTP
+                Username: "fourches.erv@gmail.com", // Remplacez par votre email Elastic Email
+                Password: "54AA08F61906A09EA6F19E1FF52CECC37CB3", // Remplacez par votre clé API Elastic Email
+                To: params.to_email, // Email du destinataire
+                From: "fourches.erv@gmail.com", // Email de l'expéditeur
+                Subject: params.subject, // Sujet de l'email
+                Body: params.message // Corps du message
+            }).then(
+                (message) => {
+                    // Vérification du succès
+                    if (message === "OK") {
+                        alert("Email envoyé avec succès !");
+                    } else {
+                        console.error("Erreur SMTPJS :", message);
+                        alert("Échec de l'envoi de l'email. Vérifiez les logs.");
+                    }
+                }
+            ).catch((error) => {
+                // Gestion des erreurs
+                console.error("Erreur SMTPJS :", error);
+                alert("Une erreur est survenue lors de l'envoi de l'email.");
+            });
+        }
+    });
+
+    // Gestion du bouton "Soumettre" (par exemple pour d'autres validations)
+    packageForm.addEventListener("submit", (event) => {
+        event.preventDefault(); // Empêche l'envoi classique du formulaire
+        alert("Formulaire soumis !");
+    });
 });
+
 
 
     </script>
