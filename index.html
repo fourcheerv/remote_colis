@@ -240,7 +240,7 @@ document.getElementById("packageForm").addEventListener("change", () => {
         };
 
         // Appeler la Cloud Function
-        fetch("https://<URL_DE_LA_CLOUD_FUNCTION>", {
+        fetch("https://europe-west9-asymmetric-cove-308719.cloudfunctions.net/sendEmailFunction", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
