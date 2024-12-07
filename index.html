@@ -214,39 +214,35 @@
             imageFiles = [];
             signaturePad.clear();
         });
-
-// Gestion d'email avec EmailJS
+        
+// Initialisation d'EmailJS avec la clé publique (publicKey)
 emailjs.init({
-  publicKey: 'luubZPEqp5DJPadPW',
-  // Do not allow headless browsers
-  blockHeadless: true,
+  publicKey: 'luubZPEqp5DJPadPW', // Remplacez par votre propre clé publique
+  blockHeadless: true, // Bloque les navigateurs sans interface utilisateur
   blockList: {
-    // Block the suspended emails
-    list: ['foo@emailjs.com', 'bar@emailjs.com'],
-    // The variable contains the email address
-    watchVariable: 'userEmail',
+    list: ['foo@emailjs.com', 'bar@emailjs.com'], // Liste d'emails bloqués
+    watchVariable: 'userEmail', // Variable contenant l'email à surveiller
   },
   limitRate: {
-    // Set the limit rate for the application
-    id: 'app',
-    // Allow 1 request per 10s
-    throttle: 10000,
+    id: 'app', // ID de l'application pour limiter les requêtes
+    throttle: 10000, // Limite d'une requête par 10 secondes
   },
 });
 
-// Gestion de l'envoi d'email
+// Gestion de l'envoi d'email lorsque l'utilisateur interagit avec le formulaire
 document.getElementById("packageForm").addEventListener("change", () => {
-    const email = document.getElementById("serviceEmails").value;
-    const notDelivered = document.getElementById("falseRadio").checked;
+    const email = document.getElementById("serviceEmails").value; // Récupère l'email sélectionné
+    const notDelivered = document.getElementById("falseRadio").checked; // Vérifie si "Colis non livré" est coché
 
     if (email && notDelivered) {
-        // Préparer et envoyer l'email
+        // Préparer les paramètres pour l'envoi de l'email
         const params = {
             to_email: email,
-            subject: "Notification : Colis non livré",
-            message: "Un colis destiné à votre service n'a pas été livré.",
+            subject: "Notification : Colis non livré", // Sujet de l'email
+            message: "Un colis destiné à votre service n'a pas été livré.", // Contenu du message
         };
 
+        // Envoi de l'email via EmailJS avec le service ID et le template ID
         emailjs.send("service_email_colis", "template_email_colis", params)
             .then(() => {
                 alert("Email envoyé avec succès !");
