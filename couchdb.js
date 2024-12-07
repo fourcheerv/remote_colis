@@ -25,7 +25,7 @@ const loadData = async (page = 1) => {
         const paginatedRows = result.rows.slice(startIndex, endIndex);
 
         paginatedRows.forEach(row => {
-            const { _id, recipientName, receiverName, email, packageCount, deliveryDate, signature, photos } = row.doc;
+            const { _id, recipientName, receiverName, serviceEmail, packageCount, deliveryDate, signature, photos } = row.doc;
 
             const tr = document.createElement("tr");
             tr.innerHTML = `
@@ -33,7 +33,7 @@ const loadData = async (page = 1) => {
                 <td>${_id}</td>
                 <td>${recipientName || "N/A"}</td>
                 <td>${receiverName || "N/A"}</td>
-                <td>${email || "N/A"}</td>
+                <td>${serviceEmail || "N/A"}</td>
                 <td>${packageCount || 0}</td>
                 <td>${deliveryDate || "Non défini"}</td>
                 <td>
@@ -106,7 +106,7 @@ const exportToExcel = async () => {
             ID: row.doc._id,
             Destinataire: row.doc.recipientName || "N/A",
             Réceptionnaire: row.doc.receiverName || "N/A",
-            Email: row.doc.email || "N/A",
+            Email: row.doc.serviceEmail || "N/A",
             "Nombre de colis": row.doc.packageCount || 0,
             "Date de réception": row.doc.deliveryDate || "Non défini"
         }));
@@ -139,7 +139,7 @@ const exportToExcel = async () => {
                         id: item._id,
                         recipientName: item.recipientName,
                         receiverName: item.receiverName,
-                        email: item.email,
+                        serviceEmail: item.serviceEmail,
                         packageCount: item.packageCount,
                         deliveryDate: item.deliveryDate,
                     };
