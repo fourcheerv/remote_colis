@@ -129,7 +129,27 @@ button:hover {
     background-color: orangered;
 }
 
+/* Conteneur pour la liste d'emails */
+.email-list {
+    margin: 15px auto;
+    text-align: center;
+}
 
+.email-list label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #444;
+}
+
+#serviceEmails {
+    width: 90%;
+    max-width: 400px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+}
 
 /* Footer */
 footer {
