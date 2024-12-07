@@ -180,7 +180,7 @@
                 packageCount: formData.get("packageCount"),
                 serviceEmail: document.getElementById("serviceEmails").value, // Email sélectionné
                 deliveryDate: formData.get("deliveryDate"),
-                delivered: deliveredRadio.value, // Assurez-vous que la valeur est un booléen 
+                delivered: deliveredRadio.value, 
                 signature: signaturePad.isEmpty() ? null : signaturePad.toDataURL("image/jpeg"),
                 photos: [],
             };
@@ -226,15 +226,6 @@
 // Initialisation d'EmailJS avec la clé publique (publicKey)
 emailjs.init({
   publicKey: 'luubZPEqp5DJPadPW', // Remplacez par votre propre clé publique
-  blockHeadless: true, // Bloque les navigateurs sans interface utilisateur
-  blockList: {
-    list: ['foo@emailjs.com', 'bar@emailjs.com'], // Liste d'emails bloqués
-    watchVariable: 'userEmail', // Variable contenant l'email à surveiller
-  },
-  limitRate: {
-    id: 'app', // ID de l'application pour limiter les requêtes
-    throttle: 10000, // Limite d'une requête par 10 secondes
-  },
 });
 
 // Gestion de l'envoi d'email lorsque l'utilisateur interagit avec le formulaire
@@ -257,7 +248,7 @@ document.getElementById("packageForm").addEventListener("change", () => {
             })
             .catch((error) => {
                 console.error("Erreur lors de l'envoi de l'email :", error);
-                alert("Une erreur est survenue lors de l'envoi de l'email.");
+                alert(`Erreur lors de l'envoi de l'email : ${error.text || error.message}`);
             });
     }
 });
