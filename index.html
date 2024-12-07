@@ -262,20 +262,6 @@ document.getElementById("packageForm").addEventListener("change", () => {
     }
 });
 
-// Gestion de l'envoi d'email lorsque l'utilisateur interagit avec le formulaire
-document.getElementById("packageForm").addEventListener("change", () => {
-    const email = document.getElementById("serviceEmails").value; // Récupère l'email sélectionné
-    const notDelivered = document.getElementById("falseRadio").checked; // Vérifie si "Colis non livré" est coché
-
-    if (email && notDelivered) {
-        // Préparer et envoyer l'email avec SendGrid
-        sendEmailWithSendGrid(
-            email,
-            "Notification : Colis non livré", // Sujet de l'email
-            "Un colis destiné à votre service n'a pas été livré." // Contenu du message
-        );
-    }
-});
     // Gestion du bouton "Soumettre" (par exemple pour d'autres validations)
     packageForm.addEventListener("submit", (event) => {
         event.preventDefault(); // Empêche l'envoi classique du formulaire
