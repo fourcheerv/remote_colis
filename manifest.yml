@@ -1,0 +1,6 @@
+applications:
+  - name: sendgrid-email-service
+    memory: 256M
+    buildpack: nodejs_buildpack
+    env:
+    SENDGRID_API_KEY: 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
