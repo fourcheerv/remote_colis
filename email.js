@@ -1,34 +1,39 @@
-//envoi email
-document.getElementById("packageForm").addEventListener("change", () => {
-    const email = document.getElementById("serviceEmails").value;
-    const notDelivered = document.getElementById("falseRadio").checked;
+document.getElementById("packageForm").addEventListener("submit", (event) => {
+    event.preventDefault();
 
-    if (notDelivered && email) {
-        const emailData = {
-            toEmail: email,
-            subject: "Notification : Colis non livré",
-            message: "Un colis destiné à votre service n'a pas été livré.",
-        };
+    // Récupération des valeurs du formulaire
+    const recipientName = document.getElementById("recipientName").value;
+    const receiverName = document.getElementById("receiverName").value;
+    const packageCount = document.getElementById("packageCount").value;
+    const deliveryDate = document.getElementById("deliveryDate").value;
+    const serviceEmail = document.getElementById("serviceEmails").value;
+    const delivered = document.querySelector('input[name="delivered"]:checked').value;
 
-        console.log("Données de l'email envoyées :", emailData);
+    // Données à envoyer au backend
+    const emailData = {
+        recipientName,
+        receiverName,
+        packageCount,
+        deliveryDate,
+        serviceEmail,
+        delivered,
+    };
 
-        fetch("https://europe-west9-asymmetric-cove-308719.cloudfunctions.net/sendEmailFunction", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(emailData),
-        })
-        .then((response) => {
-            if (!response.ok) throw new Error(`Erreur HTTP ${response.status}: ${response.statusText}`);
-            return response.json();
-        })
-        .then((data) => {
-            alert(data.message || "Email envoyé avec succès !");
-        })
-        .catch((error) => {
-            alert("Erreur lors de l'envoi de l'email :", error.message);
-            alert("Une erreur est survenue lors de l'envoi de l'email.");
-        });
-    } else if (notDelivered && !email) {
-        alert("Veuillez sélectionner un email pour envoyer la notification.");
-    }
+    // Appel à l'API backend
+    fetch("https://votre-backend-url/send-email", { // Remplacez par l'URL de votre backend
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(emailData),
+    })
+    .then((response) => {
+        if (!response.ok) throw new Error("Erreur lors de l'envoi de l'email.");
+        return response.json();
+    })
+    .then((data) => {
+        alert(data.message || "Email envoyé avec succès !");
+    })
+    .catch((error) => {
+        console.error("Erreur :", error);
+        alert("Une erreur est survenue.");
+    });
 });
