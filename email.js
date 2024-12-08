@@ -20,7 +20,7 @@ document.getElementById("packageForm").addEventListener("submit", (event) => {
     };
 
     // Appel à l'API backend
-    fetch("https://votre-backend-url/send-email", { // Remplacez par l'URL de votre backend
+    fetch("http://localhost:3000/send-email", { // Remplacez par l'URL de votre backend
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(emailData),
