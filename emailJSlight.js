@@ -35,8 +35,8 @@ document.getElementById("packageForm").addEventListener("submit", async (event) 
 
             alert("Email envoyé avec succès !");
         } catch (error) {
-            console.error('Erreur lors de l\'envoi de l\'email :', error);
-            alert("Une erreur est survenue lors de l'envoi de l'email.");
+            console.error('Erreur lors de l\'envoi de l\'email :', JSON.stringify(error, null, 2));
+            alert(`Une erreur est survenue lors de l'envoi de l'email : ${error.text || error.message || 'Erreur inconnue'}`);
         }
     }
 });
