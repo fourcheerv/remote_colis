@@ -34,9 +34,23 @@ document.getElementById("packageForm").addEventListener("submit", async (event) 
             });
 
             alert("Email envoyé avec succès !");
-        } catch (error) {
-            console.error('Erreur lors de l\'envoi de l\'email :', error);
-            alert("Une erreur est survenue lors de l'envoi de l'email.");
-        }
+     } catch (error) {
+    // Affiche l'erreur complète dans la console
+    console.error('Erreur lors de l\'envoi de l\'email :', error);
+    
+    // Tente d'afficher le message d'erreur dans la fenêtre d'alerte
+    let errorMessage = "Une erreur est survenue lors de l'envoi de l'email.";
+    
+    // Si l'erreur contient un message ou des détails, on l'affiche
+    if (error && error.text) {
+        errorMessage += `\nDétails de l'erreur : ${error.text}`;
+    } else if (error && error.message) {
+        errorMessage += `\nDétails de l'erreur : ${error.message}`;
+    } else if (typeof error === 'string') {
+        errorMessage += `\nDétails de l'erreur : ${error}`;
     }
+
+    // Affiche l'erreur au complet dans l'alerte
+    alert(errorMessage);
+}
 });
