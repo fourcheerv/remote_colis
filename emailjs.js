@@ -30,7 +30,7 @@ document.getElementById("packageForm").addEventListener("submit", async (event) 
                 serviceEmail: serviceEmail,
                 recipientName: recipientName,
                 packageCount: packageCount,
-                message: "Le colis n'a pas été livré.",
+                message: "Le colis n'a pas été livré. Merci de prévoir un rendez vous pour le relever dans notre service au quai papier RDC",
             });
 
             alert("Email envoyé avec succès !");
