@@ -14,8 +14,8 @@ document.getElementById("packageForm").addEventListener("submit", async (event) 
 
         try {
             // Remplir avec vos clés EmailJS
-            emailjs.init("YOUR_USER_ID");
-            await emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
+            emailjs.init("UFlNoLfp7PdWyrBak");
+            await emailjs.send("service_colis_smtp", "template_colis", {
                 serviceEmail: serviceEmail,
                 recipientName: recipientName,
                 packageCount: packageCount,
