@@ -20,7 +20,10 @@ document.getElementById("packageForm").addEventListener("submit", async (event) 
 
         try {
             // Initialiser EmailJS avec votre User ID
-            emailjs.init("UFlNoLfp7PdWyrBak"); // Remplacez par votre User ID
+     
+emailjs.init({
+        publicKey: "UFlNoLfp7PdWyrBak",
+      });
 
             // Affichage d'un message de chargement (facultatif)
             alert("Envoi de l'e-mail en cours...");
