@@ -12,18 +12,30 @@ document.getElementById("packageForm").addEventListener("submit", async (event) 
         const recipientName = document.getElementById("recipientName").value;
         const packageCount = document.getElementById("packageCount").value;
 
+        // Vérification que tous les champs sont remplis
+        if (!serviceEmail || !recipientName || !packageCount) {
+            alert("Veuillez remplir tous les champs !");
+            return;
+        }
+
         try {
-            // Remplir avec vos clés EmailJS
-            emailjs.init("UFlNoLfp7PdWyrBak");
+            // Initialiser EmailJS avec votre User ID
+            emailjs.init("UFlNoLfp7PdWyrBak"); // Remplacez par votre User ID
+
+            // Affichage d'un message de chargement (facultatif)
+            alert("Envoi de l'e-mail en cours...");
+
+            // Envoi de l'e-mail via EmailJS
             await emailjs.send("service_colis_smtp", "template_colis", {
                 serviceEmail: serviceEmail,
                 recipientName: recipientName,
                 packageCount: packageCount,
                 message: "Le colis n'a pas été livré.",
             });
+
             alert("Email envoyé avec succès !");
         } catch (error) {
-            console.error("Erreur lors de l'envoi de l'email :", error);
+            console.error('Erreur lors de l\'envoi de l\'email :', error);
             alert("Une erreur est survenue lors de l'envoi de l'email.");
         }
     }
