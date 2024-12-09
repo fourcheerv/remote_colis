@@ -26,7 +26,7 @@ document.getElementById("packageForm").addEventListener("submit", async (event) 
             alert("Envoi de l'e-mail en cours...");
 
             // Envoi de l'e-mail via EmailJS
-            await emailjs.send("service_colis_smtp", "template_colis", {
+            await emailjs.send("service_colis", "template_colis", {
                 serviceEmail: serviceEmail,
                 recipientName: recipientName,
                 packageCount: packageCount,
