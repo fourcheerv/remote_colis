@@ -21,7 +21,7 @@ document.getElementById("packageForm").addEventListener("submit", async (event) 
         try {
             // Initialiser EmailJS avec votre User ID
      
-emailjs.init({
+        emailjs.init({
         publicKey: "UFlNoLfp7PdWyrBak",
       });
 
