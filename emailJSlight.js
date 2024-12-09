@@ -11,6 +11,7 @@ document.getElementById("packageForm").addEventListener("submit", async (event) 
         const serviceEmail = document.getElementById("serviceEmails").value;
         const recipientName = document.getElementById("recipientName").value;
         const packageCount = document.getElementById("packageCount").value;
+        const receiverName = document.getElementById("receiverName").value;
 
         // Vérification que tous les champs sont remplis
         if (!serviceEmail || !recipientName || !packageCount) {
@@ -33,6 +34,7 @@ document.getElementById("packageForm").addEventListener("submit", async (event) 
                 serviceEmail: serviceEmail,
                 recipientName: recipientName,
                 packageCount: packageCount,
+                receiverName: receiverName,
                 message: "Le colis n'a pas été livré.",
             });
 
