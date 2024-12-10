@@ -154,7 +154,8 @@ const purgeDatabase = async () => {
 // Fonction pour compacter la base CouchDB
 const compactDatabase = async () => {
     try {
-        const response = await fetch(`${remoteDB.name}/_compact`, {
+        const url = `${remoteDB.name}/_compact`;
+        const response = await fetch(url, {
             method: "POST",
             headers: {
                 "Authorization": "Basic " + btoa("apikey-318d952854dd4175a745a1381dab41b4"),
@@ -165,13 +166,13 @@ const compactDatabase = async () => {
         if (response.ok) {
             alert("Compaction lancée avec succès. Cela peut prendre un moment.");
         } else {
-            const error = await response.json();
-            console.error("Erreur lors de la compaction :", error);
-            alert("Erreur lors de la tentative de compaction : " + (error.reason || "Inconnue"));
+            const errorData = await response.json();
+            console.error("Erreur lors de la compaction :", errorData);
+            alert(`Erreur lors de la compaction : ${errorData.reason || "Inconnue"}`);
         }
     } catch (error) {
         console.error("Erreur lors de la compaction :", error);
-        alert("Une erreur est survenue lors de la compaction.");
+        alert(`Une erreur est survenue lors de la compaction : ${error.message}`);
     }
 };
 
