@@ -107,6 +107,7 @@
 
         let imageFiles = [];
 
+        // Compression des images
         function compresserImage(file, callback) {
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -123,7 +124,7 @@
             };
             reader.readAsDataURL(file);
         }
-
+        // 3 photos maximum
         fileUpload.addEventListener("change", () => {
             if (imageFiles.length >= 3) {
                 alert("Vous ne pouvez télécharger que 3 photos au maximum.");
@@ -152,7 +153,7 @@
 
         document.getElementById("packageForm").addEventListener("submit", async (event) => {
             event.preventDefault();
-
+            //test 1 photo uploader minimum
             if (imageFiles.length === 0) {
                 alert("Veuillez ajouter au moins une photo avant de sauvegarder !");
                 return;
@@ -166,46 +167,39 @@
                 return;
             }
 
-            const id = formData.get("recipientName") + "-" + formData.get("receiverName") + "-" + formData.get("deliveryDate");
-            const isDeliveredNow = deliveredRadio.value === "true";
+            const data = {
+                _id: new Date().toISOString(),
+                recipientName: formData.get("recipientName"),
+                receiverName: formData.get("receiverName"),
+                packageCount: formData.get("packageCount"),
+                serviceEmail: document.getElementById("serviceEmails").value,
+                deliveryDate: formData.get("deliveryDate"),
+                delivered: deliveredRadio.value,
+                signature: signaturePad.isEmpty() ? null : signaturePad.toDataURL("image/jpeg"),
+                photos: [],
+            };
+
+            if (!data.signature) {
+                alert("Veuillez fournir une signature !");
+                return;
+            }
+
+            for (let file of imageFiles) {
+                const dataURL = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.readAsDataURL(file);
+                });
+                data.photos.push(dataURL);
+            }
 
             try {
-                const existingRecord = await localDB.get(id);
-
-                if (existingRecord.delivered === "false" && isDeliveredNow) {
-                    existingRecord.delivered = "true";
-                    await localDB.put(existingRecord);
-                    alert("Le colis marqué comme livré !");
-                }
+                await localDB.put(data);
+                alert("Données sauvegardées et synchronisées !");
+                document.getElementById("clearForm").click();
             } catch (error) {
-                if (error.name === "not_found") {
-                    const data = {
-                        _id: id,
-                        recipientName: formData.get("recipientName"),
-                        receiverName: formData.get("receiverName"),
-                        packageCount: formData.get("packageCount"),
-                        serviceEmail: document.getElementById("serviceEmails").value,
-                        deliveryDate: formData.get("deliveryDate"),
-                        delivered: deliveredRadio.value,
-                        signature: signaturePad.isEmpty() ? null : signaturePad.toDataURL("image/jpeg"),
-                        photos: [],
-                    };
-
-                    for (let file of imageFiles) {
-                        const dataURL = await new Promise((resolve) => {
-                            const reader = new FileReader();
-                            reader.onload = () => resolve(reader.result);
-                            reader.readAsDataURL(file);
-                        });
-                        data.photos.push(dataURL);
-                    }
-
-                    await localDB.put(data);
-                    alert("Nouveau colis enregistré !");
-                } else {
-                    console.error("Erreur :", error);
-                    alert("Une erreur est survenue lors de l'enregistrement.");
-                }
+                console.error("Erreur lors de l'enregistrement :", error);
+                alert("Une erreur est survenue lors de l'enregistrement.");
             }
         });
 
@@ -220,5 +214,7 @@
             signaturePad.clear();
         });
     </script>
+    <!-- Script envoi email-->
+    <script src="emailJSlight.js"></script>
 </body>
 </html>

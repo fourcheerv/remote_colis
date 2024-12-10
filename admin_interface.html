@@ -48,7 +48,18 @@
                     <th>Colis livré ?</th>
                 </tr>
             </thead>
-            <tbody></tbody>
+            <tbody>
+            <!-- Exemple de ligne générée dynamiquement dans le fichier JS -->
+            <tr>
+                <td>
+                    <select class="updateDeliveredStatus" data-id="${_id}">
+                        <option value="true" ${delivered === "true" ? "selected" : ""}>Oui</option>
+                        <option value="false" ${delivered === "false" ? "selected" : ""}>Non</option>
+                    </select>
+                </td>
+            </tr>
+
+            </tbody>
         </table>
     </main>
      <!-- Section de pagination -->

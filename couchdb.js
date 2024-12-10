@@ -1,12 +1,11 @@
 // Initialisation de PouchDB pour la synchronisation avec CouchDB
 const localDB = new PouchDB('receptions');
-
 const remoteDB = new PouchDB('https://apikey-v2-237azo7t1nwttyu787vl2zuxfh5ywxrddnfhcujd2nbu:b7ce3f8c0a99a10c0825a4c1ff68fe62@ca3c9329-df98-4982-a3dd-ba2b294b02ef-bluemix.cloudantnosqldb.appdomain.cloud/receptions');
-//initialisation pagination
-let currentPage = 1;
-const rowsPerPage = 10; // Nombre de lignes par page
-let totalRows = 0; // Total des lignes disponibles
 
+// Initialisation pagination
+let currentPage = 1;
+const rowsPerPage = 20; // Nombre de lignes par page
+let totalRows = 0; // Total des lignes disponibles
 
 // Synchronisation avec CouchDB
 localDB.sync(remoteDB, { live: true, retry: true }).on('error', console.error);
@@ -44,8 +43,12 @@ const loadData = async (page = 1) => {
                         .map(photo => `<img src="${photo}" alt="Photo" class="table-img" onclick="showImage('${photo}')">`)
                         .join("") || "Aucune"}
                 </td>
-                <td>${delivered ? (delivered === "true" ? "Oui" : "Non") : "Non défini"}</td>
-
+                <td>
+                    <select class="updateDeliveredStatus" data-id="${_id}">
+                        <option value="true" ${delivered === "true" ? "selected" : ""}>Oui</option>
+                        <option value="false" ${delivered === "false" ? "selected" : ""}>Non</option>
+                    </select>
+                </td>
             `;
             tbody.appendChild(tr);
         });
@@ -56,10 +59,28 @@ const loadData = async (page = 1) => {
     }
 };
 
+// Mise à jour du statut de livraison
+document.addEventListener("change", async (event) => {
+    if (event.target.classList.contains("updateDeliveredStatus")) {
+        const docId = event.target.dataset.id;
+        const newValue = event.target.value === "true" ? "true" : "false";
+
+        try {
+            const doc = await localDB.get(docId);
+            doc.delivered = newValue;
+            await localDB.put(doc);
+            alert("Statut de livraison mis à jour avec succès !");
+        } catch (error) {
+            console.error("Erreur lors de la mise à jour :", error);
+            alert("Impossible de mettre à jour le statut.");
+        }
+    }
+});
+
+// Mise à jour de la pagination
 const updatePaginationInfo = () => {
     const totalPages = Math.ceil(totalRows / rowsPerPage);
     document.getElementById("pageInfo").textContent = `Page ${currentPage} sur ${totalPages}`;
-    
     document.getElementById("prevPageBtn").disabled = currentPage === 1;
     document.getElementById("nextPageBtn").disabled = currentPage === totalPages;
 };
