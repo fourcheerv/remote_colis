@@ -35,7 +35,7 @@ document.getElementById("packageForm").addEventListener("submit", async (event) 
                 recipientName: recipientName,
                 packageCount: packageCount,
                 receiverName: receiverName,
-                message: "Le colis n'a pas pu être livré pour motif d'absence ou autre, merci de vous rapprocher auprès du service manutention pour récuperer votre(vos) colis",
+                message: "Le colis n'a pas pu être livré en raison d'une absence ou d'un autre motif. Merci de contacter le service manutention pour le récupérer.",
             });
 
             alert("Email envoyé avec succès !");
