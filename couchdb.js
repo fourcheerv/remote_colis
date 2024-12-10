@@ -121,6 +121,36 @@ const deleteSelected = async () => {
     }
 };
 
+// Fonction pour purger la base CouchDB
+const purgeDatabase = async () => {
+    try {
+        const result = await localDB.allDocs({ include_docs: true });
+
+        // Récupérer tous les éléments marqués pour suppression
+        const docsToPurge = result.rows
+            .filter(row => row.doc._deleted)
+            .map(row => ({
+                _id: row.doc._id,
+                _rev: row.doc._rev,
+                _deleted: true
+            }));
+
+        if (docsToPurge.length === 0) {
+            alert("Aucun document à purger !");
+            return;
+        }
+
+        // Purger les documents supprimés
+        const response = await localDB.bulkDocs(docsToPurge);
+        console.log("Résultat de la purge :", response);
+        alert("Base purgée avec succès !");
+        loadData(currentPage);
+    } catch (error) {
+        console.error("Erreur lors de la purge :", error);
+        alert("Une erreur est survenue lors de la purge.");
+    }
+};
+
 // Exporter les données au format Excel
 const exportToExcel = async () => {
     try {
@@ -231,6 +261,10 @@ document.getElementById("nextPageBtn").addEventListener("click", () => {
     }
 });
 
+document.getElementById("purgeBtn").addEventListener("click", () => {
+    const confirmation = confirm("Voulez-vous vraiment purger tous les éléments supprimés ?");
+    if (confirmation) purgeDatabase();
+});
 
 // Charger les données au démarrage
 window.addEventListener("DOMContentLoaded", () => loadData(currentPage));
