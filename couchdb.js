@@ -151,6 +151,31 @@ const purgeDatabase = async () => {
     }
 };
 
+// Fonction pour compacter la base CouchDB
+const compactDatabase = async () => {
+    try {
+        const response = await fetch(`${remoteDB.name}/_compact`, {
+            method: "POST",
+            headers: {
+                "Authorization": "Basic " + btoa("apikey-v2-237azo7t1nwttyu787vl2zuxfh5ywxrddnfhcujd2nbu:b7ce3f8c0a99a10c0825a4c1ff68fe62"),
+                "Content-Type": "application/json"
+            }
+        });
+
+        if (response.ok) {
+            alert("Compaction lancée avec succès. Cela peut prendre un moment.");
+        } else {
+            const error = await response.json();
+            console.error("Erreur lors de la compaction :", error);
+            alert("Erreur lors de la tentative de compaction : " + (error.reason || "Inconnue"));
+        }
+    } catch (error) {
+        console.error("Erreur lors de la compaction :", error);
+        alert("Une erreur est survenue lors de la compaction.");
+    }
+};
+
+
 // Exporter les données au format Excel
 const exportToExcel = async () => {
     try {
@@ -264,6 +289,11 @@ document.getElementById("nextPageBtn").addEventListener("click", () => {
 document.getElementById("purgeBtn").addEventListener("click", () => {
     const confirmation = confirm("Voulez-vous vraiment purger tous les éléments supprimés ?");
     if (confirmation) purgeDatabase();
+});
+
+document.getElementById("compactBtn").addEventListener("click", () => {
+    const confirmation = confirm("Voulez-vous vraiment lancer la compaction de la base ? Cela peut prendre du temps.");
+    if (confirmation) compactDatabase();
 });
 
 // Charger les données au démarrage
