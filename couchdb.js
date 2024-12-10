@@ -157,7 +157,7 @@ const compactDatabase = async () => {
         const response = await fetch(`${remoteDB.name}/_compact`, {
             method: "POST",
             headers: {
-                "Authorization": "Basic " + btoa("apikey-v2-237azo7t1nwttyu787vl2zuxfh5ywxrddnfhcujd2nbu:b7ce3f8c0a99a10c0825a4c1ff68fe62"),
+                "Authorization": "Basic " + btoa("apikey-318d952854dd4175a745a1381dab41b4"),
                 "Content-Type": "application/json"
             }
         });
