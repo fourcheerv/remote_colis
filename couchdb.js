@@ -121,36 +121,6 @@ const deleteSelected = async () => {
     }
 };
 
-// Fonction pour purger la base CouchDB
-const purgeDatabase = async () => {
-    try {
-        const result = await remoteDB.allDocs({ include_docs: true });
-
-        // Récupérer tous les éléments marqués pour suppression
-        const docsToPurge = result.rows
-            .filter(row => row.doc._deleted)
-            .map(row => ({
-                _id: row.doc._id,
-                _rev: row.doc._rev,
-                _deleted: true
-            }));
-
-        if (docsToPurge.length === 0) {
-            alert("Aucun document à purger !");
-            return;
-        }
-
-        // Purger les documents supprimés
-        const response = await remoteDB.bulkDocs(docsToPurge);
-        console.log("Résultat de la purge :", response);
-        alert("Base purgée avec succès !");
-        loadData(currentPage);
-    } catch (error) {
-        console.error("Erreur lors de la purge :", error);
-        alert("Une erreur est survenue lors de la purge.");
-    }
-};
-
 // Fonction pour compacter la base CouchDB
 const compactDatabase = async (remoteDBName, username, password) => {
     try {
@@ -188,6 +158,35 @@ const remoteDBName = "https://ca3c9329-df98-4982-a3dd-ba2b294b02ef-bluemix.cloud
 const username = "apikey-v2-237azo7t1nwttyu787vl2zuxfh5ywxrddnfhcujd2nbu"; // Remplacez par votre nom d'utilisateur
 const password = "b7ce3f8c0a99a10c0825a4c1ff68fe62"; // Remplacez par votre clé secrète
 
+// Fonction pour purger la base CouchDB
+const purgeDatabase = async (remoteDBName, username, password) => {
+    try {
+        const result = await remoteDBName.allDocs({ include_docs: true });
+
+        // Récupérer tous les éléments marqués pour suppression
+        const docsToPurge = result.rows
+            .filter(row => row.doc._deleted)
+            .map(row => ({
+                _id: row.doc._id,
+                _rev: row.doc._rev,
+                _deleted: true
+            }));
+
+        if (docsToPurge.length === 0) {
+            alert("Aucun document à purger !");
+            return;
+        }
+
+        // Purger les documents supprimés
+        const response = await remoteDBName.bulkDocs(docsToPurge);
+        console.log("Résultat de la purge :", response);
+        alert("Base purgée avec succès !");
+        loadData(currentPage);
+    } catch (error) {
+        console.error("Erreur lors de la purge :", error);
+        alert("Une erreur est survenue lors de la purge.");
+    }
+};
 
 // Exporter les données au format Excel
 const exportToExcel = async () => {
