@@ -124,7 +124,7 @@ const deleteSelected = async () => {
 // Fonction pour purger la base CouchDB
 const purgeDatabase = async () => {
     try {
-        const result = await localDB.allDocs({ include_docs: true });
+        const result = await remoteDB.allDocs({ include_docs: true });
 
         // Récupérer tous les éléments marqués pour suppression
         const docsToPurge = result.rows
@@ -141,7 +141,7 @@ const purgeDatabase = async () => {
         }
 
         // Purger les documents supprimés
-        const response = await localDB.bulkDocs(docsToPurge);
+        const response = await remoteDB.bulkDocs(docsToPurge);
         console.log("Résultat de la purge :", response);
         alert("Base purgée avec succès !");
         loadData(currentPage);
