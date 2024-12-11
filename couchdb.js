@@ -225,7 +225,7 @@ const exportToExcel = async () => {
                 const zip = new JSZip();
 
                 for (const item of data) {
-                    const folder = zip.folder(`ligne_${item._id}`);
+                    const folder = zip.folder(`ID_${item._id}`);
                     const jsonContent = {
                         id: item._id,
                         recipientName: item.recipientName,
