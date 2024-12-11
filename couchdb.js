@@ -184,7 +184,7 @@ const compactDatabase = async (remoteDBName, username, password) => {
 };
 
 // Exemple d'appel de la fonction
-const remoteDBName = "https://your-cloudant-instance.cloudant.com/nom_de_la_base";
+const remoteDBName = "https://ca3c9329-df98-4982-a3dd-ba2b294b02ef-bluemix.cloudantnosqldb.appdomain.cloud/receptions";
 const username = "apikey-v2-237azo7t1nwttyu787vl2zuxfh5ywxrddnfhcujd2nbu"; // Remplacez par votre nom d'utilisateur
 const password = "b7ce3f8c0a99a10c0825a4c1ff68fe62"; // Remplacez par votre clé secrète
 
