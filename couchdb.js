@@ -185,8 +185,8 @@ const compactDatabase = async (remoteDBName, username, password) => {
 
 // Exemple d'appel de la fonction
 const remoteDBName = "https://your-cloudant-instance.cloudant.com/nom_de_la_base";
-const username = "apikey-318d952854dd4175a745a1381dab41b4"; // Remplacez par votre nom d'utilisateur
-const password = "votre_mot_de_passe"; // Remplacez par votre clé secrète
+const username = "apikey-639fba7ad74b43a78a9d35eca64012eb"; // Remplacez par votre nom d'utilisateur
+const password = "9acfd36e195bbc01dfbe29009f4de623def30697"; // Remplacez par votre clé secrète
 
 
 // Exporter les données au format Excel
