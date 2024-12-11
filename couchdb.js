@@ -152,17 +152,24 @@ const purgeDatabase = async () => {
 };
 
 // Fonction pour compacter la base CouchDB
-const compactDatabase = async () => {
+const compactDatabase = async (remoteDBName, username, password) => {
     try {
-        const url = `${remoteDB.name}/_compact`;
+        // Construire l'URL de compaction
+        const url = `${remoteDBName}/_compact`;
+
+        // Construire l'en-tête Authorization avec Basic Auth
+        const authHeader = "Basic " + btoa(`${username}:${password}`);
+
+        // Effectuer la requête POST
         const response = await fetch(url, {
             method: "POST",
             headers: {
-                "Authorization": "Basic " + btoa("apikey-318d952854dd4175a745a1381dab41b4"),
-                "Content-Type": "application/json"
-            }
+                "Authorization": authHeader,
+                "Content-Type": "application/json",
+            },
         });
 
+        // Vérifier la réponse
         if (response.ok) {
             alert("Compaction lancée avec succès. Cela peut prendre un moment.");
         } else {
@@ -175,6 +182,11 @@ const compactDatabase = async () => {
         alert(`Une erreur est survenue lors de la compaction : ${error.message}`);
     }
 };
+
+// Exemple d'appel de la fonction
+const remoteDBName = "https://your-cloudant-instance.cloudant.com/nom_de_la_base";
+const username = "apikey-318d952854dd4175a745a1381dab41b4"; // Remplacez par votre nom d'utilisateur
+const password = "votre_mot_de_passe"; // Remplacez par votre clé secrète
 
 
 // Exporter les données au format Excel
@@ -294,7 +306,8 @@ document.getElementById("purgeBtn").addEventListener("click", () => {
 
 document.getElementById("compactBtn").addEventListener("click", () => {
     const confirmation = confirm("Voulez-vous vraiment lancer la compaction de la base ? Cela peut prendre du temps.");
-    if (confirmation) compactDatabase();
+    if (confirmation) compactDatabase(remoteDBName, username, password);
+
 });
 
 // Charger les données au démarrage
