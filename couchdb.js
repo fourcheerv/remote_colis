@@ -159,30 +159,51 @@ const username = "apikey-v2-237azo7t1nwttyu787vl2zuxfh5ywxrddnfhcujd2nbu"; // Re
 const password = "b7ce3f8c0a99a10c0825a4c1ff68fe62"; // Remplacez par votre clé secrète
 
 // Fonction pour purger la base CouchDB
-const purgeDatabase = async (remoteDBName, username, password) => {
+const purgeDatabase = async (remoteDB, username, password) => {
     try {
-        const result = await remoteDBName.allDocs({ include_docs: true });
-         // Construire l'en-tête Authorization avec Basic Auth
-         const authHeader = "Basic " + btoa(`${username}:${password}`);
-        // Récupérer tous les éléments marqués pour suppression
+        // Vérification des paramètres nécessaires
+        if (!remoteDB || !username || !password) {
+            throw new Error("Les paramètres 'remoteDB', 'username' ou 'password' sont manquants.");
+        }
+
+        // Construire l'en-tête Authorization avec Basic Auth
+        const authHeader = "Basic " + btoa(`${username}:${password}`);
+
+        // Récupérer tous les documents de la base
+        const result = await remoteDB.allDocs({ include_docs: true });
+
+        // Vérifier que result.rows existe et est un tableau
+        if (!Array.isArray(result.rows)) {
+            throw new Error("La réponse de la base est invalide ou ne contient pas de documents.");
+        }
+
+        // Filtrer les documents marqués pour suppression
         const docsToPurge = result.rows
-            .filter(row => row.doc._deleted)
+            .filter(row => row.doc && row.doc._deleted)
             .map(row => ({
                 _id: row.doc._id,
                 _rev: row.doc._rev,
                 _deleted: true
             }));
 
+        // Vérifier si des documents sont à purger
         if (docsToPurge.length === 0) {
+            console.log("Aucun document à purger.");
             alert("Aucun document à purger !");
             return;
         }
 
-        // Purger les documents supprimés
-        const response = await remoteDBName.bulkDocs(docsToPurge);
+        // Effectuer la purge avec bulkDocs
+        const response = await remoteDB.bulkDocs(docsToPurge, { headers: { Authorization: authHeader } });
+
+        // Vérifier la réponse pour identifier les erreurs éventuelles
+        const errors = response.filter(res => res.error);
+        if (errors.length > 0) {
+            throw new Error(`Erreur(s) lors de la purge : ${JSON.stringify(errors)}`);
+        }
+
         console.log("Résultat de la purge :", response);
         alert("Base purgée avec succès !");
-        loadData(currentPage);
     } catch (error) {
         console.error("Erreur lors de la purge :", error);
         alert(`Une erreur est survenue lors de la purge : ${error.message}`);
