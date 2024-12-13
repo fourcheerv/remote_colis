@@ -12,7 +12,7 @@ body {
     display: flex;
     justify-content: center; /* Centrer horizontalement */
     align-items: center; /* Centrer verticalement si le conteneur a une hauteur définie */
-    width: 100%; /* Prend toute la largeur */
+    width: 80%; /* Prend toute la largeur */
     margin: 20px 0; /* Espacement autour du logo */
 }
 
