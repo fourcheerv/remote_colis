@@ -14,6 +14,13 @@ body {
     text-align: center; /* Utile si le contenu du logo est du texte */
 }
 
+.logo-container {
+    display: flex;
+    justify-content: center; /* Centre horizontalement */
+    align-items: center; /* Centre verticalement */
+    height: 100px; /* Ajustez selon la hauteur désirée */
+}
+
 /* Titre principal */
 h1 {
     text-align: center;
