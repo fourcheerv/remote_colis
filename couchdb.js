@@ -170,7 +170,7 @@ const purgeDatabase = async (remoteDBName, username, password) => {
         const authHeader = "Basic " + btoa(`${username}:${password}`);
 
         // Récupérer tous les documents de la base
-        const result = await remoteDB.allDocs({ include_docs: true });
+        const result = await remoteDBName.allDocs({ include_docs: true });
 
         // Vérifier que result.rows existe et est un tableau
         if (!Array.isArray(result.rows)) {

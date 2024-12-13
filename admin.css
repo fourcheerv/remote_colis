@@ -12,6 +12,7 @@ body {
     justify-content: center; /* Centre horizontalement */
     align-items: center; /* Centre verticalement */
     height: 100px; /* Ajustez selon la hauteur désirée */
+    width: 500px;
 }
 
 /* Titre principal */
