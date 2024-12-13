@@ -162,7 +162,8 @@ const password = "b7ce3f8c0a99a10c0825a4c1ff68fe62"; // Remplacez par votre clé
 const purgeDatabase = async (remoteDBName, username, password) => {
     try {
         const result = await remoteDBName.allDocs({ include_docs: true });
-
+         // Construire l'en-tête Authorization avec Basic Auth
+         const authHeader = "Basic " + btoa(`${username}:${password}`);
         // Récupérer tous les éléments marqués pour suppression
         const docsToPurge = result.rows
             .filter(row => row.doc._deleted)
@@ -184,7 +185,7 @@ const purgeDatabase = async (remoteDBName, username, password) => {
         loadData(currentPage);
     } catch (error) {
         console.error("Erreur lors de la purge :", error);
-        alert("Une erreur est survenue lors de la purge.");
+        alert(`Une erreur est survenue lors de la purge : ${error.message}`);
     }
 };
 
