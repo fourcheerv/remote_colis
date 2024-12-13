@@ -7,10 +7,20 @@ body {
     color: #333;
 }
 
+/* Logo centré et responsive */
 .logo-container {
-    width: 500px;
+    display: flex;
+    justify-content: center; /* Centrer horizontalement */
+    align-items: center; /* Centrer verticalement si le conteneur a une hauteur définie */
+    width: 100%; /* Prend toute la largeur */
+    margin: 20px 0; /* Espacement autour du logo */
 }
 
+.logo {
+    max-width: 100%; /* S'adapte à la taille de l'écran */
+    height: auto; /* Maintient les proportions */
+    max-height: 150px; /* Taille maximale pour éviter qu'il ne devienne trop grand */
+}
 /* Titre principal */
 h1 {
     text-align: center;
