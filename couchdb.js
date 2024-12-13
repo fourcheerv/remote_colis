@@ -159,10 +159,10 @@ const username = "apikey-v2-237azo7t1nwttyu787vl2zuxfh5ywxrddnfhcujd2nbu"; // Re
 const password = "b7ce3f8c0a99a10c0825a4c1ff68fe62"; // Remplacez par votre clé secrète
 
 // Fonction pour purger la base CouchDB
-const purgeDatabase = async (remoteDB, username, password) => {
+const purgeDatabase = async (remoteDBName, username, password) => {
     try {
         // Vérification des paramètres nécessaires
-        if (!remoteDB || !username || !password) {
+        if (!remoteDBName || !username || !password) {
             throw new Error("Les paramètres 'remoteDB', 'username' ou 'password' sont manquants.");
         }
 
@@ -194,7 +194,7 @@ const purgeDatabase = async (remoteDB, username, password) => {
         }
 
         // Effectuer la purge avec bulkDocs
-        const response = await remoteDB.bulkDocs(docsToPurge, { headers: { Authorization: authHeader } });
+        const response = await remoteDBName.bulkDocs(docsToPurge, { headers: { Authorization: authHeader } });
 
         // Vérifier la réponse pour identifier les erreurs éventuelles
         const errors = response.filter(res => res.error);
