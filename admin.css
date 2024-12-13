@@ -8,8 +8,10 @@ body {
 }
 
 .logo {
-    margin: 0 auto; /* S'assurer que le logo est centré */
+    margin: 0 auto; /* Centrer horizontalement */
+    display: block; /* Assurez-vous que l'élément est un bloc */
     width: 500px;
+    text-align: center; /* Utile si le contenu du logo est du texte */
 }
 
 /* Titre principal */
