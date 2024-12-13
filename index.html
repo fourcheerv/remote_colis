@@ -166,16 +166,6 @@
                 alert("Veuillez sélectionner si le colis a été livré !");
                 return;
             }
-                        // Obtenir la date au format ISO 8601
-            const isoDate = new Date().toISOString();
-
-            // Convertir au fuseau horaire Europe/Paris
-            const parisTime = new Date(isoDate).toLocaleString("fr-FR", {
-                timeZone: "Europe/Paris",
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-            });
 
             const data = {
                 _id: new Date().toISOString(),
