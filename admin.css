@@ -7,12 +7,9 @@ body {
     color: #333;
 }
 
-/* Logo */
 .logo {
-    display: block;
-    margin: 20px auto;
-    max-width: 300px;
-    height: auto;
+    margin: 0 auto; /* S'assurer que le logo est centré */
+    width: 500px;
 }
 
 /* Titre principal */
@@ -223,6 +220,10 @@ footer {
 @media (max-width: 768px) {
     body {
         font-size: 16px;
+    }
+
+    .logo {
+        width: 300px; /* Réduire la taille du logo */
     }
 
     table {
