@@ -7,13 +7,6 @@ body {
     color: #333;
 }
 
-.logo {
-    margin: 0 auto; /* Centrer horizontalement */
-    display: block; /* Assurez-vous que l'élément est un bloc */
-    width: 500px;
-    text-align: center; /* Utile si le contenu du logo est du texte */
-}
-
 .logo-container {
     display: flex;
     justify-content: center; /* Centre horizontalement */
