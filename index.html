@@ -178,7 +178,7 @@
             });
 
             const data = {
-                _id: parisTime,
+                _id: new Date().toISOString(),
                 recipientName: formData.get("recipientName"),
                 receiverName: formData.get("receiverName"),
                 packageCount: formData.get("packageCount"),
