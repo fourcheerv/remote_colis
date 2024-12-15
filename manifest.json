@@ -1,6 +1,6 @@
 {
   "name": "Remote Colis",
-  "short_name": "Colis",
+  "short_name": "Gestion des Colis",
   "description": "Suivez vos colis facilement.",
   "start_url": "/remote_colis/",
   "display": "standalone",
