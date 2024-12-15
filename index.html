@@ -6,7 +6,24 @@
     <title>Formulaire de réception des colis</title>
     <link rel="stylesheet" href="index.css">
     <script src="https://cdn.jsdelivr.net/npm/pouchdb@7.3.1/dist/pouchdb.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js">
+
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker
+      .register("/remote_colis/service-worker.js")
+      .then((registration) => {
+        console.log("Service Worker enregistré avec succès:", registration);
+      })
+      .catch((error) => {
+        console.error("Échec de l'enregistrement du Service Worker:", error);
+      });
+  });
+}
+
+
+</script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body>
