@@ -117,7 +117,7 @@ if ("serviceWorker" in navigator) {
         }).on('error', (err) => {
             console.error("Erreur de synchronisation :", err);
         });
-
+        // champs appareil photo
         const fileUpload = document.getElementById("fileUpload");
         const imagePreview = document.getElementById("imagePreview");
         const signatureCanvas = document.getElementById("signaturePad");
@@ -171,6 +171,7 @@ if ("serviceWorker" in navigator) {
             fileUpload.value = "";
         });
 
+        // soumission du formulaire
         document.getElementById("packageForm").addEventListener("submit", async (event) => {
             event.preventDefault();
             //test 1 photo uploader minimum
@@ -187,6 +188,7 @@ if ("serviceWorker" in navigator) {
                 return;
             }
 
+            // compteur ID incrémentation
             const deliveryDateInput = formData.get("deliveryDate");
             const deliveryDate = new Date(deliveryDateInput);
 
@@ -197,7 +199,7 @@ if ("serviceWorker" in navigator) {
             hour: '2-digit',
             minute: '2-digit',
             });
-
+            
             let counter = 1; // Initialisation d'un compteur global
 
             function getFormattedDate() {
@@ -214,7 +216,8 @@ if ("serviceWorker" in navigator) {
             return formattedDate;
             }
 
-
+            
+            // date de réception
             const data = {
                // _id: new Date().toISOString(),
                 _id: getFormattedDate(),
