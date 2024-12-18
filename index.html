@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulaire de réception des colis</title>
-    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="css/index.css">
 <link rel="manifest" href="/remote_colis/manifest.json">
 
     <script src="https://cdn.jsdelivr.net/npm/pouchdb@7.3.1/dist/pouchdb.min.js"></script>
@@ -14,7 +14,7 @@
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker
-      .register("/remote_colis/service-worker.js")
+      .register("/remote_colis/js/service-worker.js")
       .then((registration) => {
         console.log("Service Worker enregistré avec succès:", registration);
       })
@@ -30,7 +30,7 @@ if ("serviceWorker" in navigator) {
 </head>
 <body>
     <div class="header-content">
-        <img src="logo.png" alt="Logo" class="logo">
+        <img src="img/logo.png" alt="Logo" class="logo">
         <h1>Formulaire de remise des colis</h1>
     </div>
     <main>
@@ -187,37 +187,37 @@ if ("serviceWorker" in navigator) {
                 return;
             }
 
-const deliveryDateInput = formData.get("deliveryDate");
-const deliveryDate = new Date(deliveryDateInput);
+            const deliveryDateInput = formData.get("deliveryDate");
+            const deliveryDate = new Date(deliveryDateInput);
 
-const formattedDeliveryDate = deliveryDate.toLocaleString('fr-FR', {
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
-  hour: '2-digit',
-  minute: '2-digit',
-});
+            const formattedDeliveryDate = deliveryDate.toLocaleString('fr-FR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            });
 
-let counter = 1; // Initialisation d'un compteur global
+            let counter = 1; // Initialisation d'un compteur global
 
-function getFormattedDate() {
-  const date = new Date();
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
+            function getFormattedDate() {
+            const date = new Date();
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
 
-  // Génère un identifiant avec un compteur sur 4 digits
-  const formattedCounter = String(counter).padStart(4, '0');
-  const formattedDate = `${day}-${month}-${year}-${formattedCounter}`;
+            // Génère un identifiant avec un compteur sur 4 digits
+            const formattedCounter = String(counter).padStart(4, '0');
+            const formattedDate = `${day}-${month}-${year}-${formattedCounter}`;
 
-  counter++; // Incrémenter le compteur pour le prochain appel
-  return formattedDate;
-}
+            counter++; // Incrémenter le compteur pour le prochain appel
+            return formattedDate;
+            }
 
 
             const data = {
                // _id: new Date().toISOString(),
-_id: getFormattedDate(),
+                _id: getFormattedDate(),
                 recipientName: formData.get("recipientName"),
                 receiverName: formData.get("receiverName"),
                 packageCount: formData.get("packageCount"),
@@ -265,6 +265,6 @@ _id: getFormattedDate(),
         });
     </script>
     <!-- Script envoi email-->
-    <script src="emailJSlight.js"></script>
+    <script src="js/emailJSlight.js"></script>
 </body>
 </html>
