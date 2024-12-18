@@ -50,25 +50,25 @@ if ("serviceWorker" in navigator) {
 
                 <div class="email-list">
                     <label for="serviceEmails">Emails Référents par service si colis non remis :</label>
-<select id="serviceEmails">
-    <option value="" disabled selected>Sélectionnez un email</option>
-    <optgroup label="Test Seb">
-        <option value="sebastien.pokorski@estrepublicain.fr">sebastien.pokorski@estrepublicain.fr</option>
-    </optgroup>
-    <optgroup label="Publicité Ebra Médias">
-        <option value="charline.visca@ebramedia.fr">charline.visca@ebramedia.fr</option>
-    </optgroup>
-    <optgroup label="Rédaction">
-        <option value="sandrine.florentin@estrepublicain.fr">sandrine.florentin@estrepublicain.fr</option>
-    </optgroup>
-    <optgroup label="Ventes">
-        <option value="celia.dubois@estrepublicain.fr">celia.dubois@estrepublicain.fr</option>
-    </optgroup>
-    <optgroup label="Ebra Services">
-        <option value="myriam.lefebvre@ebraservices.fr">myriam.lefebvre@ebraservices.fr</option>
-    </optgroup>
-</select>
-                               </div>
+                <select id="serviceEmails">
+                    <option value="" disabled selected>Sélectionnez un email</option>
+                    <optgroup label="Test Seb">
+                        <option value="sebastien.pokorski@estrepublicain.fr">sebastien.pokorski@estrepublicain.fr</option>
+                    </optgroup>
+                    <optgroup label="Publicité Ebra Médias">
+                        <option value="charline.visca@ebramedia.fr">charline.visca@ebramedia.fr</option>
+                    </optgroup>
+                    <optgroup label="Rédaction">
+                        <option value="sandrine.florentin@estrepublicain.fr">sandrine.florentin@estrepublicain.fr</option>
+                    </optgroup>
+                    <optgroup label="Ventes">
+                        <option value="celia.dubois@estrepublicain.fr">celia.dubois@estrepublicain.fr</option>
+                    </optgroup>
+                    <optgroup label="Ebra Services">
+                        <option value="myriam.lefebvre@ebraservices.fr">myriam.lefebvre@ebraservices.fr</option>
+                    </optgroup>
+                </select>
+                </div>
 
                 <label for="deliveryDate">Date et Heure de réception :</label>
                 <input type="datetime-local" id="deliveryDate" name="deliveryDate" required>
@@ -223,7 +223,6 @@ if ("serviceWorker" in navigator) {
                 packageCount: formData.get("packageCount"),
                 serviceEmail: document.getElementById("serviceEmails").value,
                 deliveryDate: formattedDeliveryDate,
-
                 delivered: deliveredRadio.value,
                 signature: signaturePad.isEmpty() ? null : signaturePad.toDataURL("image/jpeg"),
                 photos: [],
