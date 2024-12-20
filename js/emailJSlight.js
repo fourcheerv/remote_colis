@@ -65,6 +65,8 @@ document.getElementById("packageForm").addEventListener("submit", async (event) 
             setTimeout(() => {
                 loadingPopup.classList.remove("visible");
                 loadingPopup.classList.add("hidden");
+                 // Rafraîchir la page
+                 location.reload();
             }, 1000);
         }
     }
