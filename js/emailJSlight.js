@@ -1,3 +1,5 @@
+/*mail d'envoi via le service emailJS.com et via Mailjet, non envoi un mail et oui envoi un mail*/
+
 document.getElementById("packageForm").addEventListener("submit", async (event) => {
     event.preventDefault();
 
