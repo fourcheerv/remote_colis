@@ -188,7 +188,7 @@ if ("serviceWorker" in navigator) {
                 alert("Veuillez sélectionner si le colis a été livré !");
                 return;
             }
-
+            //formatage de la date pour fr-Fr dans le champs date selectionné par l'utilisateur
             const deliveryDateInput = formData.get("deliveryDate");
             const deliveryDate = new Date(deliveryDateInput);
 
