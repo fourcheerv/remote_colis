@@ -119,30 +119,8 @@
         // Remise à zéro du formulaire
         document.getElementById("clearForm").addEventListener("click", clearForm);
 
-        // Ajout de l'événement pour envoyer un email lorsque "Non" est sélectionné
-        document.getElementById("falseRadio").addEventListener("change", () => {
-            if (document.getElementById("falseRadio").checked) {
-                // Récupération des données nécessaires
-                const recipientName = document.getElementById("recipientName").value;
-                const receiverName = document.getElementById("receiverName").value;
-                const packageCount = document.getElementById("packageCount").value;
-                const serviceEmail = document.getElementById("serviceEmails").value;
-
-                if (!serviceEmail) {
-                    alert("Veuillez sélectionner un email référent.");
-                    return;
-                }
-
-                // Appel à la fonction du script emailJSlight.js
-                sendEmail({
-                    recipientName,
-                    receiverName,
-                    packageCount,
-                    serviceEmail,
-                    message: "Le colis n'a pas été remis."
-                });
-            }
-        });
+        // Soumission du formulaire
+        document.getElementById("packageForm").addEventListener("submit", submitForm);
 
         // Fonction de gestion du téléchargement des images
         function handleImageUpload() {
