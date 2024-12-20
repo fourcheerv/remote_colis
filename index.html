@@ -219,8 +219,8 @@ if ("serviceWorker" in navigator) {
             
             // date de réception
             const data = {
-               // _id: new Date().toISOString(),
-                _id: getFormattedDate(),
+               _id: new Date().toISOString(),
+                //_id: getFormattedDate(),
                 recipientName: formData.get("recipientName"),
                 receiverName: formData.get("receiverName"),
                 packageCount: formData.get("packageCount"),
