@@ -241,7 +241,7 @@ footer {
         font-size: 0.7em;
     }
 }
-
+/* boite de chargement après envoi email (emailJSlight.js)*/
 .hidden {
     display: none;
 }
