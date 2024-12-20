@@ -1,4 +1,4 @@
-/*mail d'envoi via le service emailJS.com et via Mailjet, non envoi un mail et oui envoi un mail*/
+/*mail d'envoi via le service emailJS.com et via Mailjet, non envoi un mail et oui envoi un mail (en cours d'implementation)*/
 
 document.getElementById("packageForm").addEventListener("submit", async (event) => {
     event.preventDefault();
