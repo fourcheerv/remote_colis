@@ -56,6 +56,8 @@ document.getElementById("packageForm").addEventListener("submit", async (event) 
             popupProgressBar.style.width = "100%";
 
             alert("Email envoyé avec succès !");
+            // Rafraîchir la page
+            location.reload();
         } catch (error) {
             console.error('Erreur lors de l\'envoi de l\'email :', JSON.stringify(error, null, 2));
             alert(`Une erreur est survenue lors de l'envoi de l'email : ${error.text || error.message || 'Erreur inconnue'}`);
@@ -65,8 +67,6 @@ document.getElementById("packageForm").addEventListener("submit", async (event) 
             setTimeout(() => {
                 loadingPopup.classList.remove("visible");
                 loadingPopup.classList.add("hidden");
-                 // Rafraîchir la page
-                 location.reload();
             }, 1000);
         }
     }
