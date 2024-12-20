@@ -23,7 +23,7 @@ document.getElementById("packageForm").addEventListener("submit", async (event) 
         const popupProgressBar = document.getElementById("popupProgressBar");
 
         try {
-            // Afficher la popup
+            // Afficher la popup uniquement maintenant
             loadingPopup.style.display = "flex";
             popupProgressBar.style.width = "0%";
 
@@ -60,6 +60,7 @@ document.getElementById("packageForm").addEventListener("submit", async (event) 
             alert(`Une erreur est survenue lors de l'envoi de l'email : ${error.text || error.message || 'Erreur inconnue'}`);
         } finally {
             // Masquer la popup après un court délai
+            clearInterval(interval); // Nettoyer l'intervalle en cas d'erreur
             setTimeout(() => {
                 loadingPopup.style.display = "none";
             }, 1000);
