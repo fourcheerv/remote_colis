@@ -19,20 +19,20 @@ document.getElementById("packageForm").addEventListener("submit", async (event) 
             return;
         }
 
-        const loadingBar = document.getElementById("loadingBar");
-        const progressBar = document.getElementById("progressBar");
+        const loadingPopup = document.getElementById("loadingPopup");
+        const popupProgressBar = document.getElementById("popupProgressBar");
 
         try {
-            // Afficher la barre de chargement
-            loadingBar.style.display = "block";
-            progressBar.style.width = "0%";
+            // Afficher la popup
+            loadingPopup.style.display = "flex";
+            popupProgressBar.style.width = "0%";
 
-            // Simuler une progression (facultatif, pour l'expérience utilisateur)
+            // Simuler une progression (facultatif)
             let progress = 0;
             const interval = setInterval(() => {
                 progress += 10;
                 if (progress <= 90) {
-                    progressBar.style.width = `${progress}%`;
+                    popupProgressBar.style.width = `${progress}%`;
                 }
             }, 200);
 
@@ -52,16 +52,16 @@ document.getElementById("packageForm").addEventListener("submit", async (event) 
 
             // Mise à jour à 100% après l'envoi réussi
             clearInterval(interval);
-            progressBar.style.width = "100%";
+            popupProgressBar.style.width = "100%";
 
             alert("Email envoyé avec succès !");
         } catch (error) {
             console.error('Erreur lors de l\'envoi de l\'email :', JSON.stringify(error, null, 2));
             alert(`Une erreur est survenue lors de l'envoi de l'email : ${error.text || error.message || 'Erreur inconnue'}`);
         } finally {
-            // Masquer la barre de chargement après un court délai
+            // Masquer la popup après un court délai
             setTimeout(() => {
-                loadingBar.style.display = "none";
+                loadingPopup.style.display = "none";
             }, 1000);
         }
     }
