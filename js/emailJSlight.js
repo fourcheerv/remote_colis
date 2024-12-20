@@ -23,8 +23,9 @@ document.getElementById("packageForm").addEventListener("submit", async (event) 
         const popupProgressBar = document.getElementById("popupProgressBar");
 
         try {
-            // Afficher la popup uniquement maintenant
-            loadingPopup.style.display = "flex";
+            // Afficher la popup
+            loadingPopup.classList.remove("hidden");
+            loadingPopup.classList.add("visible");
             popupProgressBar.style.width = "0%";
 
             // Simuler une progression (facultatif)
@@ -60,9 +61,10 @@ document.getElementById("packageForm").addEventListener("submit", async (event) 
             alert(`Une erreur est survenue lors de l'envoi de l'email : ${error.text || error.message || 'Erreur inconnue'}`);
         } finally {
             // Masquer la popup après un court délai
-            clearInterval(interval); // Nettoyer l'intervalle en cas d'erreur
+            clearInterval(interval);
             setTimeout(() => {
-                loadingPopup.style.display = "none";
+                loadingPopup.classList.remove("visible");
+                loadingPopup.classList.add("hidden");
             }, 1000);
         }
     }

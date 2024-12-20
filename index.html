@@ -97,15 +97,14 @@ if ("serviceWorker" in navigator) {
                 </div>
                 <span id="deliveredError" class="error-message"></span>
             
-                <div id="loadingPopup" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 9999; display: flex; align-items: center; justify-content: center;">
+                <div id="loadingPopup" class="hidden">
                     <div style="background-color: white; padding: 20px; border-radius: 10px; text-align: center; width: 300px;">
                         <p>Envoi de l'email en cours...</p>
                         <div style="width: 100%; background-color: #f3f3f3; margin-top: 10px;">
                             <div id="popupProgressBar" style="width: 0; height: 10px; background-color: #4caf50;"></div>
                         </div>
                     </div>
-                </div>
-                
+                </div>               
                 
                 <button type="submit" id="saveDataBtn" class="button-save">Sauvegarder</button>
                 <button type="button" id="clearForm" class="button-clear">Vider les champs</button>
