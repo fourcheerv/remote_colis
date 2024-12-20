@@ -188,7 +188,7 @@ if ("serviceWorker" in navigator) {
                 return;
             }
 
-                        const deliveryDateInput = formData.get("deliveryDate");
+            const deliveryDateInput = formData.get("deliveryDate");
             const deliveryDate = new Date(deliveryDateInput);
 
             const formattedDeliveryDate = deliveryDate.toLocaleString('fr-FR', {
