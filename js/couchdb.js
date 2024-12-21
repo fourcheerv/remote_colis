@@ -1,32 +1,6 @@
 // Initialisation de PouchDB pour la synchronisation avec CouchDB
-   async function initializeDB() {
-    try {
-        // Appel à l'API pour obtenir l'URL sécurisée
-        const response = await fetch('/api/getdata');
-        if (!response.ok) {
-            throw new Error("Erreur lors de la récupération de l'URL de la base de données.");
-        }
-        const data = await response.json();
-        const remoteDB = new PouchDB(data.cloudantUrl);
-
-        const localDB = new PouchDB('receptions');
-
-        // Synchronisation des bases de données
-        localDB.sync(remoteDB, {
-            live: true,
-            retry: true
-        }).on('error', (err) => {
-            console.error("Erreur de synchronisation :", err);
-        });
-
-        console.log("Base de données initialisée avec succès.");
-    } catch (error) {
-        console.error("Erreur d'initialisation de la base de données :", error.message);
-    }
-}
-
-// Initialiser la base de données lors du chargement de la page
-initializeDB();
+const localDB = new PouchDB('receptions');
+const remoteDB = new PouchDB('https://apikey-v2-237azo7t1nwttyu787vl2zuxfh5ywxrddnfhcujd2nbu:b7ce3f8c0a99a10c0825a4c1ff68fe62@ca3c9329-df98-4982-a3dd-ba2b294b02ef-bluemix.cloudantnosqldb.appdomain.cloud/receptions');
 
 // Initialisation pagination
 let currentPage = 1;
@@ -180,6 +154,9 @@ const compactDatabase = async (remoteDBName, username, password) => {
 };
 
 // Exemple d'appel de la fonction
+const remoteDBName = "https://ca3c9329-df98-4982-a3dd-ba2b294b02ef-bluemix.cloudantnosqldb.appdomain.cloud/receptions";
+const username = "apikey-v2-237azo7t1nwttyu787vl2zuxfh5ywxrddnfhcujd2nbu"; // Remplacez par votre nom d'utilisateur
+const password = "b7ce3f8c0a99a10c0825a4c1ff68fe62"; // Remplacez par votre clé secrète
 
 // Fonction pour purger la base CouchDB
 const purgeDatabase = async (remoteDB, username, password) => {
