@@ -231,18 +231,5 @@ document.getElementById("nextPageBtn").addEventListener("click", () => {
     }
 });
 
-
-document.getElementById("compactBtn").addEventListener("click", () => {
-    const confirmation = confirm("Voulez-vous vraiment lancer la compaction de la base ? Cela peut prendre du temps.");
-    if (confirmation) compactDatabase(remoteDBName, username, password);
-
-});
-
-document.getElementById("purgeBtn").addEventListener("click", () => {
-    const confirmation = confirm("Voulez-vous vraiment purger tous les éléments supprimés ?");
-    if (confirmation) purgeDatabase(remoteDB, username, password);
-});
-
-
 // Charger les données au démarrage
 window.addEventListener("DOMContentLoaded", () => loadData(currentPage));
