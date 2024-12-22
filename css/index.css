@@ -15,14 +15,16 @@ body{
     margin: 0px;
 }
 
-/* Conteneur pour le logo et le titre */
-.header-content {
-    display: flex;
-    flex-direction: column; /* Logo et titre empilés */
-    align-items: center; /* Centrer horizontalement */
-    justify-content: center; /* Centrer verticalement */
+header {
+    position: sticky;
+    top: 0;
+    z-index: 1000; /* Assurez-vous que le header reste au-dessus des autres éléments */
+    background-color: #003d66;
+    color: white;
+    padding: 20px;
     text-align: center;
-    gap: 15px; /* Espacement entre le logo et le titre */
+    font-size: 1.5em;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optionnel : ajoute une ombre pour le style */
 }
 
 .logo {
