@@ -16,10 +16,10 @@ body{
 }
 
 header {
-    position: sticky;
+    position: fixed;
     top: 0;
     z-index: 1000; /* Assurez-vous que le header reste au-dessus des autres éléments */
-    background-color: #003d66;
+    background-color: none;
     color: white;
     padding: 20px;
     text-align: center;
