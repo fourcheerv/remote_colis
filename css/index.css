@@ -23,8 +23,6 @@ body{
     justify-content: center; /* Centrer verticalement */
     text-align: center;
     gap: 15px; /* Espacement entre le logo et le titre */
-    position:sticky;
-    z-index: 100;
 }
 
 .logo {
