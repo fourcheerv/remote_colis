@@ -4,7 +4,7 @@ document.getElementById("packageForm").addEventListener("submit", async (event) 
 
     const deliveredRadio = document.querySelector('input[name="delivered"]:checked');
     if (!deliveredRadio) {
-        alert("Veuillez sélectionner si le colis a été livré !");
+        alert("Veuillez sélectionner si le(les) colis a(ont) été livré(s) !");
         return;
     }
 
@@ -49,7 +49,7 @@ document.getElementById("packageForm").addEventListener("submit", async (event) 
                 recipientName: recipientName,
                 packageCount: packageCount,
                 receiverName: receiverName,
-                message: "Le colis n'a pas pu être livré en raison d'une absence ou d'un autre motif. Merci de contacter le service manutention pour le récupérer.",
+                message: "Le(les) colis n'a(ont) pas pu être livré(s) en raison d'une absence ou d'un autre motif. Merci de contacter le service manutention pour le(les) récupérer.",
             });
 
             // Mise à jour à 100% après l'envoi réussi
