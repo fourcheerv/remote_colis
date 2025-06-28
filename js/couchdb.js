@@ -57,10 +57,15 @@ const loadData = async () => {
                 <td>${packageCount || 0}</td>
                 <td>${deliveryDate || "Non défini"}</td>
                 <td>
-                    ${signature ? `<img src="${signature}" alt="Signature" class="table-img" onclick="showImage('${signature}')">` : "Aucune"}
+                    ${signature ? 
+   `<img src="${signature}" alt="Signature de ${receiverName || 'N/A'}" class="table-img" tabindex="0" onclick="showImage('${signature}')">`
+   : "Aucune"}
                 </td>
                 <td>
-                    ${(photos || []).map(photo => `<img src="${photo}" alt="Photo" class="table-img" onclick="showImage('${photo}')">`).join("") || "Aucune"}
+                    ${(photos || []).map((photo, i) => 
+   `<img src="${photo}" alt="Photo ${i + 1} de ${receiverName || 'N/A'}" class="table-img" tabindex="0" onclick="showImage('${photo}')">`
+).join("") || "Aucune"}
+
                 </td>
                 <td>
                     <select class="updateDeliveredStatus" data-id="${_id}">
