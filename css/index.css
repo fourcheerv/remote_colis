@@ -81,7 +81,7 @@ input, textarea, select, canvas {
 }
 
 button {
-    width: 25;
+    width: 25%;
 }
 
 input[type="file"] {
