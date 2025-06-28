@@ -1,3 +1,4 @@
+/*colis si livré à non*/
 document.getElementById("packageForm").addEventListener("submit", async (event) => {
     event.preventDefault();
 
@@ -7,52 +8,28 @@ document.getElementById("packageForm").addEventListener("submit", async (event) 
         return;
     }
 
-    const isDelivered = deliveredRadio.value === "true";
+    if (deliveredRadio.value === "false") {
+        const serviceEmail = document.getElementById("serviceEmails").value;
+        const recipientName = document.getElementById("recipientName").value;
+        const packageCount = document.getElementById("packageCount").value;
+        const receiverName = document.getElementById("receiverName").value;
 
-    // Champs communs
-    const serviceEmail = document.getElementById("serviceEmails").value.trim();
-    const recipientName = document.getElementById("recipientName").value.trim();
-    const packageCount = document.getElementById("packageCount").value.trim();
-    const receiverName = document.getElementById("receiverName").value.trim();
-    const photoInput = document.getElementById("photoInput");
-    const imageFiles = photoInput?.files || [];
-    const signatureEmpty = signaturePad?.isEmpty?.() ?? true;
-
-    // Si colis NON livré
-    if (!isDelivered) {
-        // Vérification des champs requis
-        if (!serviceEmail) {
-            alert("Veuillez renseigner l'adresse e-mail du service référent !");
-            return;
-        }
-        if (!recipientName || !packageCount || !receiverName) {
-            alert("Veuillez remplir tous les champs requis !");
-            return;
-        }
-        if (imageFiles.length === 0) {
-            alert("Veuillez ajouter au moins une photo !");
-            return;
-        }
-        if (signatureEmpty) {
-            alert("Veuillez ajouter votre signature !");
+        // Vérification que tous les champs sont remplis
+        if (!serviceEmail || !recipientName || !packageCount) {
+            alert("Veuillez remplir tous les champs !");
             return;
         }
 
-        // (Optionnel) Marquer "non" dans un champ caché
-        const colisLivréField = document.getElementById("colisLivréStatus");
-        if (colisLivréField) {
-            colisLivréField.value = "non";
-        }
-
-        // EmailJS + animation
         const loadingPopup = document.getElementById("loadingPopup");
         const popupProgressBar = document.getElementById("popupProgressBar");
 
         try {
+            // Afficher la popup
             loadingPopup.classList.remove("hidden");
             loadingPopup.classList.add("visible");
             popupProgressBar.style.width = "0%";
 
+            // Simuler une progression (facultatif)
             let progress = 0;
             const interval = setInterval(() => {
                 progress += 10;
@@ -61,31 +38,37 @@ document.getElementById("packageForm").addEventListener("submit", async (event) 
                 }
             }, 200);
 
-            emailjs.init({ publicKey: "UFlNoLfp7PdWyrBak" });
-
-            await emailjs.send("service_colis", "template_colis_non", {
-                serviceEmail,
-                recipientName,
-                packageCount,
-                receiverName,
-                message: "Le(les) colis n'a(ont) pas pu être livré(s). Merci de contacter le service manutention.",
+            // Initialiser EmailJS
+            emailjs.init({
+                publicKey: "UFlNoLfp7PdWyrBak",
             });
 
+            // Envoi de l'e-mail via EmailJS
+            await emailjs.send("service_colis", "template_colis_non", {
+                serviceEmail: serviceEmail,
+                recipientName: recipientName,
+                packageCount: packageCount,
+                receiverName: receiverName,
+                message: "Le(les) colis n'a(ont) pas pu être livré(s) en raison d'une absence ou d'un autre motif. Merci de contacter le service manutention pour le(les) récupérer.",
+            });
+
+            // Mise à jour à 100% après l'envoi réussi
             clearInterval(interval);
             popupProgressBar.style.width = "100%";
+
             alert("Email envoyé avec succès !");
+            // Rafraîchir la page
             location.reload();
         } catch (error) {
-            clearInterval(interval);
-            console.error("Erreur lors de l'envoi de l'email :", error);
-            alert(`Erreur : ${error.text || error.message || "Erreur inconnue"}`);
+            console.error('Erreur lors de l\'envoi de l\'email :', JSON.stringify(error, null, 2));
+            alert(`Une erreur est survenue lors de l'envoi de l'email : ${error.text || error.message || 'Erreur inconnue'}`);
         } finally {
+            // Masquer la popup après un court délai
+            clearInterval(interval);
             setTimeout(() => {
                 loadingPopup.classList.remove("visible");
                 loadingPopup.classList.add("hidden");
             }, 1000);
         }
     }
-
-    // (Optionnel : ajouter ici la gestion du cas "livré" si tu veux faire autre chose dans ce cas)
 });
