@@ -179,23 +179,6 @@ button:hover {
 }
 
 
-.remove-button {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    background-color: red;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    font-size: 14px;
-    cursor: pointer;
-    line-height: 20px;
-    text-align: center;
-}
-
-
 .preview-image {
     position: relative;
     display: inline-block;
