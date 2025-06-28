@@ -1,3 +1,4 @@
+/*colis si livré à non*/
 document.getElementById("packageForm").addEventListener("submit", async (event) => {
     event.preventDefault();
 
@@ -19,26 +20,16 @@ document.getElementById("packageForm").addEventListener("submit", async (event) 
             return;
         }
 
-        // 🚫 Vérifie qu’au moins une photo est ajoutée
-        if (imageFiles.length === 0) {
-            alert("Veuillez ajouter au moins une photo !");
-            return;
-        }
-
-        // 🚫 Vérifie que la signature n’est pas vide
-        if (signaturePad.isEmpty()) {
-            alert("Veuillez ajouter votre signature !");
-            return;
-        }
-
         const loadingPopup = document.getElementById("loadingPopup");
         const popupProgressBar = document.getElementById("popupProgressBar");
 
         try {
+            // Afficher la popup
             loadingPopup.classList.remove("hidden");
             loadingPopup.classList.add("visible");
             popupProgressBar.style.width = "0%";
 
+            // Simuler une progression (facultatif)
             let progress = 0;
             const interval = setInterval(() => {
                 progress += 10;
@@ -47,8 +38,12 @@ document.getElementById("packageForm").addEventListener("submit", async (event) 
                 }
             }, 200);
 
-            emailjs.init({ publicKey: "UFlNoLfp7PdWyrBak" });
+            // Initialiser EmailJS
+            emailjs.init({
+                publicKey: "UFlNoLfp7PdWyrBak",
+            });
 
+            // Envoi de l'e-mail via EmailJS
             await emailjs.send("service_colis", "template_colis_non", {
                 serviceEmail: serviceEmail,
                 recipientName: recipientName,
@@ -57,14 +52,18 @@ document.getElementById("packageForm").addEventListener("submit", async (event) 
                 message: "Le(les) colis n'a(ont) pas pu être livré(s) en raison d'une absence ou d'un autre motif. Merci de contacter le service manutention pour le(les) récupérer.",
             });
 
+            // Mise à jour à 100% après l'envoi réussi
             clearInterval(interval);
             popupProgressBar.style.width = "100%";
+
             alert("Email envoyé avec succès !");
+            // Rafraîchir la page
             location.reload();
         } catch (error) {
             console.error('Erreur lors de l\'envoi de l\'email :', JSON.stringify(error, null, 2));
             alert(`Une erreur est survenue lors de l'envoi de l'email : ${error.text || error.message || 'Erreur inconnue'}`);
         } finally {
+            // Masquer la popup après un court délai
             clearInterval(interval);
             setTimeout(() => {
                 loadingPopup.classList.remove("visible");
