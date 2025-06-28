@@ -154,6 +154,24 @@ button:hover {
     border-radius: 5px;
     font-size: 14px;
 }
+/* Ajouter des photos*/
+.custom-file-label {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #4caf50;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.custom-file-label:hover {
+    background-color: #45a049;
+}
+
+
 
 /* Footer*/
 footer {

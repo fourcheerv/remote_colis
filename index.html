@@ -86,8 +86,8 @@ if ("serviceWorker" in navigator) {
                 <input type="datetime-local" id="deliveryDate" name="deliveryDate" required>
                 <span id="deliveryDateError" class="error-message"></span>
 
-                <label for="fileUpload">Prendre une photo :</label>
-                <input type="file" id="fileUpload" accept="image/*">
+                <label for="fileUpload" class="custom-file-label">📷 Ajouter des photos</label>
+                <input type="file" id="fileUpload" accept="image/*" multiple style="display: none;">
                 <div id="imagePreview"></div>
 
                 <label>Signature :</label>
@@ -166,15 +166,17 @@ if ("serviceWorker" in navigator) {
             reader.readAsDataURL(file);
         }
         // 3 photos maximum
-        fileUpload.addEventListener("change", () => {
-            if (imageFiles.length >= 3) {
-                alert("Vous ne pouvez télécharger que 3 photos au maximum.");
-                fileUpload.value = "";
-                return;
-            }
+       fileUpload.addEventListener("change", () => {
+        const files = Array.from(fileUpload.files);
 
-            const file = fileUpload.files[0];
-            if (file && file.type.startsWith("image/")) {
+        if (imageFiles.length + files.length > 3) {
+            alert("Vous ne pouvez télécharger que 3 photos au maximum.");
+            fileUpload.value = "";
+            return;
+        }
+
+        files.forEach((file) => {
+            if (file.type.startsWith("image/")) {
                 compresserImage(file, (compressedBlob) => {
                     imageFiles.push(compressedBlob);
 
@@ -189,8 +191,11 @@ if ("serviceWorker" in navigator) {
                     reader.readAsDataURL(compressedBlob);
                 });
             }
-            fileUpload.value = "";
         });
+
+        fileUpload.value = "";
+        });
+
 
         // soumission du formulaire
         document.getElementById("packageForm").addEventListener("submit", async (event) => {
