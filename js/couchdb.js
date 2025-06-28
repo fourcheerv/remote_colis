@@ -34,6 +34,8 @@ const loadData = async () => {
             return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
         });
 
+        allSortedRows = sortedRows;
+
         // Pagination
         const start = (currentPage - 1) * rowsPerPage;
         const end = start + rowsPerPage;
