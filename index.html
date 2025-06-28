@@ -86,9 +86,12 @@ if ("serviceWorker" in navigator) {
                 <input type="datetime-local" id="deliveryDate" name="deliveryDate" required>
                 <span id="deliveryDateError" class="error-message"></span>
 
-                <label for="fileUpload" class="custom-file-label">📷 Ajouter des photos</label>
-                <input type="file" id="fileUpload" accept="image/*" multiple style="display: none;">
-                <div id="imagePreview"></div>
+                <label for="fileUpload" class="custom-file-label" id="photoLabel">
+                📷 Ajouter des photos (0/3)
+                </label>
+                <input type="file" id="fileUpload" accept="image/*" capture="environment" multiple style="display: none;">
+                <div id="imagePreview" class="preview-container"></div>
+
 
                 <label>Signature :</label>
                 <canvas id="signaturePad" width="500" height="200" style="border: 1px solid #000;"></canvas>
@@ -166,35 +169,70 @@ if ("serviceWorker" in navigator) {
             reader.readAsDataURL(file);
         }
         // 3 photos maximum
-       fileUpload.addEventListener("change", () => {
-        const files = Array.from(fileUpload.files);
+      
+        function updatePhotoLabel() {
+    const label = document.getElementById("photoLabel");
+    label.textContent = `📷 Ajouter des photos (${imageFiles.length}/3)`;
+}
 
-        if (imageFiles.length + files.length > 3) {
-            alert("Vous ne pouvez télécharger que 3 photos au maximum.");
-            fileUpload.value = "";
-            return;
-        }
+fileUpload.addEventListener("change", () => {
+    const files = Array.from(fileUpload.files);
 
-        files.forEach((file) => {
-            if (file.type.startsWith("image/")) {
-                compresserImage(file, (compressedBlob) => {
-                    imageFiles.push(compressedBlob);
-
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        const img = document.createElement("img");
-                        img.src = e.target.result;
-                        img.style.maxWidth = "200px";
-                        img.style.margin = "5px";
-                        imagePreview.appendChild(img);
-                    };
-                    reader.readAsDataURL(compressedBlob);
-                });
-            }
-        });
-
+    if (imageFiles.length + files.length > 3) {
+        alert("Vous ne pouvez télécharger que 3 photos au maximum.");
         fileUpload.value = "";
-        });
+        return;
+    }
+
+    files.forEach((file) => {
+        if (file.type.startsWith("image/")) {
+            compresserImage(file, (compressedBlob) => {
+                imageFiles.push(compressedBlob);
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const wrapper = document.createElement("div");
+                    wrapper.className = "preview-image";
+
+                    const img = document.createElement("img");
+                    img.src = e.target.result;
+
+                    const removeBtn = document.createElement("button");
+                    removeBtn.className = "remove-button";
+                    removeBtn.textContent = "❌";
+
+                    removeBtn.addEventListener("click", () => {
+                        const index = Array.from(imagePreview.children).indexOf(wrapper);
+                        if (index !== -1) {
+                            imageFiles.splice(index, 1);
+                            wrapper.remove();
+                            updatePhotoLabel();
+                        }
+                    });
+
+                    wrapper.appendChild(img);
+                    wrapper.appendChild(removeBtn);
+                    imagePreview.appendChild(wrapper);
+                    updatePhotoLabel();
+                };
+
+                reader.readAsDataURL(compressedBlob);
+            });
+        }
+    });
+
+    fileUpload.value = "";
+});
+
+// Réinitialisation du formulaire
+document.getElementById("clearForm").addEventListener("click", () => {
+    document.getElementById("packageForm").reset();
+    imagePreview.innerHTML = "";
+    imageFiles = [];
+    signaturePad.clear();
+    updatePhotoLabel();
+});
+
 
 
         // soumission du formulaire
