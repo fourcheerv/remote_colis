@@ -312,6 +312,8 @@ footer {
 @media (max-width: 600px) {
     button {
         width: 100%;
+        padding: 14px 20px;
+        font-size: 18px;
     }
 }
 /* boite de chargement après envoi email (emailJSlight.js)*/
