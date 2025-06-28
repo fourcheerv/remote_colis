@@ -110,16 +110,26 @@ document.getElementById("packageForm").addEventListener("submit", async (event) 
     const deliveredRadio = document.querySelector('input[name="delivered"]:checked');
     if (!deliveredRadio) return alert("Veuillez sélectionner si le(les) colis a(ont) été livré(s) !");
 
+    const deliveredValue = deliveredRadio.value;
     const serviceEmail = document.getElementById("serviceEmails").value.trim();
     const recipientName = formData.get("recipientName").trim();
     const receiverName = formData.get("receiverName").trim();
     const packageCount = formData.get("packageCount").trim();
     const deliveryDate = new Date(formData.get("deliveryDate"));
-    const formattedDeliveryDate = deliveryDate.toLocaleString('fr-FR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+    const formattedDeliveryDate = deliveryDate.toLocaleString('fr-FR', {
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit'
+    });
 
-    if (!serviceEmail || !recipientName || !receiverName || !packageCount) {
+    if (
+        !recipientName ||
+        !receiverName ||
+        !packageCount ||
+        (!serviceEmail && deliveredValue === "false")
+    ) {
         return alert("Veuillez remplir tous les champs obligatoires !");
     }
+
 
     if (imageFiles.length === 0) return alert("Veuillez ajouter au moins une photo !");
     if (signaturePad.isEmpty()) return alert("Veuillez signer avant de sauvegarder.");
