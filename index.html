@@ -86,11 +86,13 @@ if ("serviceWorker" in navigator) {
                 <input type="datetime-local" id="deliveryDate" name="deliveryDate" required>
                 <span id="deliveryDateError" class="error-message"></span>
 
-                <label for="fileUpload" class="custom-file-label" id="photoLabel">
-                📷 Ajouter des photos (0/3)
-                </label>
-                <input type="file" id="fileUpload" accept="image/*" multiple style="display: none;">
-                <div id="imagePreview" class="preview-container"></div>
+                <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;">
+                <input type="file" id="galleryInput" accept="image/*" style="display: none;" multiple>
+
+                <button type="button" id="takePhotoBtn">📸 Prendre une photo</button>
+                <button type="button" id="chooseGalleryBtn">🖼️ Choisir depuis la galerie</button>
+
+                <div id="previewContainer"></div>
 
 
                 <label>Signature :</label>
@@ -171,58 +173,58 @@ if ("serviceWorker" in navigator) {
         // 3 photos maximum
       
         function updatePhotoLabel() {
-    const label = document.getElementById("photoLabel");
-    label.textContent = `📷 Ajouter des photos (${imageFiles.length}/3)`;
-}
-
-fileUpload.addEventListener("change", () => {
-    const files = Array.from(fileUpload.files);
-
-    if (imageFiles.length + files.length > 3) {
-        alert("Vous ne pouvez télécharger que 3 photos au maximum.");
-        fileUpload.value = "";
-        return;
-    }
-
-    files.forEach((file) => {
-        if (file.type.startsWith("image/")) {
-            compresserImage(file, (compressedBlob) => {
-                imageFiles.push(compressedBlob);
-
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const wrapper = document.createElement("div");
-                    wrapper.className = "preview-image";
-
-                    const img = document.createElement("img");
-                    img.src = e.target.result;
-
-                    const removeBtn = document.createElement("button");
-                    removeBtn.className = "remove-button";
-                    removeBtn.textContent = "❌";
-
-                    removeBtn.addEventListener("click", () => {
-                        const index = Array.from(imagePreview.children).indexOf(wrapper);
-                        if (index !== -1) {
-                            imageFiles.splice(index, 1);
-                            wrapper.remove();
-                            updatePhotoLabel();
-                        }
-                    });
-
-                    wrapper.appendChild(img);
-                    wrapper.appendChild(removeBtn);
-                    imagePreview.appendChild(wrapper);
-                    updatePhotoLabel();
-                };
-
-                reader.readAsDataURL(compressedBlob);
-            });
+        const label = document.getElementById("photoLabel");
+        label.textContent = `📷 Ajouter des photos (${imageFiles.length}/3)`;
         }
-    });
 
-    fileUpload.value = "";
-});
+        fileUpload.addEventListener("change", () => {
+        const files = Array.from(fileUpload.files);
+
+            if (imageFiles.length + files.length > 3) {
+                alert("Vous ne pouvez télécharger que 3 photos au maximum.");
+                fileUpload.value = "";
+                return;
+            }
+
+            files.forEach((file) => {
+                if (file.type.startsWith("image/")) {
+                    compresserImage(file, (compressedBlob) => {
+                        imageFiles.push(compressedBlob);
+
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            const wrapper = document.createElement("div");
+                            wrapper.className = "preview-image";
+
+                            const img = document.createElement("img");
+                            img.src = e.target.result;
+
+                            const removeBtn = document.createElement("button");
+                            removeBtn.className = "remove-button";
+                            removeBtn.textContent = "❌";
+
+                            removeBtn.addEventListener("click", () => {
+                                const index = Array.from(imagePreview.children).indexOf(wrapper);
+                                if (index !== -1) {
+                                    imageFiles.splice(index, 1);
+                                    wrapper.remove();
+                                    updatePhotoLabel();
+                                }
+                            });
+
+                            wrapper.appendChild(img);
+                            wrapper.appendChild(removeBtn);
+                            imagePreview.appendChild(wrapper);
+                            updatePhotoLabel();
+                        };
+
+                        reader.readAsDataURL(compressedBlob);
+                    });
+                }
+            });
+
+            fileUpload.value = "";
+        });
 
 // Réinitialisation du formulaire
 document.getElementById("clearForm").addEventListener("click", () => {
@@ -313,5 +315,43 @@ document.getElementById("clearForm").addEventListener("click", () => {
     </script>
     <!-- Script envoi email-->
     <script src="./js/emailJSlight.js"></script>
+    
+    
+    <script>
+  const cameraInput = document.getElementById("cameraInput");
+  const galleryInput = document.getElementById("galleryInput");
+  const previewContainer = document.getElementById("previewContainer");
+
+  document.getElementById("takePhotoBtn").addEventListener("click", () => {
+    cameraInput.click();
+  });
+
+  document.getElementById("chooseGalleryBtn").addEventListener("click", () => {
+    galleryInput.click();
+  });
+
+  function handleFiles(files) {
+    for (const file of files) {
+      if (!file.type.startsWith("image/")) continue;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = document.createElement("img");
+        img.src = e.target.result;
+        img.style.maxWidth = "150px";
+        img.style.margin = "5px";
+        previewContainer.appendChild(img);
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  cameraInput.addEventListener("change", () => {
+    handleFiles(cameraInput.files);
+  });
+
+  galleryInput.addEventListener("change", () => {
+    handleFiles(galleryInput.files);
+  });
+</script>
 </body>
 </html>
