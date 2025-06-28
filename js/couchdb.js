@@ -6,7 +6,6 @@ const remoteDB = new PouchDB('https://apikey-v2-237azo7t1nwttyu787vl2zuxfh5ywxrd
 let currentPage = 1;
 const rowsPerPage = 20; // Nombre de lignes par page
 let totalRows = 0; // Total des lignes disponibles
-let sortOrder = 'desc'; // ordre par défaut : décroissant
 
 // Synchronisation avec CouchDB
 localDB.sync(remoteDB, { live: true, retry: true }).on('error', console.error);
@@ -18,19 +17,11 @@ const loadData = async (page = 1) => {
 
     try {
         const result = await localDB.allDocs({ include_docs: true });
-
-        // Trier selon la date
-        const sortedRows = result.rows.sort((a, b) => {
-            const dateA = new Date(a.doc.deliveryDate || 0);
-            const dateB = new Date(b.doc.deliveryDate || 0);
-            return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
-        });
-
         totalRows = result.rows.length;
         const startIndex = (page - 1) * rowsPerPage;
         const endIndex = startIndex + rowsPerPage;
-        const paginatedRows = sortedRows.slice(startIndex, endIndex);
-        const sortedRows = await getSortedDocs();
+
+        const paginatedRows = result.rows.slice(startIndex, endIndex);
 
         paginatedRows.forEach(row => {
             const { _id, recipientName, receiverName, serviceEmail, packageCount, deliveryDate, signature, photos, delivered } = row.doc;
@@ -133,14 +124,7 @@ const deleteSelected = async () => {
 // Exporter les données au format Excel
 const exportToExcel = async () => {
     try {
-         const result = await localDB.allDocs({ include_docs: true });
-
-            // Tri décroissant par défaut selon deliveryDate
-            const sortedRows = result.rows.sort((a, b) => {
-            const dateA = new Date(a.doc.deliveryDate || 0);
-            const dateB = new Date(b.doc.deliveryDate || 0);
-            return dateB - dateA; // décroissant
-        });
+        const result = await localDB.allDocs({ include_docs: true });
         const data = result.rows.map(row => ({
             ID: row.doc._id,
             Destinataire: row.doc.recipientName || "N/A",
@@ -247,22 +231,5 @@ document.getElementById("nextPageBtn").addEventListener("click", () => {
     }
 });
 
-document.getElementById("sortDeliveryDate").addEventListener("click", () => {
-    // Alterner le sens du tri
-    sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
-
-    // Mettre à jour l'affichage de la flèche dans le titre
-    document.getElementById("sortDeliveryDate").innerHTML = 
-        `Date de réception ${sortOrder === 'asc' ? '&#8593;' : '&#8595;'}`;
-
-    // Recharger les données triées
-    loadData(currentPage);
-});
-
 // Charger les données au démarrage
-window.addEventListener("DOMContentLoaded", async () => {
-    const result = await localDB.allDocs({ include_docs: true });
-    const totalRows = result.rows.length;
-    currentPage = Math.ceil(totalRows / rowsPerPage); // Commencer par la dernière page
-    loadData(currentPage);
-});
+window.addEventListener("DOMContentLoaded", () => loadData(currentPage));
