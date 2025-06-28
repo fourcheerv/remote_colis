@@ -87,16 +87,18 @@
             <canvas id="signaturePad" width="600" height="300" style="border: 1px solid #000;"></canvas>
             <button type="button" id="clearSignature">Effacer la signature</button>
 
-          <label><strong>Colis Livré :</strong></label>
-<div style="display: flex; gap: 20px; align-items: center; margin-bottom: 10px;">
-    <label for="deliveredYes" style="display: flex; align-items: center; gap: 5px;">
-        <input type="radio" id="deliveredYes" name="delivered" value="true">
-        Oui
+          <div class="delivery-status">
+  <label><strong>Colis Livré :</strong></label>
+  <div class="radio-group">
+    <label for="deliveredYes">
+      <input type="radio" id="deliveredYes" name="delivered" value="true">
+      Oui
     </label>
-    <label for="deliveredNo" style="display: flex; align-items: center; gap: 5px;">
-        <input type="radio" id="deliveredNo" name="delivered" value="false">
-        Non
+    <label for="deliveredNo">
+      <input type="radio" id="deliveredNo" name="delivered" value="false">
+      Non
     </label>
+  </div>
 </div>
 
             <div id="loadingPopup" class="hidden">
