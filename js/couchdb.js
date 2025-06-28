@@ -1,6 +1,10 @@
 // Initialisation de PouchDB pour la synchronisation avec CouchDB
 const localDB = new PouchDB('receptions');
 const remoteDB = new PouchDB('https://apikey-v2-237azo7t1nwttyu787vl2zuxfh5ywxrddnfhcujd2nbu:b7ce3f8c0a99a10c0825a4c1ff68fe62@ca3c9329-df98-4982-a3dd-ba2b294b02ef-bluemix.cloudantnosqldb.appdomain.cloud/receptions');
+//Pagination
+let currentPage = 1;
+const rowsPerPage = 10;
+let allSortedRows = [];
 
 // Tri initial
 let sortOrder = 'desc';
@@ -9,6 +13,14 @@ let sortOrder = 'desc';
 localDB.sync(remoteDB, { live: true, retry: true }).on('error', console.error);
 
 // Fonction pour charger les données
+
+const parseDate = (str) => {
+    if (!str) return new Date(0);
+    const [datePart, timePart] = str.split(' ');
+    const [day, month, year] = datePart.split('/');
+    return new Date(`${year}-${month}-${day}T${timePart || '00:00'}:00`);
+};
+
 const loadData = async () => {
     const tbody = document.querySelector("#dataTable tbody");
     tbody.innerHTML = "";
@@ -16,24 +28,23 @@ const loadData = async () => {
     try {
         const result = await localDB.allDocs({ include_docs: true });
 
-        const sortedRows = result.rows.sort((a, b) => {
-        const parseDate = (str) => {
-            if (!str) return new Date(0); // date par défaut si null
-            const [datePart, timePart] = str.split(' ');
-            const [day, month, year] = datePart.split('/');
-            return new Date(`${year}-${month}-${day}T${timePart}:00`);
-        };
-
-        const dateA = parseDate(a.doc.deliveryDate);
-        const dateB = parseDate(b.doc.deliveryDate);
+        allSortedRows = result.rows.sort((a, b) => {
+            const dateA = parseDate(a.doc.deliveryDate);
+            const dateB = parseDate(b.doc.deliveryDate);
             return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
         });
+
+        // Pagination
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        const pageRows = allSortedRows.slice(start, end);
 
         // Met à jour l'en-tête du tri
         document.getElementById("sortDeliveryDate").innerHTML =
             `Date de réception ${sortOrder === 'asc' ? '&#8593;' : '&#8595;'}`;
 
-        sortedRows.forEach(row => {
+        // Remplit le tableau
+        pageRows.forEach(row => {
             const { _id, recipientName, receiverName, serviceEmail, packageCount, deliveryDate, signature, photos, delivered } = row.doc;
 
             const tr = document.createElement("tr");
@@ -60,6 +71,9 @@ const loadData = async () => {
             `;
             tbody.appendChild(tr);
         });
+
+        updatePaginationControls();
+
     } catch (error) {
         console.error("Erreur lors du chargement des données :", error);
     }
@@ -232,4 +246,27 @@ document.getElementById("sortDeliveryDate").addEventListener("click", () => {
 // Chargement initial
 window.addEventListener("DOMContentLoaded", () => {
     loadData();
+});
+
+// Pagination
+const updatePaginationControls = () => {
+    const totalPages = Math.ceil(allSortedRows.length / rowsPerPage);
+    document.getElementById("pageInfo").textContent = `Page ${currentPage} / ${totalPages}`;
+    document.getElementById("prevPage").disabled = currentPage === 1;
+    document.getElementById("nextPage").disabled = currentPage === totalPages;
+};
+
+document.getElementById("prevPage").addEventListener("click", () => {
+    if (currentPage > 1) {
+        currentPage--;
+        loadData();
+    }
+});
+
+document.getElementById("nextPage").addEventListener("click", () => {
+    const totalPages = Math.ceil(allSortedRows.length / rowsPerPage);
+    if (currentPage < totalPages) {
+        currentPage++;
+        loadData();
+    }
 });
