@@ -213,13 +213,6 @@ button:hover {
     transition: background-color 0.2s;
 }
 
-.remove-button:hover {
-    background-color: rgba(200, 0, 0, 1);
-}
-
-
-
-
 /* Footer*/
 footer {
     display: flex;
