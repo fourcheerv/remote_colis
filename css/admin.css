@@ -284,13 +284,21 @@ footer {
     }
 }
 
-/* cacher des colonnes comme la 5 email receptionnaire*/
 @media (max-width: 600px) {
+  /* Masquer la colonne Email du réceptionnaire (col 5) */
   th:nth-child(5),
   td:nth-child(5) {
     display: none;
   }
+
+  /* Masquer la colonne ID (col 2) */
+  th:nth-child(2),
+  td:nth-child(2) {
+    display: none;
+  }
 }
+
+
 
 /* Rend la table scrollable horizontalement sur petit écran */
 .table-container {
