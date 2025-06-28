@@ -87,9 +87,12 @@
             <canvas id="signaturePad" width="600" height="300" style="border: 1px solid #000;"></canvas>
             <button type="button" id="clearSignature">Effacer la signature</button>
 
-            <p><strong>Colis Livré :</strong></p>
-            <label><input type="radio" name="delivered" value="true"> Oui</label>
-            <label><input type="radio" name="delivered" value="false"> Non</label>
+           <p><strong>Colis Livré :</strong></p>
+<input type="radio" id="deliveredYes" name="delivered" value="true">
+<label for="deliveredYes">Oui</label>
+
+<input type="radio" id="deliveredNo" name="delivered" value="false">
+<label for="deliveredNo">Non</label>
 
             <div id="loadingPopup" class="hidden">
                 <div style="background:#fff; padding:20px; border-radius:10px; text-align:center; width:300px;">
