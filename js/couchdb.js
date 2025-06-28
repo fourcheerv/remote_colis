@@ -30,6 +30,7 @@ const loadData = async (page = 1) => {
         const startIndex = (page - 1) * rowsPerPage;
         const endIndex = startIndex + rowsPerPage;
         const paginatedRows = sortedRows.slice(startIndex, endIndex);
+        const sortedRows = await getSortedDocs();
 
         paginatedRows.forEach(row => {
             const { _id, recipientName, receiverName, serviceEmail, packageCount, deliveryDate, signature, photos, delivered } = row.doc;
