@@ -22,6 +22,10 @@ const loadData = async () => {
             return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
         });
 
+        // Met à jour l'en-tête du tri
+        document.getElementById("sortDeliveryDate").innerHTML =
+            `Date de réception ${sortOrder === 'asc' ? '&#8593;' : '&#8595;'}`;
+
         sortedRows.forEach(row => {
             const { _id, recipientName, receiverName, serviceEmail, packageCount, deliveryDate, signature, photos, delivered } = row.doc;
 
