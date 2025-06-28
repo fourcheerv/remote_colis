@@ -27,12 +27,9 @@ const loadData = async (page = 1) => {
         });
 
         totalRows = result.rows.length;
-        // Pagination activée
-        //const startIndex = (page - 1) * rowsPerPage;
-        //const endIndex = startIndex + rowsPerPage;
-        //const paginatedRows = sortedRows.slice(startIndex, endIndex);
-        // Pagination désactivée temporairement
-        const paginatedRows = sortedRows; // On affiche tout
+        const startIndex = (page - 1) * rowsPerPage;
+        const endIndex = startIndex + rowsPerPage;
+        const paginatedRows = sortedRows.slice(startIndex, endIndex);
 
         paginatedRows.forEach(row => {
             const { _id, recipientName, receiverName, serviceEmail, packageCount, deliveryDate, signature, photos, delivered } = row.doc;
@@ -234,7 +231,6 @@ document.getElementById("deleteSelectedBtn").addEventListener("click", deleteSel
 document.getElementById("exportBtn").addEventListener("click", exportToExcel);
 document.getElementById("exportZipBtn").addEventListener("click", exportToZip);
 
-/* Pagination activée
 document.getElementById("prevPageBtn").addEventListener("click", () => {
     if (currentPage > 1) {
         currentPage--;
@@ -249,9 +245,6 @@ document.getElementById("nextPageBtn").addEventListener("click", () => {
         loadData(currentPage);
     }
 });
-*/
-
-
 
 document.getElementById("sortDeliveryDate").addEventListener("click", () => {
     // Alterner le sens du tri
@@ -272,8 +265,3 @@ window.addEventListener("DOMContentLoaded", async () => {
     currentPage = Math.ceil(totalRows / rowsPerPage); // Commencer par la dernière page
     loadData(currentPage);
 });
-
-// Désactiver aussi la mise à jour du texte "Page X sur Y"
-const updatePaginationInfo = () => {
-    // Pagination désactivée
-};
