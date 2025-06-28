@@ -9,44 +9,42 @@ document.getElementById("packageForm").addEventListener("submit", async (event) 
 
     const isDelivered = deliveredRadio.value === "true";
 
-    // Obtenir les champs
+    // Champs communs
     const serviceEmail = document.getElementById("serviceEmails").value.trim();
     const recipientName = document.getElementById("recipientName").value.trim();
     const packageCount = document.getElementById("packageCount").value.trim();
     const receiverName = document.getElementById("receiverName").value.trim();
-
-    // 🖼️ Photo obligatoire
-    const photoInput = document.getElementById("photoInput"); // ID du champ input[type=file]
+    const photoInput = document.getElementById("photoInput");
     const imageFiles = photoInput?.files || [];
-
-    // ✍️ Signature obligatoire
     const signatureEmpty = signaturePad?.isEmpty?.() ?? true;
 
-    // Cas "Non livré"
+    // Si colis NON livré
     if (!isDelivered) {
-        // 🧠 Vérification de tous les champs requis
-        if (!serviceEmail || !recipientName || !packageCount) {
-            alert("Veuillez remplir tous les champs !");
+        // Vérification des champs requis
+        if (!serviceEmail) {
+            alert("Veuillez renseigner l'adresse e-mail du service référent !");
             return;
         }
-
+        if (!recipientName || !packageCount || !receiverName) {
+            alert("Veuillez remplir tous les champs requis !");
+            return;
+        }
         if (imageFiles.length === 0) {
             alert("Veuillez ajouter au moins une photo !");
             return;
         }
-
         if (signatureEmpty) {
             alert("Veuillez ajouter votre signature !");
             return;
         }
 
-        // (Optionnel) Mettre à jour un champ visible ou caché avec "non"
+        // (Optionnel) Marquer "non" dans un champ caché
         const colisLivréField = document.getElementById("colisLivréStatus");
         if (colisLivréField) {
             colisLivréField.value = "non";
         }
 
-        // 🔄 Envoi Email + Popup
+        // EmailJS + animation
         const loadingPopup = document.getElementById("loadingPopup");
         const popupProgressBar = document.getElementById("popupProgressBar");
 
@@ -79,8 +77,8 @@ document.getElementById("packageForm").addEventListener("submit", async (event) 
             location.reload();
         } catch (error) {
             clearInterval(interval);
-            console.error('Erreur lors de l\'envoi de l\'email :', error);
-            alert(`Erreur : ${error.text || error.message || 'Erreur inconnue'}`);
+            console.error("Erreur lors de l'envoi de l'email :", error);
+            alert(`Erreur : ${error.text || error.message || "Erreur inconnue"}`);
         } finally {
             setTimeout(() => {
                 loadingPopup.classList.remove("visible");
@@ -88,4 +86,6 @@ document.getElementById("packageForm").addEventListener("submit", async (event) 
             }, 1000);
         }
     }
+
+    // (Optionnel : ajouter ici la gestion du cas "livré" si tu veux faire autre chose dans ce cas)
 });
