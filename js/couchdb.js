@@ -260,4 +260,9 @@ document.getElementById("sortDeliveryDate").addEventListener("click", () => {
 });
 
 // Charger les données au démarrage
-window.addEventListener("DOMContentLoaded", () => loadData(currentPage));
+window.addEventListener("DOMContentLoaded", async () => {
+    const result = await localDB.allDocs({ include_docs: true });
+    const totalRows = result.rows.length;
+    currentPage = Math.ceil(totalRows / rowsPerPage); // Commencer par la dernière page
+    loadData(currentPage);
+});
