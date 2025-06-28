@@ -86,13 +86,17 @@ if ("serviceWorker" in navigator) {
                 <input type="datetime-local" id="deliveryDate" name="deliveryDate" required>
                 <span id="deliveryDateError" class="error-message"></span>
 
+                <!-- Partie du formulaire avec inputs et boutons photos -->
                 <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;">
-                <input type="file" id="galleryInput" accept="image/*" style="display: none;" multiple>
+                <input type="file" id="galleryInput" accept="image/*" multiple style="display: none;">
 
                 <button type="button" id="takePhotoBtn">📸 Prendre une photo</button>
                 <button type="button" id="chooseGalleryBtn">🖼️ Choisir depuis la galerie</button>
 
-                <div id="previewContainer"></div>
+                <p>Photos ajoutées : <span id="photoCount">0</span>/3</p>
+
+                <div id="previewContainer" style="display:flex; gap:10px; flex-wrap: wrap;"></div>
+
 
 
                 <label>Signature :</label>
@@ -132,226 +136,191 @@ if ("serviceWorker" in navigator) {
         <p>&copy; 2024 Gestion des Colis</p>
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
-    <script>
-        // Initialisation de PouchDB
-        const localDB = new PouchDB('receptions');
-        const remoteDB = new PouchDB('https://apikey-v2-237azo7t1nwttyu787vl2zuxfh5ywxrddnfhcujd2nbu:b7ce3f8c0a99a10c0825a4c1ff68fe62@ca3c9329-df98-4982-a3dd-ba2b294b02ef-bluemix.cloudantnosqldb.appdomain.cloud/receptions');
+   <script>
+  // Initialisation PouchDB et sync Cloudant
+  const localDB = new PouchDB('receptions');
+  const remoteDB = new PouchDB('https://apikey-v2-237azo7t1nwttyu787vl2zuxfh5ywxrddnfhcujd2nbu:b7ce3f8c0a99a10c0825a4c1ff68fe62@ca3c9329-df98-4982-a3dd-ba2b294b02ef-bluemix.cloudantnosqldb.appdomain.cloud/receptions');
 
-        localDB.sync(remoteDB, {
-            live: true,
-            retry: true
-        }).on('error', (err) => {
-            console.error("Erreur de synchronisation :", err);
-        });
-        // champs appareil photo
-        const fileUpload = document.getElementById("fileUpload");
-        const imagePreview = document.getElementById("imagePreview");
-        const signatureCanvas = document.getElementById("signaturePad");
-        const signaturePad = new SignaturePad(signatureCanvas, {
-            backgroundColor: '#fff',
-        });
+  localDB.sync(remoteDB, { live: true, retry: true }).on('error', (err) => {
+    console.error("Erreur de synchronisation :", err);
+  });
 
-        let imageFiles = [];
-
-        // Compression des images
-        function compresserImage(file, callback) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement("canvas");
-                    const ctx = canvas.getContext("2d");
-                    canvas.width = 800;
-                    canvas.height = (img.height / img.width) * 800;
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    canvas.toBlob(callback, "image/jpeg", 0.7);
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-        // 3 photos maximum
-      
-        function updatePhotoLabel() {
-        const label = document.getElementById("photoLabel");
-        label.textContent = `📷 Ajouter des photos (${imageFiles.length}/3)`;
-        }
-
-        fileUpload.addEventListener("change", () => {
-        const files = Array.from(fileUpload.files);
-
-            if (imageFiles.length + files.length > 3) {
-                alert("Vous ne pouvez télécharger que 3 photos au maximum.");
-                fileUpload.value = "";
-                return;
-            }
-
-            files.forEach((file) => {
-                if (file.type.startsWith("image/")) {
-                    compresserImage(file, (compressedBlob) => {
-                        imageFiles.push(compressedBlob);
-
-                        const reader = new FileReader();
-                        reader.onload = (e) => {
-                            const wrapper = document.createElement("div");
-                            wrapper.className = "preview-image";
-
-                            const img = document.createElement("img");
-                            img.src = e.target.result;
-
-                            const removeBtn = document.createElement("button");
-                            removeBtn.className = "remove-button";
-                            removeBtn.textContent = "❌";
-
-                            removeBtn.addEventListener("click", () => {
-                                const index = Array.from(imagePreview.children).indexOf(wrapper);
-                                if (index !== -1) {
-                                    imageFiles.splice(index, 1);
-                                    wrapper.remove();
-                                    updatePhotoLabel();
-                                }
-                            });
-
-                            wrapper.appendChild(img);
-                            wrapper.appendChild(removeBtn);
-                            imagePreview.appendChild(wrapper);
-                            updatePhotoLabel();
-                        };
-
-                        reader.readAsDataURL(compressedBlob);
-                    });
-                }
-            });
-
-            fileUpload.value = "";
-        });
-
-// Réinitialisation du formulaire
-document.getElementById("clearForm").addEventListener("click", () => {
-    document.getElementById("packageForm").reset();
-    imagePreview.innerHTML = "";
-    imageFiles = [];
-    signaturePad.clear();
-    updatePhotoLabel();
-});
-
-
-
-        // soumission du formulaire
-        document.getElementById("packageForm").addEventListener("submit", async (event) => {
-            event.preventDefault();
-            //test 1 photo uploader minimum
-            if (imageFiles.length === 0) {
-                alert("Veuillez ajouter au moins une photo avant de sauvegarder !");
-                return;
-            }
-
-            const formData = new FormData(event.target);
-            const deliveredRadio = document.querySelector('input[name="delivered"]:checked');
-
-            if (!deliveredRadio) {
-                alert("Veuillez sélectionner si le colis a été livré !");
-                return;
-            }
-            //formatage de la date pour fr-Fr dans le champs date selectionné par l'utilisateur
-            const deliveryDateInput = formData.get("deliveryDate");
-            const deliveryDate = new Date(deliveryDateInput);
-
-            const formattedDeliveryDate = deliveryDate.toLocaleString('fr-FR', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            });
-            
-            // date de réception
-            const data = {
-                _id: new Date().toISOString(),
-                recipientName: formData.get("recipientName"),
-                receiverName: formData.get("receiverName"),
-                packageCount: formData.get("packageCount"),
-                serviceEmail: document.getElementById("serviceEmails").value,
-                deliveryDate: formattedDeliveryDate,
-                delivered: deliveredRadio.value,
-                signature: signaturePad.isEmpty() ? null : signaturePad.toDataURL("image/jpeg"),
-                photos: [],
-            };
-
-            if (!data.signature) {
-                alert("Veuillez fournir une signature !");
-                return;
-            }
-
-            for (let file of imageFiles) {
-                const dataURL = await new Promise((resolve) => {
-                    const reader = new FileReader();
-                    reader.onload = () => resolve(reader.result);
-                    reader.readAsDataURL(file);
-                });
-                data.photos.push(dataURL);
-            }
-
-            try {
-                await localDB.put(data);
-                alert("Données sauvegardées et synchronisées !");
-                document.getElementById("clearForm").click();
-            } catch (error) {
-                console.error("Erreur lors de l'enregistrement :", error);
-                alert("Une erreur est survenue lors de l'enregistrement.");
-            }
-        });
-
-        document.getElementById("clearSignature").addEventListener("click", () => {
-            signaturePad.clear();
-        });
-
-        document.getElementById("clearForm").addEventListener("click", () => {
-            document.getElementById("packageForm").reset();
-            imagePreview.innerHTML = "";
-            imageFiles = [];
-            signaturePad.clear();
-        });
-    </script>
-    <!-- Script envoi email-->
-    <script src="./js/emailJSlight.js"></script>
-    
-    
-    <script>
+  // Références DOM
   const cameraInput = document.getElementById("cameraInput");
   const galleryInput = document.getElementById("galleryInput");
   const previewContainer = document.getElementById("previewContainer");
+  const signatureCanvas = document.getElementById("signaturePad");
+  const signaturePad = new SignaturePad(signatureCanvas, { backgroundColor: '#fff' });
 
-  document.getElementById("takePhotoBtn").addEventListener("click", () => {
-    cameraInput.click();
-  });
+  let imageFiles = []; // stocke les blobs compressés
 
-  document.getElementById("chooseGalleryBtn").addEventListener("click", () => {
-    galleryInput.click();
-  });
-
-  function handleFiles(files) {
-    for (const file of files) {
-      if (!file.type.startsWith("image/")) continue;
+  // Compresser image
+  function compresserImage(file) {
+    return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = (e) => {
-        const img = document.createElement("img");
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          canvas.width = 800;
+          canvas.height = (img.height / img.width) * 800;
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          canvas.toBlob(
+            (blob) => {
+              if (blob) resolve(blob);
+              else reject(new Error("Erreur compression"));
+            },
+            "image/jpeg",
+            0.7
+          );
+        };
         img.src = e.target.result;
-        img.style.maxWidth = "150px";
-        img.style.margin = "5px";
-        previewContainer.appendChild(img);
       };
       reader.readAsDataURL(file);
+    });
+  }
+
+  // Ajouter photos avec contrôle max 3
+  async function handleFiles(files) {
+    for (const file of files) {
+      if (!file.type.startsWith("image/")) continue;
+      if (imageFiles.length >= 3) {
+        alert("Vous ne pouvez télécharger que 3 photos au maximum.");
+        break;
+      }
+      try {
+        const compressedBlob = await compresserImage(file);
+        imageFiles.push(compressedBlob);
+
+        // Créer aperçu image avec bouton supprimer
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const wrapper = document.createElement("div");
+          wrapper.className = "preview-image";
+
+          const img = document.createElement("img");
+          img.src = e.target.result;
+          img.style.maxWidth = "150px";
+          img.style.margin = "5px";
+
+          const removeBtn = document.createElement("button");
+          removeBtn.className = "remove-button";
+          removeBtn.textContent = "❌";
+          removeBtn.type = "button";
+
+          removeBtn.addEventListener("click", () => {
+            const index = imageFiles.indexOf(compressedBlob);
+            if (index !== -1) {
+              imageFiles.splice(index, 1);
+              wrapper.remove();
+            }
+          });
+
+          wrapper.appendChild(img);
+          wrapper.appendChild(removeBtn);
+          previewContainer.appendChild(wrapper);
+        };
+        reader.readAsDataURL(compressedBlob);
+      } catch (e) {
+        console.error("Erreur compression image:", e);
+      }
     }
   }
 
+  // Écouteurs sur inputs fichiers
   cameraInput.addEventListener("change", () => {
     handleFiles(cameraInput.files);
+    cameraInput.value = "";
   });
 
   galleryInput.addEventListener("change", () => {
     handleFiles(galleryInput.files);
+    galleryInput.value = "";
+  });
+
+  // Réinitialiser formulaire complet
+  function clearForm() {
+    document.getElementById("packageForm").reset();
+    previewContainer.innerHTML = "";
+    imageFiles = [];
+    signaturePad.clear();
+  }
+
+  document.getElementById("clearForm").addEventListener("click", clearForm);
+
+  document.getElementById("clearSignature").addEventListener("click", () => {
+    signaturePad.clear();
+  });
+
+  // Soumission formulaire
+  document.getElementById("packageForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    if (imageFiles.length === 0) {
+      alert("Veuillez ajouter au moins une photo avant de sauvegarder !");
+      return;
+    }
+
+    const formData = new FormData(event.target);
+    const deliveredRadio = document.querySelector('input[name="delivered"]:checked');
+
+    if (!deliveredRadio) {
+      alert("Veuillez sélectionner si le colis a été livré !");
+      return;
+    }
+
+    const deliveryDateInput = formData.get("deliveryDate");
+    const deliveryDate = new Date(deliveryDateInput);
+    const formattedDeliveryDate = deliveryDate.toLocaleString('fr-FR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
+    if (signaturePad.isEmpty()) {
+      alert("Veuillez fournir une signature !");
+      return;
+    }
+
+    // Préparer données à stocker
+    const data = {
+      _id: new Date().toISOString(),
+      recipientName: formData.get("recipientName"),
+      receiverName: formData.get("receiverName"),
+      packageCount: formData.get("packageCount"),
+      serviceEmail: document.getElementById("serviceEmails").value,
+      deliveryDate: formattedDeliveryDate,
+      delivered: deliveredRadio.value,
+      signature: signaturePad.toDataURL("image/jpeg"),
+      photos: [],
+    };
+
+    // Convertir blobs en DataURL pour stockage base64
+    for (const file of imageFiles) {
+      const dataURL = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.readAsDataURL(file);
+      });
+      data.photos.push(dataURL);
+    }
+
+    try {
+      await localDB.put(data);
+      alert("Données sauvegardées et synchronisées !");
+      clearForm();
+    } catch (error) {
+      console.error("Erreur lors de l'enregistrement :", error);
+      alert("Une erreur est survenue lors de l'enregistrement.");
+    }
   });
 </script>
+
+    <!-- Script envoi email-->
+    <script src="./js/emailJSlight.js"></script>
+    
 </body>
 </html>
