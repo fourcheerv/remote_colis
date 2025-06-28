@@ -283,3 +283,70 @@ footer {
         font-size: 12px;
     }
 }
+
+/* cacher des colonnes comme la 5 email receptionnaire*/
+@media (max-width: 600px) {
+  th:nth-child(5),
+  td:nth-child(5) {
+    display: none;
+  }
+}
+
+/* Rend la table scrollable horizontalement sur petit écran */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* Assure que le tableau garde sa largeur minimale */
+table {
+  width: 100%;
+  min-width: 900px; /* à ajuster selon les colonnes */
+  border-collapse: collapse;
+}
+
+/* Responsive image dans tableau */
+.table-img {
+  max-width: 80px;
+  height: auto;
+}
+
+/* Adaptations mobiles */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .toolbar {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .toolbar input,
+  .toolbar button {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  .toolbar-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  #paginationControls button {
+    padding: 6px 10px;
+    font-size: 14px;
+  }
+
+  th, td {
+    padding: 6px 8px;
+  }
+
+  /* Images popup */
+  #popupImage {
+    max-width: 95vw;
+    max-height: 90vh;
+  }
+}
