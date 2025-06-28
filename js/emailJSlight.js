@@ -7,30 +7,46 @@ document.getElementById("packageForm").addEventListener("submit", async (event) 
         return;
     }
 
-    if (deliveredRadio.value === "false") {
-        const serviceEmail = document.getElementById("serviceEmails").value;
-        const recipientName = document.getElementById("recipientName").value;
-        const packageCount = document.getElementById("packageCount").value;
-        const receiverName = document.getElementById("receiverName").value;
+    const isDelivered = deliveredRadio.value === "true";
 
-        // Vérification que tous les champs sont remplis
+    // Obtenir les champs
+    const serviceEmail = document.getElementById("serviceEmails").value.trim();
+    const recipientName = document.getElementById("recipientName").value.trim();
+    const packageCount = document.getElementById("packageCount").value.trim();
+    const receiverName = document.getElementById("receiverName").value.trim();
+
+    // 🖼️ Photo obligatoire
+    const photoInput = document.getElementById("photoInput"); // ID du champ input[type=file]
+    const imageFiles = photoInput?.files || [];
+
+    // ✍️ Signature obligatoire
+    const signatureEmpty = signaturePad?.isEmpty?.() ?? true;
+
+    // Cas "Non livré"
+    if (!isDelivered) {
+        // 🧠 Vérification de tous les champs requis
         if (!serviceEmail || !recipientName || !packageCount) {
             alert("Veuillez remplir tous les champs !");
             return;
         }
 
-        // 🚫 Vérifie qu’au moins une photo est ajoutée
         if (imageFiles.length === 0) {
             alert("Veuillez ajouter au moins une photo !");
             return;
         }
 
-        // 🚫 Vérifie que la signature n’est pas vide
-        if (signaturePad.isEmpty()) {
+        if (signatureEmpty) {
             alert("Veuillez ajouter votre signature !");
             return;
         }
 
+        // (Optionnel) Mettre à jour un champ visible ou caché avec "non"
+        const colisLivréField = document.getElementById("colisLivréStatus");
+        if (colisLivréField) {
+            colisLivréField.value = "non";
+        }
+
+        // 🔄 Envoi Email + Popup
         const loadingPopup = document.getElementById("loadingPopup");
         const popupProgressBar = document.getElementById("popupProgressBar");
 
@@ -50,11 +66,11 @@ document.getElementById("packageForm").addEventListener("submit", async (event) 
             emailjs.init({ publicKey: "UFlNoLfp7PdWyrBak" });
 
             await emailjs.send("service_colis", "template_colis_non", {
-                serviceEmail: serviceEmail,
-                recipientName: recipientName,
-                packageCount: packageCount,
-                receiverName: receiverName,
-                message: "Le(les) colis n'a(ont) pas pu être livré(s) en raison d'une absence ou d'un autre motif. Merci de contacter le service manutention pour le(les) récupérer.",
+                serviceEmail,
+                recipientName,
+                packageCount,
+                receiverName,
+                message: "Le(les) colis n'a(ont) pas pu être livré(s). Merci de contacter le service manutention.",
             });
 
             clearInterval(interval);
@@ -62,10 +78,10 @@ document.getElementById("packageForm").addEventListener("submit", async (event) 
             alert("Email envoyé avec succès !");
             location.reload();
         } catch (error) {
-            console.error('Erreur lors de l\'envoi de l\'email :', JSON.stringify(error, null, 2));
-            alert(`Une erreur est survenue lors de l'envoi de l'email : ${error.text || error.message || 'Erreur inconnue'}`);
-        } finally {
             clearInterval(interval);
+            console.error('Erreur lors de l\'envoi de l\'email :', error);
+            alert(`Erreur : ${error.text || error.message || 'Erreur inconnue'}`);
+        } finally {
             setTimeout(() => {
                 loadingPopup.classList.remove("visible");
                 loadingPopup.classList.add("hidden");
