@@ -117,8 +117,23 @@
     const cameraInput = document.getElementById("cameraInput");
     const galleryInput = document.getElementById("galleryInput");
     const previewContainer = document.getElementById("previewContainer");
-    const signaturePad = new SignaturePad(document.getElementById("signaturePad"), { backgroundColor: '#fff' });
 
+    const canvas = document.getElementById("signaturePad");
+    const signaturePad = new SignaturePad(canvas, { backgroundColor: '#fff' });
+
+    // 🔧 Redimensionner proprement le canvas pour éviter le décalage de signature
+    function resizeCanvas() {
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        canvas.width = canvas.offsetWidth * ratio;
+        canvas.height = canvas.offsetHeight * ratio;
+        canvas.getContext("2d").scale(ratio, ratio);
+        signaturePad.clear();
+    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas(); // à l'initialisation
+
+
+    // 📸 Photo preview + compression
     let imageFiles = [];
 
     function updatePhotoCount() {
