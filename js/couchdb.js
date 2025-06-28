@@ -251,22 +251,64 @@ window.addEventListener("DOMContentLoaded", () => {
 // Pagination
 const updatePaginationControls = () => {
     const totalPages = Math.ceil(allSortedRows.length / rowsPerPage);
-    document.getElementById("pageInfo").textContent = `Page ${currentPage} / ${totalPages}`;
-    document.getElementById("prevPage").disabled = currentPage === 1;
-    document.getElementById("nextPage").disabled = currentPage === totalPages;
+    const container = document.getElementById("paginationControls");
+    container.innerHTML = "";
+
+    // Bouton "Début"
+    const firstBtn = document.createElement("button");
+    firstBtn.textContent = "⏮ Début";
+    firstBtn.disabled = currentPage === 1;
+    firstBtn.addEventListener("click", () => {
+        currentPage = 1;
+        loadData();
+    });
+    container.appendChild(firstBtn);
+
+    // Bouton "Précédent"
+    const prevBtn = document.createElement("button");
+    prevBtn.textContent = "◀";
+    prevBtn.disabled = currentPage === 1;
+    prevBtn.addEventListener("click", () => {
+        if (currentPage > 1) {
+            currentPage--;
+            loadData();
+        }
+    });
+    container.appendChild(prevBtn);
+
+    // Pages numérotées
+    for (let i = 1; i <= totalPages; i++) {
+        const pageBtn = document.createElement("button");
+        pageBtn.textContent = i;
+        pageBtn.disabled = i === currentPage;
+        pageBtn.style.margin = "0 2px";
+        pageBtn.addEventListener("click", () => {
+            currentPage = i;
+            loadData();
+        });
+        container.appendChild(pageBtn);
+    }
+
+    // Bouton "Suivant"
+    const nextBtn = document.createElement("button");
+    nextBtn.textContent = "▶";
+    nextBtn.disabled = currentPage === totalPages;
+    nextBtn.addEventListener("click", () => {
+        if (currentPage < totalPages) {
+            currentPage++;
+            loadData();
+        }
+    });
+    container.appendChild(nextBtn);
+
+    // Bouton "Fin"
+    const lastBtn = document.createElement("button");
+    lastBtn.textContent = "Fin ⏭";
+    lastBtn.disabled = currentPage === totalPages;
+    lastBtn.addEventListener("click", () => {
+        currentPage = totalPages;
+        loadData();
+    });
+    container.appendChild(lastBtn);
 };
 
-document.getElementById("prevPage").addEventListener("click", () => {
-    if (currentPage > 1) {
-        currentPage--;
-        loadData();
-    }
-});
-
-document.getElementById("nextPage").addEventListener("click", () => {
-    const totalPages = Math.ceil(allSortedRows.length / rowsPerPage);
-    if (currentPage < totalPages) {
-        currentPage++;
-        loadData();
-    }
-});
