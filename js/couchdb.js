@@ -17,8 +17,15 @@ const loadData = async () => {
         const result = await localDB.allDocs({ include_docs: true });
 
         const sortedRows = result.rows.sort((a, b) => {
-            const dateA = new Date(a.doc.deliveryDate || 0);
-            const dateB = new Date(b.doc.deliveryDate || 0);
+        const parseDate = (str) => {
+            if (!str) return new Date(0); // date par défaut si null
+            const [datePart, timePart] = str.split(' ');
+            const [day, month, year] = datePart.split('/');
+            return new Date(`${year}-${month}-${day}T${timePart}:00`);
+        };
+
+        const dateA = parseDate(a.doc.deliveryDate);
+        const dateB = parseDate(b.doc.deliveryDate);
             return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
         });
 
@@ -117,9 +124,9 @@ const exportToExcel = async () => {
         const result = await localDB.allDocs({ include_docs: true });
 
         const sortedRows = result.rows.sort((a, b) => {
-            const dateA = new Date(a.doc.deliveryDate || 0);
-            const dateB = new Date(b.doc.deliveryDate || 0);
-            return dateB - dateA;
+        const dateA = parseDate(a.doc.deliveryDate);
+        const dateB = parseDate(b.doc.deliveryDate);
+        return dateB - dateA;
         });
 
         const data = sortedRows.map(row => ({
