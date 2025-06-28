@@ -11,315 +11,237 @@
     <script src="https://cdn.jsdelivr.net/npm/pouchdb@7.3.1/dist/pouchdb.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
     <script>
-    // raccourci sur les smartphone appel d'un serviceworker pour application PWA
     if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
-        navigator.serviceWorker
-            .register("/remote_colis/js/service-worker.js")
-            .then((registration) => {
-            console.log("Service Worker enregistré avec succès:", registration);
-            })
-            .catch((error) => {
-            console.error("Échec de l'enregistrement du Service Worker:", error);
-            });
+            navigator.serviceWorker
+                .register("/remote_colis/js/service-worker.js")
+                .then((registration) => {
+                    console.log("Service Worker enregistré avec succès:", registration);
+                })
+                .catch((error) => {
+                    console.error("Échec de l'enregistrement du Service Worker:", error);
+                });
         });
     }
     </script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body>
-    <header>
-        <div class="header-content">
-            <img src="./img/logo.png" alt="Logo" class="logo">
-            <h1>Formulaire de remise des colis</h1>
-        </div>
-    </header>
-    <main>
-        <section>
-            <form id="packageForm">
-                <label for="recipientName">Nom du destinataire :</label>
-                <input type="text" id="recipientName" name="recipientName" required>
-                <span id="recipientNameError" class="error-message"></span>
+<header>
+    <div class="header-content">
+        <img src="./img/logo.png" alt="Logo" class="logo">
+        <h1>Formulaire de remise des colis</h1>
+    </div>
+</header>
+<main>
+    <section>
+        <form id="packageForm">
+            <label for="recipientName">Nom du destinataire :</label>
+            <input type="text" id="recipientName" name="recipientName" required>
+            <label for="receiverName">Nom du réceptionnaire :</label>
+            <input type="text" id="receiverName" name="receiverName" required>
+            <label for="packageCount">Nombre de colis :</label>
+            <input type="number" id="packageCount" name="packageCount" min="1" required>
 
-                <label for="receiverName">Nom du réceptionnaire :</label>
-                <input type="text" id="receiverName" name="receiverName" required>
-                <span id="receiverNameError" class="error-message"></span>
+            <label for="serviceEmails">Emails Référents :</label>
+            <select id="serviceEmails">
+                <option value="" disabled selected>Sélectionnez un email</option>
+                <optgroup label="Direction Technique et Achats">
+                    <option value="sebastien.pokorski@estrepublicain.fr">sebastien.pokorski@estrepublicain.fr</option>
+                    <option value="ketty.gerardin@estrepublicain.fr">ketty.gerardin@estrepublicain.fr</option>
+                </optgroup>
+                <optgroup label="Publicité Ebra Médias">
+                    <option value="charline.visca@ebramedia.fr">charline.visca@ebramedia.fr</option>
+                </optgroup>
+                <optgroup label="Direction Rédaction">
+                    <option value="emmanuelle.cunin@estrepublicain.fr">emmanuelle.cunin@estrepublicain.fr</option>
+                </optgroup>
+                <optgroup label="Direction Générale">
+                    <option value="sandrine.florentin@estrepublicain.fr">sandrine.florentin@estrepublicain.fr</option>
+                </optgroup>
+                <optgroup label="Direction Ventes">
+                    <option value="celia.dubois@estrepublicain.fr">celia.dubois@estrepublicain.fr</option>
+                </optgroup>
+                <optgroup label="Ebra Services">
+                    <option value="myriam.lefebvre@ebraservices.fr">myriam.lefebvre@ebraservices.fr</option>
+                </optgroup>
+                <optgroup label="Ebra Events">
+                    <option value="dorian.grandjacquot@ebra.fr">dorian.grandjacquot@ebra.fr</option>
+                </optgroup>
+            </select>
 
-                <label for="packageCount">Nombre de colis :</label>
-                <input type="number" id="packageCount" name="packageCount" min="1" required>
-                <span id="packageCountError" class="error-message"></span>
+            <label for="deliveryDate">Date et Heure de réception :</label>
+            <input type="datetime-local" id="deliveryDate" name="deliveryDate" required>
 
-                <div class="email-list">
-                    <label for="serviceEmails">Emails Référents par service si colis non remis :</label>
-                <select id="serviceEmails">
-                    <option value="" disabled selected>Sélectionnez un email</option>
-                    <optgroup label="Direction Technique et Achats">
-                        <option value="sebastien.pokorski@estrepublicain.fr">sebastien.pokorski@estrepublicain.fr</option>
-                        <option value="ketty.gerardin@estrepublicain.fr">ketty.gerardin@estrepublicain.fr</option>
-                    </optgroup>
-                    <optgroup label="Publicité Ebra Médias">
-                        <option value="charline.visca@ebramedia.fr">charline.visca@ebramedia.fr</option>
-                    </optgroup>
-                    <optgroup label=" Direction Rédaction">
-                        <option value="emmanuelle.cunin@estrepublicain.fr">emmanuelle.cunin@estrepublicain.fr</option>
-                    </optgroup>
-                      <optgroup label="Direction Générale">
-                        <option value="sandrine.florentin@estrepublicain.fr">sandrine.florentin@estrepublicain.fr</option>
-                    </optgroup>
-                    <optgroup label="Direction Ventes">
-                        <option value="celia.dubois@estrepublicain.fr">celia.dubois@estrepublicain.fr</option>
-                    </optgroup>
-                    <optgroup label="Ebra Services">
-                        <option value="myriam.lefebvre@ebraservices.fr">myriam.lefebvre@ebraservices.fr</option>
-                    </optgroup>
-                    <optgroup label="Ebra Events">
-                        <option value="dorian.grandjacquot@ebra.fr">dorian.grandjacquot@ebra.fr</option>
-                    </optgroup>
-                    
-                </select>
-                </div>
+            <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;">
+            <input type="file" id="galleryInput" accept="image/*" multiple style="display:none;">
 
-                <label for="deliveryDate">Date et Heure de réception :</label>
-                <input type="datetime-local" id="deliveryDate" name="deliveryDate" required>
-                <span id="deliveryDateError" class="error-message"></span>
+            <button type="button" id="takePhotoBtn">📸 Prendre une photo</button>
+            <button type="button" id="chooseGalleryBtn">🖼️ Choisir depuis la galerie</button>
+            <p>Photos ajoutées : <span id="photoCount">0</span>/3</p>
+            <div id="previewContainer" style="display:flex; gap:10px; flex-wrap: wrap;"></div>
 
-                <!-- Partie du formulaire avec inputs et boutons photos -->
-                <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;">
-                <input type="file" id="galleryInput" accept="image/*" multiple style="display: none;">
+            <label>Signature :</label>
+            <canvas id="signaturePad" width="500" height="200" style="border: 1px solid #000;"></canvas>
+            <button type="button" id="clearSignature">Effacer la signature</button>
 
-                <button type="button" id="takePhotoBtn">📸 Prendre une photo</button>
-                <button type="button" id="chooseGalleryBtn">🖼️ Choisir depuis la galerie</button>
+            <p><strong>Colis Livré :</strong></p>
+            <label><input type="radio" name="delivered" value="true" required> Oui</label>
+            <label><input type="radio" name="delivered" value="false"> Non</label>
 
-                <p>Photos ajoutées : <span id="photoCount">0</span>/3</p>
-
-                <div id="previewContainer" style="display:flex; gap:10px; flex-wrap: wrap;"></div>
-
-
-
-                <label>Signature :</label>
-                <canvas id="signaturePad" width="500" height="200" style="border: 1px solid #000;"></canvas>
-                <button type="button" id="clearSignature" class="button-clear">Effacer la signature</button>
-                <span id="signatureError" class="error-message"></span>
-
-                <p><strong>Colis Livré :</strong></p>
-                <div class="radio-group">
-                    <label>
-                        <input type="radio" id="trueRadio" name="delivered" value="true" required>
-                        Oui
-                    </label>
-                    <label>
-                        <input type="radio" id="falseRadio" name="delivered" value="false">
-                        Non
-                    </label>
-                </div>
-                <span id="deliveredError" class="error-message"></span>
-            
-                <div id="loadingPopup" class="hidden">
-                    <div style="background-color: white; padding: 20px; border-radius: 10px; text-align: center; width: 300px;">
-                        <p>Envoi de l'email en cours...</p>
-                        <div style="width: 100%; background-color: #f3f3f3; margin-top: 10px;">
-                            <div id="popupProgressBar" style="width: 0; height: 10px; background-color: #4caf50;"></div>
-                        </div>
+            <div id="loadingPopup" class="hidden">
+                <div style="background:#fff; padding:20px; border-radius:10px; text-align:center; width:300px;">
+                    <p>Envoi de l'email en cours...</p>
+                    <div style="width:100%; background:#f3f3f3; margin-top:10px;">
+                        <div id="popupProgressBar" style="width:0; height:10px; background:#4caf50;"></div>
                     </div>
-                </div>               
-                
-                <button type="submit" id="saveDataBtn" class="button-save">Sauvegarder</button>
-                <button type="button" id="clearForm" class="button-clear">Vider les champs</button>
-                <div><a href="admin_interface.html" id="viewResultsLink">Voir les résultats</a></div>
-            </form>
-        </section>
-    </main>
-    <footer>
-        <p>&copy; 2024 Gestion des Colis</p>
-    </footer>
-    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
-    <script>
-        // Initialisation de PouchDB
-        const localDB = new PouchDB('receptions');
-        const remoteDB = new PouchDB('https://apikey-v2-237azo7t1nwttyu787vl2zuxfh5ywxrddnfhcujd2nbu:b7ce3f8c0a99a10c0825a4c1ff68fe62@ca3c9329-df98-4982-a3dd-ba2b294b02ef-bluemix.cloudantnosqldb.appdomain.cloud/receptions');
+                </div>
+            </div>
 
-        localDB.sync(remoteDB, {
-            live: true,
-            retry: true
-        }).on('error', (err) => {
-            console.error("Erreur de synchronisation :", err);
-        });
-        // champs appareil photo
-        const fileUpload = document.getElementById("fileUpload");
-        const imagePreview = document.getElementById("imagePreview");
-        const signatureCanvas = document.getElementById("signaturePad");
-        const signaturePad = new SignaturePad(signatureCanvas, {
-            backgroundColor: '#fff',
-        });
+            <button type="submit" id="saveDataBtn">Sauvegarder</button>
+            <button type="button" id="clearForm">Vider les champs</button>
+            <div><a href="admin_interface.html">Voir les résultats</a></div>
+        </form>
+    </section>
+</main>
+<footer>
+    <p>&copy; 2024 Gestion des Colis</p>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+<script>
+    const localDB = new PouchDB('receptions');
+    const remoteDB = new PouchDB('https://apikey-v2-237azo7t1nwttyu787vl2zuxfh5ywxrddnfhcujd2nbu:b7ce3f8c0a99a10c0825a4c1ff68fe62@ca3c9329-df98-4982-a3dd-ba2b294b02ef-bluemix.cloudantnosqldb.appdomain.cloud/receptions');
 
-        let imageFiles = [];
+    localDB.sync(remoteDB, { live: true, retry: true }).on('error', console.error);
 
-        // Compression des images
-        function compresserImage(file, callback) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement("canvas");
-                    const ctx = canvas.getContext("2d");
-                    canvas.width = 800;
-                    canvas.height = (img.height / img.width) * 800;
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    canvas.toBlob(callback, "image/jpeg", 0.7);
-                };
-                img.src = e.target.result;
+    const cameraInput = document.getElementById("cameraInput");
+    const galleryInput = document.getElementById("galleryInput");
+    const previewContainer = document.getElementById("previewContainer");
+    const signaturePad = new SignaturePad(document.getElementById("signaturePad"), { backgroundColor: '#fff' });
+
+    let imageFiles = [];
+
+    function updatePhotoCount() {
+        document.getElementById("photoCount").textContent = imageFiles.length;
+    }
+
+    function compresserImage(file, callback) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement("canvas");
+                canvas.width = 800;
+                canvas.height = (img.height / img.width) * 800;
+                canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+                canvas.toBlob(callback, "image/jpeg", 0.7);
             };
-            reader.readAsDataURL(file);
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function handleFiles(fileList) {
+        const files = Array.from(fileList);
+        if (imageFiles.length + files.length > 3) {
+            alert("Vous ne pouvez ajouter que 3 photos au maximum.");
+            return;
         }
-        // 3 photos maximum
-      
-        function updatePhotoLabel() {
-        const label = document.getElementById("photoLabel");
-        label.textContent = `📷 Ajouter des photos (${imageFiles.length}/3)`;
-        }
 
-        fileUpload.addEventListener("change", () => {
-        const files = Array.from(fileUpload.files);
+        files.forEach((file) => {
+            if (!file.type.startsWith("image/")) return;
+            compresserImage(file, (compressedBlob) => {
+                imageFiles.push(compressedBlob);
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const wrapper = document.createElement("div");
+                    wrapper.className = "preview-image";
 
-            if (imageFiles.length + files.length > 3) {
-                alert("Vous ne pouvez télécharger que 3 photos au maximum.");
-                fileUpload.value = "";
-                return;
-            }
+                    const img = document.createElement("img");
+                    img.src = e.target.result;
 
-            files.forEach((file) => {
-                if (file.type.startsWith("image/")) {
-                    compresserImage(file, (compressedBlob) => {
-                        imageFiles.push(compressedBlob);
+                    const removeBtn = document.createElement("button");
+                    removeBtn.className = "remove-button";
+                    removeBtn.textContent = "❌";
 
-                        const reader = new FileReader();
-                        reader.onload = (e) => {
-                            const wrapper = document.createElement("div");
-                            wrapper.className = "preview-image";
-
-                            const img = document.createElement("img");
-                            img.src = e.target.result;
-
-                            const removeBtn = document.createElement("button");
-                            removeBtn.className = "remove-button";
-                            removeBtn.textContent = "❌";
-
-                            removeBtn.addEventListener("click", () => {
-                                const index = Array.from(imagePreview.children).indexOf(wrapper);
-                                if (index !== -1) {
-                                    imageFiles.splice(index, 1);
-                                    wrapper.remove();
-                                    updatePhotoLabel();
-                                }
-                            });
-
-                            wrapper.appendChild(img);
-                            wrapper.appendChild(removeBtn);
-                            imagePreview.appendChild(wrapper);
-                            updatePhotoLabel();
-                        };
-
-                        reader.readAsDataURL(compressedBlob);
+                    removeBtn.addEventListener("click", () => {
+                        const index = Array.from(previewContainer.children).indexOf(wrapper);
+                        if (index !== -1) {
+                            imageFiles.splice(index, 1);
+                            wrapper.remove();
+                            updatePhotoCount();
+                        }
                     });
-                }
+
+                    wrapper.appendChild(img);
+                    wrapper.appendChild(removeBtn);
+                    previewContainer.appendChild(wrapper);
+                    updatePhotoCount();
+                };
+                reader.readAsDataURL(compressedBlob);
             });
-
-            fileUpload.value = "";
         });
+    }
 
-// Réinitialisation du formulaire
-document.getElementById("clearForm").addEventListener("click", () => {
-    document.getElementById("packageForm").reset();
-    imagePreview.innerHTML = "";
-    imageFiles = [];
-    signaturePad.clear();
-    updatePhotoLabel();
-});
+    cameraInput.addEventListener("change", (e) => handleFiles(e.target.files));
+    galleryInput.addEventListener("change", (e) => handleFiles(e.target.files));
 
+    document.getElementById("takePhotoBtn").addEventListener("click", () => cameraInput.click());
+    document.getElementById("chooseGalleryBtn").addEventListener("click", () => galleryInput.click());
 
+    document.getElementById("clearForm").addEventListener("click", () => {
+        document.getElementById("packageForm").reset();
+        previewContainer.innerHTML = "";
+        imageFiles = [];
+        signaturePad.clear();
+        updatePhotoCount();
+    });
 
-        // soumission du formulaire
-        document.getElementById("packageForm").addEventListener("submit", async (event) => {
-            event.preventDefault();
-            //test 1 photo uploader minimum
-            if (imageFiles.length === 0) {
-                alert("Veuillez ajouter au moins une photo avant de sauvegarder !");
-                return;
-            }
+    document.getElementById("clearSignature").addEventListener("click", () => signaturePad.clear());
 
-            const formData = new FormData(event.target);
-            const deliveredRadio = document.querySelector('input[name="delivered"]:checked');
+    document.getElementById("packageForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        if (imageFiles.length === 0) return alert("Veuillez ajouter au moins une photo !");
+        const formData = new FormData(event.target);
+        const delivered = document.querySelector('input[name="delivered"]:checked');
+        if (!delivered) return alert("Veuillez indiquer si le colis a été livré.");
 
-            if (!deliveredRadio) {
-                alert("Veuillez sélectionner si le colis a été livré !");
-                return;
-            }
-            //formatage de la date pour fr-Fr dans le champs date selectionné par l'utilisateur
-            const deliveryDateInput = formData.get("deliveryDate");
-            const deliveryDate = new Date(deliveryDateInput);
+        const deliveryDate = new Date(formData.get("deliveryDate"));
+        const formattedDeliveryDate = deliveryDate.toLocaleString('fr-FR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
 
-            const formattedDeliveryDate = deliveryDate.toLocaleString('fr-FR', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
+        const data = {
+            _id: new Date().toISOString(),
+            recipientName: formData.get("recipientName"),
+            receiverName: formData.get("receiverName"),
+            packageCount: formData.get("packageCount"),
+            serviceEmail: formData.get("serviceEmails"),
+            deliveryDate: formattedDeliveryDate,
+            delivered: delivered.value,
+            signature: signaturePad.isEmpty() ? null : signaturePad.toDataURL("image/jpeg"),
+            photos: [],
+        };
+
+        if (!data.signature) return alert("Veuillez signer avant de sauvegarder.");
+
+        for (const file of imageFiles) {
+            const dataURL = await new Promise((res) => {
+                const reader = new FileReader();
+                reader.onload = () => res(reader.result);
+                reader.readAsDataURL(file);
             });
-            
-            // date de réception
-            const data = {
-                _id: new Date().toISOString(),
-                recipientName: formData.get("recipientName"),
-                receiverName: formData.get("receiverName"),
-                packageCount: formData.get("packageCount"),
-                serviceEmail: document.getElementById("serviceEmails").value,
-                deliveryDate: formattedDeliveryDate,
-                delivered: deliveredRadio.value,
-                signature: signaturePad.isEmpty() ? null : signaturePad.toDataURL("image/jpeg"),
-                photos: [],
-            };
+            data.photos.push(dataURL);
+        }
 
-            if (!data.signature) {
-                alert("Veuillez fournir une signature !");
-                return;
-            }
-
-            for (let file of imageFiles) {
-                const dataURL = await new Promise((resolve) => {
-                    const reader = new FileReader();
-                    reader.onload = () => resolve(reader.result);
-                    reader.readAsDataURL(file);
-                });
-                data.photos.push(dataURL);
-            }
-
-            try {
-                await localDB.put(data);
-                alert("Données sauvegardées et synchronisées !");
-                document.getElementById("clearForm").click();
-            } catch (error) {
-                console.error("Erreur lors de l'enregistrement :", error);
-                alert("Une erreur est survenue lors de l'enregistrement.");
-            }
-        });
-
-        document.getElementById("clearSignature").addEventListener("click", () => {
-            signaturePad.clear();
-        });
-
-      
-        document.getElementById("takePhotoBtn").addEventListener("click", () => {
-        document.getElementById("cameraInput").click();
-        });
-
-        document.getElementById("chooseGalleryBtn").addEventListener("click", () => {
-        document.getElementById("galleryInput").click();
-        });
-    </script>
-    <!-- Script envoi email-->
-    <script src="./js/emailJSlight.js"></script>
-    
-    
-
+        try {
+            await localDB.put(data);
+            alert("Données sauvegardées avec succès !");
+            document.getElementById("clearForm").click();
+        } catch (err) {
+            console.error("Erreur de sauvegarde :", err);
+            alert("Erreur lors de l'enregistrement.");
+        }
+    });
+</script>
+<script src="./js/emailJSlight.js"></script>
 </body>
 </html>
