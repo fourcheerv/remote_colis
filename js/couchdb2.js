@@ -2,27 +2,28 @@
 const localDB = new PouchDB('receptions');
 const remoteDB = new PouchDB('https://apikey-v2-237azo7t1nwttyu787vl2zuxfh5ywxrddnfhcujd2nbu:b7ce3f8c0a99a10c0825a4c1ff68fe62@ca3c9329-df98-4982-a3dd-ba2b294b02ef-bluemix.cloudantnosqldb.appdomain.cloud/receptions');
 
-// Tri initial
-let sortOrder = 'desc';
+// Initialisation pagination
+let currentPage = 1;
+const rowsPerPage = 20; // Nombre de lignes par page
+let totalRows = 0; // Total des lignes disponibles
 
 // Synchronisation avec CouchDB
 localDB.sync(remoteDB, { live: true, retry: true }).on('error', console.error);
 
-// Fonction pour charger les données
-const loadData = async () => {
+// Charger les données dans le tableau
+const loadData = async (page = 1) => {
     const tbody = document.querySelector("#dataTable tbody");
-    tbody.innerHTML = "";
+    tbody.innerHTML = ""; // Vider le tableau avant de recharger les données
 
     try {
         const result = await localDB.allDocs({ include_docs: true });
+        totalRows = result.rows.length;
+        const startIndex = (page - 1) * rowsPerPage;
+        const endIndex = startIndex + rowsPerPage;
 
-        const sortedRows = result.rows.sort((a, b) => {
-            const dateA = new Date(a.doc.deliveryDate || 0);
-            const dateB = new Date(b.doc.deliveryDate || 0);
-            return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
-        });
+        const paginatedRows = result.rows.slice(startIndex, endIndex);
 
-        sortedRows.forEach(row => {
+        paginatedRows.forEach(row => {
             const { _id, recipientName, receiverName, serviceEmail, packageCount, deliveryDate, signature, photos, delivered } = row.doc;
 
             const tr = document.createElement("tr");
@@ -38,7 +39,9 @@ const loadData = async () => {
                     ${signature ? `<img src="${signature}" alt="Signature" class="table-img" onclick="showImage('${signature}')">` : "Aucune"}
                 </td>
                 <td>
-                    ${(photos || []).map(photo => `<img src="${photo}" alt="Photo" class="table-img" onclick="showImage('${photo}')">`).join("") || "Aucune"}
+                    ${(photos || [])
+                        .map(photo => `<img src="${photo}" alt="Photo" class="table-img" onclick="showImage('${photo}')">`)
+                        .join("") || "Aucune"}
                 </td>
                 <td>
                     <select class="updateDeliveredStatus" data-id="${_id}">
@@ -49,6 +52,8 @@ const loadData = async () => {
             `;
             tbody.appendChild(tr);
         });
+
+        updatePaginationInfo();
     } catch (error) {
         console.error("Erreur lors du chargement des données :", error);
     }
@@ -58,7 +63,7 @@ const loadData = async () => {
 document.addEventListener("change", async (event) => {
     if (event.target.classList.contains("updateDeliveredStatus")) {
         const docId = event.target.dataset.id;
-        const newValue = event.target.value;
+        const newValue = event.target.value === "true" ? "true" : "false";
 
         try {
             const doc = await localDB.get(docId);
@@ -71,6 +76,15 @@ document.addEventListener("change", async (event) => {
         }
     }
 });
+
+// Mise à jour de la pagination
+const updatePaginationInfo = () => {
+    const totalPages = Math.ceil(totalRows / rowsPerPage);
+    document.getElementById("pageInfo").textContent = `Page ${currentPage} sur ${totalPages}`;
+    document.getElementById("prevPageBtn").disabled = currentPage === 1;
+    document.getElementById("nextPageBtn").disabled = currentPage === totalPages;
+};
+
 
 // Recherche dans le tableau
 const searchData = () => {
@@ -107,18 +121,11 @@ const deleteSelected = async () => {
     }
 };
 
-// Export Excel
+// Exporter les données au format Excel
 const exportToExcel = async () => {
     try {
         const result = await localDB.allDocs({ include_docs: true });
-
-        const sortedRows = result.rows.sort((a, b) => {
-            const dateA = new Date(a.doc.deliveryDate || 0);
-            const dateB = new Date(b.doc.deliveryDate || 0);
-            return dateB - dateA;
-        });
-
-        const data = sortedRows.map(row => ({
+        const data = result.rows.map(row => ({
             ID: row.doc._id,
             Destinataire: row.doc.recipientName || "N/A",
             Réceptionnaire: row.doc.receiverName || "N/A",
@@ -137,55 +144,54 @@ const exportToExcel = async () => {
     }
 };
 
-// Export ZIP
-const exportToZip = async () => {
-    try {
-        const result = await localDB.allDocs({ include_docs: true });
-        const data = result.rows.map(row => row.doc);
-
-        if (data.length === 0) {
-            alert("Aucune donnée à exporter !");
-            return;
-        }
-
-        const zip = new JSZip();
-
-        for (const item of data) {
-            const folder = zip.folder(`ID_${item._id}`);
-            const jsonContent = {
-                id: item._id,
-                recipientName: item.recipientName,
-                receiverName: item.receiverName,
-                serviceEmail: item.serviceEmail,
-                packageCount: item.packageCount,
-                deliveryDate: item.deliveryDate,
-                delivered: item.delivered,
-            };
-            folder.file("info.json", JSON.stringify(jsonContent, null, 2));
-
-            if (item.signature) {
-                const signatureBlob = await fetch(item.signature).then(res => res.blob());
-                folder.file("signature.png", signatureBlob);
-            }
-
-            if (item.photos) {
-                for (let i = 0; i < item.photos.length; i++) {
-                    const photoBlob = await fetch(item.photos[i]).then(res => res.blob());
-                    folder.file(`photo_${i + 1}.png`, photoBlob);
+// Exporter les données au format ZIP
+        const exportToZip = async () => {
+            try {
+                const result = await localDB.allDocs({ include_docs: true });
+                const data = result.rows.map(row => row.doc);
+                if (data.length === 0) {
+                    alert("Aucune donnée à exporter !");
+                    return;
                 }
+
+                const zip = new JSZip();
+
+                for (const item of data) {
+                    const folder = zip.folder(`ID_${item._id}`);
+                    const jsonContent = {
+                        id: item._id,
+                        recipientName: item.recipientName,
+                        receiverName: item.receiverName,
+                        serviceEmail: item.serviceEmail,
+                        packageCount: item.packageCount,
+                        deliveryDate: item.deliveryDate,
+                        delivered: item.delivered,
+                    };
+                    folder.file("info.json", JSON.stringify(jsonContent, null, 2));
+
+                    if (item.signature) {
+                        const signatureBlob = await fetch(item.signature).then(res => res.blob());
+                        folder.file("signature.png", signatureBlob);
+                    }
+
+                    if (item.photos) {
+                        for (let i = 0; i < item.photos.length; i++) {
+                            const photoBlob = await fetch(item.photos[i]).then(res => res.blob());
+                            folder.file(`photo_${i + 1}.png`, photoBlob);
+                        }
+                    }
+                }
+
+                zip.generateAsync({ type: "blob" }).then((content) => {
+                    saveAs(content, "Receptions.zip");
+                    alert("Fichier ZIP exporté avec succès !");
+                });
+            } catch (error) {
+                console.error("Erreur lors de l'exportation ZIP :", error);
             }
-        }
+        };
 
-        zip.generateAsync({ type: "blob" }).then((content) => {
-            saveAs(content, "Receptions.zip");
-            alert("Fichier ZIP exporté avec succès !");
-        });
-    } catch (error) {
-        console.error("Erreur lors de l'exportation ZIP :", error);
-    }
-};
-
-// Affichage de l'image
+// Afficher une image dans une pop-up
 const showImage = (src) => {
     const popup = document.getElementById("imagePopup");
     const popupImage = document.getElementById("popupImage");
@@ -198,27 +204,32 @@ document.getElementById("closePopup").addEventListener("click", () => {
     document.getElementById("imagePopup").style.display = "none";
 });
 
-// Sélectionner tout
+// Sélectionner ou désélectionner toutes les lignes
 document.getElementById("selectAll").addEventListener("change", (event) => {
     const checkboxes = document.querySelectorAll(".selectRow");
     checkboxes.forEach(checkbox => (checkbox.checked = event.target.checked));
 });
 
-// Boutons
+// Ajouter les événements aux boutons
 document.getElementById("searchBtn").addEventListener("click", searchData);
 document.getElementById("deleteSelectedBtn").addEventListener("click", deleteSelected);
 document.getElementById("exportBtn").addEventListener("click", exportToExcel);
 document.getElementById("exportZipBtn").addEventListener("click", exportToZip);
 
-// Tri dynamique sur l'en-tête
-document.getElementById("sortDeliveryDate").addEventListener("click", () => {
-    sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
-    document.getElementById("sortDeliveryDate").innerHTML =
-        `Date de réception ${sortOrder === 'asc' ? '&#8593;' : '&#8595;'}`;
-    loadData();
+document.getElementById("prevPageBtn").addEventListener("click", () => {
+    if (currentPage > 1) {
+        currentPage--;
+        loadData(currentPage);
+    }
 });
 
-// Chargement initial
-window.addEventListener("DOMContentLoaded", () => {
-    loadData();
+document.getElementById("nextPageBtn").addEventListener("click", () => {
+    const totalPages = Math.ceil(totalRows / rowsPerPage);
+    if (currentPage < totalPages) {
+        currentPage++;
+        loadData(currentPage);
+    }
 });
+
+// Charger les données au démarrage
+window.addEventListener("DOMContentLoaded", () => loadData(currentPage));
