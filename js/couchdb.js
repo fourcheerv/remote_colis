@@ -8,6 +8,16 @@ const rowsPerPage = 20; // Nombre de lignes par page
 let totalRows = 0; // Total des lignes disponibles
 let sortOrder = 'desc'; // ordre par défaut : décroissant
 
+
+const getSortedDocs = async () => {
+    const result = await localDB.allDocs({ include_docs: true });
+    return result.rows.sort((a, b) => {
+        const dateA = new Date(a.doc.deliveryDate || 0);
+        const dateB = new Date(b.doc.deliveryDate || 0);
+        return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+    });
+};
+
 // Synchronisation avec CouchDB
 localDB.sync(remoteDB, { live: true, retry: true }).on('error', console.error);
 
@@ -17,14 +27,8 @@ const loadData = async (page = 1) => {
     tbody.innerHTML = ""; // Vider le tableau avant de recharger les données
 
     try {
-        const result = await localDB.allDocs({ include_docs: true });
+        const sortedRows = await getSortedDocs();
 
-        // Trier selon la date
-        const sortedRows = result.rows.sort((a, b) => {
-            const dateA = new Date(a.doc.deliveryDate || 0);
-            const dateB = new Date(b.doc.deliveryDate || 0);
-            return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
-        });
 
         totalRows = result.rows.length;
         const startIndex = (page - 1) * rowsPerPage;
