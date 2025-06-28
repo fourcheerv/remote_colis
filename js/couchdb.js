@@ -21,13 +21,6 @@ const parseDate = (str) => {
     return new Date(`${year}-${month}-${day}T${timePart || '00:00'}:00`);
 };
 
-const parseDate = (str) => {
-    if (!str) return new Date(0);
-    const [datePart, timePart] = str.split(' ');
-    const [day, month, year] = datePart.split('/');
-    return new Date(`${year}-${month}-${day}T${timePart || '00:00'}:00`);
-};
-
 const loadData = async () => {
     const tbody = document.querySelector("#dataTable tbody");
     tbody.innerHTML = "";
