@@ -207,7 +207,9 @@ button:hover {
     height: 24px;
     font-weight: bold;
     cursor: pointer;
-    line-height: 24px;
+    display: flex;              /* Ajouté */
+    align-items: center;        /* Centrage vertical */
+    justify-content: center;    /* Centrage horizontal */
     text-align: center;
     box-shadow: 0 0 5px rgba(0,0,0,0.3);
     transition: background-color 0.2s;
