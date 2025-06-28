@@ -81,7 +81,7 @@ input, textarea, select, canvas {
 }
 
 button {
-    width: 25%;
+    width: 100%;
 }
 
 input[type="file"] {
@@ -306,6 +306,12 @@ footer {
 
     footer {
         font-size: 0.7em;
+    }
+}
+
+@media (max-width: 600px) {
+    button {
+        width: 100%;
     }
 }
 /* boite de chargement après envoi email (emailJSlight.js)*/
