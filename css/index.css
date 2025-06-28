@@ -178,16 +178,6 @@ button:hover {
     margin-top: 10px;
 }
 
-.preview-image {
-    position: relative;
-    display: inline-block;
-}
-
-.preview-image img {
-    max-width: 120px;
-    border: 2px solid #ccc;
-    border-radius: 8px;
-}
 
 .remove-button {
     position: absolute;
@@ -203,6 +193,45 @@ button:hover {
     cursor: pointer;
     line-height: 20px;
     text-align: center;
+}
+
+
+.preview-image {
+    position: relative;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    overflow: hidden;
+    max-width: 150px;
+}
+
+.preview-image img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.remove-button {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background-color: rgba(255, 0, 0, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 24px;
+    text-align: center;
+    box-shadow: 0 0 5px rgba(0,0,0,0.3);
+    transition: background-color 0.2s;
+}
+
+.remove-button:hover {
+    background-color: rgba(200, 0, 0, 1);
 }
 
 
