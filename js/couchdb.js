@@ -17,6 +17,14 @@ const loadData = async (page = 1) => {
 
     try {
         const result = await localDB.allDocs({ include_docs: true });
+
+            // Tri décroissant par défaut selon deliveryDate
+            const sortedRows = result.rows.sort((a, b) => {
+            const dateA = new Date(a.doc.deliveryDate || 0);
+            const dateB = new Date(b.doc.deliveryDate || 0);
+            return dateB - dateA; // décroissant
+        });
+
         totalRows = result.rows.length;
         const startIndex = (page - 1) * rowsPerPage;
         const endIndex = startIndex + rowsPerPage;
@@ -124,7 +132,14 @@ const deleteSelected = async () => {
 // Exporter les données au format Excel
 const exportToExcel = async () => {
     try {
-        const result = await localDB.allDocs({ include_docs: true });
+         const result = await localDB.allDocs({ include_docs: true });
+
+            // Tri décroissant par défaut selon deliveryDate
+            const sortedRows = result.rows.sort((a, b) => {
+            const dateA = new Date(a.doc.deliveryDate || 0);
+            const dateB = new Date(b.doc.deliveryDate || 0);
+            return dateB - dateA; // décroissant
+        });
         const data = result.rows.map(row => ({
             ID: row.doc._id,
             Destinataire: row.doc.recipientName || "N/A",
