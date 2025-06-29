@@ -52,7 +52,6 @@ h1 {
 }
 
 button {
-    width: 100%;
     padding: 10px 15px;
     border: none;
     border-radius: 5px;
@@ -61,7 +60,6 @@ button {
     color: #fff;
     font-size: 14px;
 }
-
 
 button:hover {
     background-color: #0056b3;
@@ -105,23 +103,6 @@ button:hover {
 
 .btn-delete:hover {
     background-color: #a71d2a; /* Rouge foncé */
-}
-
-/* Boutons de début et fin*/
-.btn-start-end {
-    padding: 4px 8px;
-    font-size: 12px;
-    background-color: #6c757d;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    margin: 0 4px;
-    cursor: pointer;
-}
-
-.btn-start-end:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
 }
 
 /* Tableau */
@@ -267,10 +248,11 @@ footer {
         margin: 5px auto;
     }
 
-      button {
-    padding: 14px 20px;
-    font-size: 18px;
-  }
+    button {
+        font-size: 12px;
+        padding: 8px;
+        margin: 5px 2px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -282,13 +264,11 @@ footer {
         font-size: 14px;
     }
 
-
-
-  button {
-    padding: 14px 20px;
-    font-size: 18px;
-  }
-
+    button {
+        font-size: 10px;
+        padding: 6px;
+        margin: 3px;
+    }
 
     table {
         font-size: 12px;
