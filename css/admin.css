@@ -266,11 +266,13 @@ footer {
         font-size: 14px;
     }
 
-    button {
-        font-size: 10px;
-        padding: 6px;
-        margin: 3px;
-    }
+
+
+  button {
+    padding: 14px 20px;
+    font-size: 18px;
+  }
+
 
     table {
         font-size: 12px;
