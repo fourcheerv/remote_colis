@@ -250,11 +250,10 @@ footer {
         margin: 5px auto;
     }
 
-    button {
-        font-size: 12px;
-        padding: 8px;
-        margin: 5px 2px;
-    }
+      button {
+    padding: 14px 20px;
+    font-size: 18px;
+  }
 }
 
 @media (max-width: 480px) {
