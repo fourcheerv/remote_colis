@@ -259,54 +259,56 @@ const updatePaginationControls = () => {
     const totalPages = Math.ceil(allSortedRows.length / rowsPerPage);
     const container = document.getElementById("paginationControls");
     container.innerHTML = "";
+    
+// Bouton "Début"
+const firstBtn = document.createElement("button");
+firstBtn.textContent = "⏮ Début";
+firstBtn.classList.add("btn-start-end");
+firstBtn.disabled = currentPage === 1;
+firstBtn.addEventListener("click", () => {
+    currentPage = 1;
+    loadData();
+});
+container.appendChild(firstBtn);
 
-    // Bouton "Début"
-    const firstBtn = document.createElement("button");
-    firstBtn.textContent = "⏮ Début";
-    firstBtn.disabled = currentPage === 1;
-    firstBtn.addEventListener("click", () => {
-        currentPage = 1;
+// Précédent
+const prevBtn = document.createElement("button");
+prevBtn.textContent = "◀";
+prevBtn.classList.add("btn-start-end"); // <- AJOUT
+prevBtn.disabled = currentPage === 1;
+prevBtn.addEventListener("click", () => {
+    if (currentPage > 1) {
+        currentPage--;
         loadData();
-    });
-    container.appendChild(firstBtn);
+    }
+});
+container.appendChild(prevBtn);
 
-    // Précédent
-    const prevBtn = document.createElement("button");
-    prevBtn.textContent = "◀";
-    prevBtn.disabled = currentPage === 1;
-    prevBtn.addEventListener("click", () => {
-        if (currentPage > 1) {
-            currentPage--;
-            loadData();
-        }
-    });
-    container.appendChild(prevBtn);
+// Infos de page
+const pageInfo = document.createElement("span");
+pageInfo.textContent = ` Page ${currentPage} / ${totalPages} `;
+container.appendChild(pageInfo);
 
-    // Infos de page
-    const pageInfo = document.createElement("span");
-    pageInfo.textContent = ` Page ${currentPage} / ${totalPages} `;
-    container.appendChild(pageInfo);
-
-    // Suivant
-    const nextBtn = document.createElement("button");
-    nextBtn.textContent = "▶";
-    nextBtn.disabled = currentPage === totalPages;
-    nextBtn.addEventListener("click", () => {
-        if (currentPage < totalPages) {
-            currentPage++;
-            loadData();
-        }
-    });
-    container.appendChild(nextBtn);
-
-    // Bouton "Fin"
-    const lastBtn = document.createElement("button");
-    lastBtn.textContent = "Fin ⏭";
-    lastBtn.disabled = currentPage === totalPages;
-    lastBtn.addEventListener("click", () => {
-        currentPage = totalPages;
+// Suivant
+const nextBtn = document.createElement("button");
+nextBtn.textContent = "▶";
+nextBtn.classList.add("btn-start-end"); // <- AJOUT
+nextBtn.disabled = currentPage === totalPages;
+nextBtn.addEventListener("click", () => {
+    if (currentPage < totalPages) {
+        currentPage++;
         loadData();
-    });
-    container.appendChild(lastBtn);
-};
+    }
+});
+container.appendChild(nextBtn);
 
+// Bouton "Fin"
+const lastBtn = document.createElement("button");
+lastBtn.textContent = "Fin ⏭";
+lastBtn.classList.add("btn-start-end");
+lastBtn.disabled = currentPage === totalPages;
+lastBtn.addEventListener("click", () => {
+    currentPage = totalPages;
+    loadData();
+});
+container.appendChild(lastBtn);
