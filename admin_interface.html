@@ -53,13 +53,26 @@
                 </tr>
             </thead>
             <tbody>
-            
+            <!-- Exemple de ligne générée dynamiquement dans le fichier JS -->
+            <tr>
+                <td>
+                    <select class="updateDeliveredStatus" data-id="${_id}">
+                        <option value="true" ${delivered === "true" ? "selected" : ""}>Oui</option>
+                        <option value="false" ${delivered === "false" ? "selected" : ""}>Non</option>
+                    </select>
+                </td>
+            </tr>
 
             </tbody>
         </table>
         </div>
     </main>
     <!--Pagination -->
+    <div id="paginationControls" style="margin-top: 1rem; text-align: center;">
+    <button id="prevPage">Précédent</button>
+    <span id="pageInfo">Page 1</span>
+    <button id="nextPage">Suivant</button>
+    </div>
     <div id="paginationControls" style="text-align: center; margin-top: 1rem;"></div>
 
     <!-- Retour et footer -->
