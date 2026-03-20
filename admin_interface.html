@@ -39,11 +39,42 @@
         <div class="toolbar-buttons">
             <button id="searchBtn" class="btn-search">Rechercher</button>
             <button id="resetFiltersBtn" class="btn-secondary">Réinitialiser les filtres</button>
-            <button id="exportBtn" class="btn-export-excel">Exporter vers Excel</button>
-            <button id="exportZipBtn" class="btn-export-zip">Exporter sous forme de ZIP</button>
-            <button id="deleteSelectedBtn" class="btn-delete">Supprimer les éléments sélectionnés</button>
+            <button id="exportCsvBtn" class="btn-secondary">Exporter CSV</button>
+            <button id="exportBtn" class="btn-export-excel">Exporter Excel</button>
+            <button id="exportZipBtn" class="btn-export-zip">Exporter ZIP</button>
+            <button id="deleteSelectedBtn" class="btn-delete">Supprimer la sélection</button>
         </div>
-        <p id="resultsSummary" class="results-summary">0 résultat</p>
+        <div class="toolbar-meta">
+            <p id="resultsSummary" class="results-summary">0 résultat</p>
+            <p id="selectedSummary" class="selected-summary">0 élément sélectionné</p>
+        </div>
+    </section>
+
+    <section id="statsSection" class="stats-grid">
+        <article class="stat-card">
+            <span class="stat-label">Total</span>
+            <strong id="statTotal" class="stat-value">0</strong>
+        </article>
+        <article class="stat-card">
+            <span class="stat-label">Non livrés</span>
+            <strong id="statPending" class="stat-value">0</strong>
+        </article>
+        <article class="stat-card">
+            <span class="stat-label">Livrés</span>
+            <strong id="statDelivered" class="stat-value">0</strong>
+        </article>
+        <article class="stat-card">
+            <span class="stat-label">Aujourd'hui</span>
+            <strong id="statToday" class="stat-value">0</strong>
+        </article>
+        <article class="stat-card">
+            <span class="stat-label">7 derniers jours</span>
+            <strong id="statLast7Days" class="stat-value">0</strong>
+        </article>
+        <article class="stat-card">
+            <span class="stat-label">Avec photos</span>
+            <strong id="statWithPhotos" class="stat-value">0</strong>
+        </article>
     </section>
 
     <main>

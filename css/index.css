@@ -1,19 +1,16 @@
-/* ================================
-   VARIABLES
-================================== */
 :root {
   --color-primary: #003d66;
   --color-secondary: #0c81b4;
-  --color-error: red;
+  --color-success: #1e8e3e;
+  --color-warning: #c98900;
+  --color-error: #d64545;
   --color-white: #fff;
   --color-gray: #ccc;
   --color-text: #333;
   --color-bg: #f4f4f4;
+  --shadow-soft: 0 10px 28px rgba(0, 61, 102, 0.10);
 }
 
-/* ================================
-   GLOBAL STYLES
-================================== */
 * {
   margin: 0;
   padding: 0;
@@ -21,16 +18,13 @@
 }
 
 body {
-  font-family: 'Arial', sans-serif;
+  font-family: Arial, sans-serif;
   background-color: var(--color-bg);
   color: var(--color-text);
   line-height: 1.6;
   overflow-x: hidden;
 }
 
-/* ================================
-   HEADER
-================================== */
 header {
   position: sticky;
   top: 0;
@@ -53,9 +47,6 @@ header h1 {
   color: var(--color-white);
 }
 
-/* ================================
-   MAIN
-================================== */
 main {
   margin: 0;
   flex: 1;
@@ -63,11 +54,8 @@ main {
   flex-direction: column;
 }
 
-/* ================================
-   FORM
-================================== */
 form {
-  max-width: 600px;
+  max-width: 640px;
   margin: 0 auto;
   background: var(--color-white);
   padding: 20px;
@@ -95,15 +83,59 @@ input[type="file"] {
   padding: 5px;
 }
 
-.error-message {
-  color: var(--color-error);
-  font-size: 14px;
+.submit-status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  box-shadow: var(--shadow-soft);
+}
+
+.submit-status.hidden {
   display: none;
 }
 
-/* ================================
-   RADIO GROUP
-================================== */
+.sync-status-indicator {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: currentColor;
+  flex: 0 0 auto;
+}
+
+.sync-status-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.submit-status.is-pending {
+  background: #fff6e6;
+  color: #a76500;
+}
+
+.submit-status.is-syncing {
+  background: #eaf6fb;
+  color: var(--color-secondary);
+}
+
+.submit-status.is-ok {
+  background: #eaf8ee;
+  color: var(--color-success);
+}
+
+.submit-status.is-warning {
+  background: #fff3e8;
+  color: var(--color-warning);
+}
+
+.submit-status.is-error {
+  background: #fdecec;
+  color: var(--color-error);
+}
+
 .delivery-status {
   display: flex;
   justify-content: center;
@@ -130,9 +162,6 @@ input[type="file"] {
   cursor: pointer;
 }
 
-/* ================================
-   BUTTONS
-================================== */
 button {
   width: 100%;
   background-color: var(--color-primary);
@@ -154,49 +183,7 @@ button:hover {
 }
 
 #clearSignature:hover {
-  background-color: orangered;
-}
-
-/* ================================
-   EMAIL LIST
-================================== */
-.email-list {
-  margin: 15px auto;
-  text-align: center;
-}
-
-.email-list label {
-  display: block;
-  margin-bottom: 5px;
-  font-size: 16px;
-  color: #444;
-}
-
-#serviceEmails {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  font-size: 14px;
-}
-
-/* ================================
-   FILE UPLOAD & IMAGE PREVIEW
-================================== */
-.custom-file-label {
-  display: inline-block;
-  padding: 10px 20px;
-  background-color: #4caf50;
-  color: white;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 10px;
-}
-
-.custom-file-label:hover {
-  background-color: #45a049;
+  background-color: #b92e2e;
 }
 
 .preview-container {
@@ -240,9 +227,6 @@ button:hover {
   transition: background-color 0.2s;
 }
 
-/* ================================
-   FOOTER
-================================== */
 footer {
   display: flex;
   justify-content: center;
@@ -257,9 +241,6 @@ footer {
   font-size: 0.9em;
 }
 
-/* ================================
-   LOADING BOX
-================================== */
 .hidden {
   display: none;
 }
@@ -277,42 +258,26 @@ footer {
   justify-content: center;
 }
 
-/* ================================
-   RESPONSIVE DESIGN
-================================== */
-@media (max-width: 480px) {
-  body {
-    padding: 10px;
-  }
-
-  header {
-    font-size: 1.3em;
-    padding: 10px;
-  }
-
-  form, table {
-    padding: 10px;
-  }
-
-  input, button, textarea {
-    font-size: 12px;
-  }
-
-  table th, table td {
-    font-size: 0.9em;
-    padding: 8px;
-  }
-
-  footer {
-    font-size: 0.7em;
-  }
+.loading-card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  width: 300px;
 }
 
-@media (max-width: 600px) {
-  button {
-    padding: 14px 20px;
-    font-size: 18px;
-  }
+.loading-progress-track {
+  width: 100%;
+  background: #f3f3f3;
+  margin-top: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.loading-progress-bar {
+  width: 0;
+  height: 10px;
+  background: #4caf50;
 }
 
 @media (max-width: 768px) {
@@ -328,11 +293,11 @@ footer {
     padding: 15px;
   }
 
-  form, table {
+  form {
     padding: 15px;
   }
 
-  input, button, textarea {
+  input, button, textarea, select {
     font-size: 14px;
   }
 
@@ -347,11 +312,41 @@ footer {
     align-items: center;
   }
 
-  table td img {
-    max-width: 40px;
+  footer {
+    font-size: 0.8em;
+  }
+}
+
+@media (max-width: 600px) {
+  button {
+    padding: 14px 20px;
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 10px;
+  }
+
+  header {
+    font-size: 1.3em;
+    padding: 10px;
+  }
+
+  form {
+    padding: 10px;
+  }
+
+  input, button, textarea, select {
+    font-size: 12px;
+  }
+
+  .submit-status {
+    align-items: flex-start;
   }
 
   footer {
-    font-size: 0.8em;
+    font-size: 0.7em;
   }
 }

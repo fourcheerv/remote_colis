@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Réception des colis</title>
-    
 
     <link rel="stylesheet" href="./css/index.css">
     <link rel="manifest" href="/remote_colis/manifest.json">
@@ -12,6 +11,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/pouchdb@7.3.1/dist/pouchdb.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
     <script>
     if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
@@ -26,7 +27,6 @@
         });
     }
     </script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body>
 <header>
@@ -38,15 +38,25 @@
 <main>
     <section>
         <form id="packageForm">
+            <div id="submitStatus" class="submit-status hidden is-pending" role="status" aria-live="polite">
+                <div class="sync-status-indicator" aria-hidden="true"></div>
+                <div class="sync-status-copy">
+                    <strong>Suivi de l'enregistrement</strong>
+                    <span id="submitStatusText"></span>
+                </div>
+            </div>
+
             <label for="recipientName">Nom du destinataire :</label>
             <input type="text" id="recipientName" name="recipientName" required>
+
             <label for="receiverName">Nom du réceptionnaire :</label>
             <input type="text" id="receiverName" name="receiverName" required>
+
             <label for="packageCount">Nombre de colis :</label>
             <input type="number" id="packageCount" name="packageCount" min="1" required>
 
             <label for="serviceEmails">Emails Référents :</label>
-            <select id="serviceEmails">
+            <select id="serviceEmails" name="serviceEmails">
                 <option value="" disabled selected>Sélectionnez un email</option>
                 <optgroup label="Direction Technique et Achats">
                     <option value="sebastien.pokorski@estrepublicain.fr">sebastien.pokorski@estrepublicain.fr</option>
@@ -70,14 +80,13 @@
                 <optgroup label="Ebra Events">
                     <option value="dorian.grandjacquot@ebra.fr">dorian.grandjacquot@ebra.fr</option>
                 </optgroup>
-                 <optgroup label="Travaux">
+                <optgroup label="Travaux">
                     <option value="christian.blaise@estrepublicain.fr">christian.blaise@estrepublicain.fr</option>
                 </optgroup>
             </select>
 
             <label for="deliveryDate">Date et Heure de réception :</label>
             <input type="datetime-local" id="deliveryDate" name="deliveryDate" required>
-
 
             <label for="proof">Preuve de livraison :</label>
             <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;">
@@ -86,31 +95,31 @@
             <button type="button" id="takePhotoBtn">📸 Prendre une photo</button>
             <button type="button" id="chooseGalleryBtn">🖼️ Choisir depuis la galerie</button>
             <p>Photos ajoutées : <span id="photoCount">0</span>/3</p>
-            <div id="previewContainer" style="display:flex; gap:10px; flex-wrap: wrap;"></div>
+            <div id="previewContainer" class="preview-container"></div>
 
             <label>Signature :</label>
             <canvas id="signaturePad" width="600" height="300" style="border: 1px solid #000;"></canvas>
             <button type="button" id="clearSignature">Effacer la signature</button>
 
             <div class="delivery-status">
-            <label><strong>Colis Livré :</strong></label>
-            <div class="radio-group">
-                <label for="deliveredYes">
-                <input type="radio" id="deliveredYes" name="delivered" value="true">
-                Oui
-                </label>
-                <label for="deliveredNo">
-                <input type="radio" id="deliveredNo" name="delivered" value="false">
-                Non
-                </label>
-            </div>
+                <label><strong>Colis Livré :</strong></label>
+                <div class="radio-group">
+                    <label for="deliveredYes">
+                        <input type="radio" id="deliveredYes" name="delivered" value="true">
+                        Oui
+                    </label>
+                    <label for="deliveredNo">
+                        <input type="radio" id="deliveredNo" name="delivered" value="false">
+                        Non
+                    </label>
+                </div>
             </div>
 
             <div id="loadingPopup" class="hidden">
-                <div style="background:#fff; padding:20px; border-radius:10px; text-align:center; width:300px;">
+                <div class="loading-card">
                     <p>Envoi de l'email en cours...</p>
-                    <div style="width:100%; background:#f3f3f3; margin-top:10px;">
-                        <div id="popupProgressBar" style="width:0; height:10px; background:#4caf50;"></div>
+                    <div class="loading-progress-track">
+                        <div id="popupProgressBar" class="loading-progress-bar"></div>
                     </div>
                 </div>
             </div>
@@ -124,156 +133,6 @@
 <footer>
     <p>&copy; 2024 Gestion des Colis</p>
 </footer>
-<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
-<script>
-    const localDB = new PouchDB('receptions');
-    const remoteDB = new PouchDB('https://apikey-v2-237azo7t1nwttyu787vl2zuxfh5ywxrddnfhcujd2nbu:b7ce3f8c0a99a10c0825a4c1ff68fe62@ca3c9329-df98-4982-a3dd-ba2b294b02ef-bluemix.cloudantnosqldb.appdomain.cloud/receptions');
-
-    localDB.sync(remoteDB, { live: true, retry: true }).on('error', console.error);
-
-    const cameraInput = document.getElementById("cameraInput");
-    const galleryInput = document.getElementById("galleryInput");
-    const previewContainer = document.getElementById("previewContainer");
-
-    const canvas = document.getElementById("signaturePad");
-    const signaturePad = new SignaturePad(canvas, { backgroundColor: '#fff' });
-
-    // 🔧 Redimensionner proprement le canvas pour éviter le décalage de signature
-    function resizeCanvas() {
-        const ratio = Math.max(window.devicePixelRatio || 1, 1);
-        canvas.width = canvas.offsetWidth * ratio;
-        canvas.height = canvas.offsetHeight * ratio;
-        canvas.getContext("2d").scale(ratio, ratio);
-        signaturePad.clear();
-    }
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas(); // à l'initialisation
-
-
-    // 📸 Photo preview + compression
-    let imageFiles = [];
-
-    function updatePhotoCount() {
-        document.getElementById("photoCount").textContent = imageFiles.length;
-    }
-
-    function compresserImage(file, callback) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const img = new Image();
-            img.onload = () => {
-                const canvas = document.createElement("canvas");
-                canvas.width = 800;
-                canvas.height = (img.height / img.width) * 800;
-                canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
-                canvas.toBlob(callback, "image/jpeg", 0.7);
-            };
-            img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-    }
-
-    function handleFiles(fileList) {
-        const files = Array.from(fileList);
-        if (imageFiles.length + files.length > 3) {
-            alert("Vous ne pouvez ajouter que 3 photos au maximum.");
-            return;
-        }
-
-        files.forEach((file) => {
-            if (!file.type.startsWith("image/")) return;
-            compresserImage(file, (compressedBlob) => {
-                imageFiles.push(compressedBlob);
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const wrapper = document.createElement("div");
-                    wrapper.className = "preview-image";
-
-                    const img = document.createElement("img");
-                    img.src = e.target.result;
-
-                    const removeBtn = document.createElement("button");
-                    removeBtn.className = "remove-button";
-                    removeBtn.textContent = "x";
-
-                    removeBtn.addEventListener("click", () => {
-                        const index = Array.from(previewContainer.children).indexOf(wrapper);
-                        if (index !== -1) {
-                            imageFiles.splice(index, 1);
-                            wrapper.remove();
-                            updatePhotoCount();
-                        }
-                    });
-
-                    wrapper.appendChild(img);
-                    wrapper.appendChild(removeBtn);
-                    previewContainer.appendChild(wrapper);
-                    updatePhotoCount();
-                };
-                reader.readAsDataURL(compressedBlob);
-            });
-        });
-    }
-
-    cameraInput.addEventListener("change", (e) => handleFiles(e.target.files));
-    galleryInput.addEventListener("change", (e) => handleFiles(e.target.files));
-
-    document.getElementById("takePhotoBtn").addEventListener("click", () => cameraInput.click());
-    document.getElementById("chooseGalleryBtn").addEventListener("click", () => galleryInput.click());
-
-    document.getElementById("clearForm").addEventListener("click", () => {
-        document.getElementById("packageForm").reset();
-        previewContainer.innerHTML = "";
-        imageFiles = [];
-        signaturePad.clear();
-        updatePhotoCount();
-    });
-
-    document.getElementById("clearSignature").addEventListener("click", () => signaturePad.clear());
-
-    document.getElementById("packageForm").addEventListener("submit", async (event) => {
-        event.preventDefault();
-        if (imageFiles.length === 0) return alert("Veuillez ajouter au moins une photo !");
-        const formData = new FormData(event.target);
-        const delivered = document.querySelector('input[name="delivered"]:checked');
-        if (!delivered) return alert("Veuillez indiquer si le colis a été livré.");
-
-        const deliveryDate = new Date(formData.get("deliveryDate"));
-        const formattedDeliveryDate = deliveryDate.toLocaleString('fr-FR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
-
-        const data = {
-            _id: new Date().toISOString(),
-            recipientName: formData.get("recipientName"),
-            receiverName: formData.get("receiverName"),
-            packageCount: formData.get("packageCount"),
-            serviceEmail: formData.get("serviceEmails"),
-            deliveryDate: formattedDeliveryDate,
-            delivered: delivered.value,
-            signature: signaturePad.isEmpty() ? null : signaturePad.toDataURL("image/jpeg"),
-            photos: [],
-        };
-
-        if (!data.signature) return alert("Veuillez signer avant de sauvegarder.");
-
-        for (const file of imageFiles) {
-            const dataURL = await new Promise((res) => {
-                const reader = new FileReader();
-                reader.onload = () => res(reader.result);
-                reader.readAsDataURL(file);
-            });
-            data.photos.push(dataURL);
-        }
-
-        try {
-            await localDB.put(data);
-            alert("Données sauvegardées avec succès !");
-            document.getElementById("clearForm").click();
-        } catch (err) {
-            console.error("Erreur de sauvegarde :", err);
-            alert("Erreur lors de l'enregistrement.");
-        }
-    });
-</script>
-<script src="./js/emailJSlight.js"></script>
+<script src="./js/frontend.js"></script>
 </body>
 </html>
