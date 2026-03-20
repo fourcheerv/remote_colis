@@ -749,36 +749,44 @@ const updateDeliveredStatus = async (docId, newValue) => {
 const updatePaginationControls = () => {
     const totalPages = Math.max(1, Math.ceil(filteredRows.length / rowsPerPage));
     const container = document.getElementById('paginationControls');
+    const compactMode = typeof window !== 'undefined' && window.matchMedia('(max-width: 600px)').matches;
     container.innerHTML = '';
+    container.className = 'pagination-controls pagination-bar';
 
     const firstBtn = document.createElement('button');
-    firstBtn.textContent = '⏮ Début';
+    firstBtn.className = 'pagination-btn pagination-btn-first';
+    firstBtn.textContent = compactMode ? '|<' : '|< Debut';
     firstBtn.disabled = currentPage === 1;
     firstBtn.addEventListener('click', () => { currentPage = 1; renderTable(); });
     container.appendChild(firstBtn);
 
     const prevBtn = document.createElement('button');
-    prevBtn.textContent = '◀';
+    prevBtn.className = 'pagination-btn pagination-btn-prev';
+    prevBtn.textContent = compactMode ? '<' : '< Prec.';
     prevBtn.disabled = currentPage === 1;
     prevBtn.addEventListener('click', () => { if (currentPage > 1) { currentPage -= 1; renderTable(); } });
     container.appendChild(prevBtn);
 
     const pageInfo = document.createElement('span');
+    pageInfo.className = 'pagination-page-info';
     pageInfo.textContent = `Page ${currentPage} / ${totalPages}`;
     container.appendChild(pageInfo);
 
     const nextBtn = document.createElement('button');
-    nextBtn.textContent = '▶';
+    nextBtn.className = 'pagination-btn pagination-btn-next';
+    nextBtn.textContent = compactMode ? '>' : 'Suiv. >';
     nextBtn.disabled = currentPage === totalPages;
     nextBtn.addEventListener('click', () => { if (currentPage < totalPages) { currentPage += 1; renderTable(); } });
     container.appendChild(nextBtn);
 
     const lastBtn = document.createElement('button');
-    lastBtn.textContent = 'Fin ⏭';
+    lastBtn.className = 'pagination-btn pagination-btn-last';
+    lastBtn.textContent = compactMode ? '>|' : 'Fin >|';
     lastBtn.disabled = currentPage === totalPages;
     lastBtn.addEventListener('click', () => { currentPage = totalPages; renderTable(); });
     container.appendChild(lastBtn);
 };
+
 
 const updateSelectAllState = () => {
     const selectAll = document.getElementById('selectAll');

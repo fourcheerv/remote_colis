@@ -833,3 +833,80 @@ footer.footer a {
         font-size: 1.6rem;
     }
 }
+
+.pagination-bar {
+    background: var(--color-surface);
+    border-radius: 18px;
+    box-shadow: var(--shadow-card);
+    padding: 12px;
+}
+
+.pagination-btn {
+    min-width: 88px;
+    justify-content: center;
+}
+
+.pagination-page-info {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0 14px;
+    border-radius: 999px;
+    background: #eef4f8;
+    color: var(--color-primary);
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+    #paginationControls,
+    .pagination-controls,
+    .pagination-bar {
+        width: min(100%, calc(100% - 16px));
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        align-items: stretch;
+    }
+
+    .pagination-btn {
+        width: 100%;
+        min-width: 0;
+        margin: 0;
+        padding: 12px 10px;
+        font-size: 14px;
+    }
+
+    .pagination-page-info {
+        grid-column: 1 / -1;
+        width: 100%;
+        text-align: center;
+        white-space: normal;
+    }
+}
+
+@media (max-width: 480px) {
+    #paginationControls,
+    .pagination-controls,
+    .pagination-bar {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-top: 14px;
+        margin-bottom: 14px;
+        padding: 10px;
+    }
+
+    .pagination-btn {
+        min-height: 42px;
+        padding: 10px 8px;
+        font-size: 13px;
+        box-shadow: 0 4px 10px rgba(0, 61, 102, 0.12);
+    }
+
+    .pagination-page-info {
+        min-height: 40px;
+        padding: 8px 10px;
+        font-size: 13px;
+    }
+}
