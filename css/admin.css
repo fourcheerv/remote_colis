@@ -26,18 +26,79 @@ h1 {
     margin: 20px 0;
 }
 
-#searchInput {
-    width: 90%;
-    max-width: 400px;
-    padding: 10px;
-    margin: 10px auto;
-    display: block;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+.sync-status-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: min(1100px, calc(100% - 32px));
+    margin: 0 auto 20px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: #eef2ff;
+    color: #243b53;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08);
+}
+
+.sync-status-indicator {
+    width: 14px;
+    height: 14px;
+    border-radius: 999px;
+    flex: 0 0 auto;
+    background: currentColor;
+}
+
+.sync-status-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.sync-status-banner.is-pending {
+    background: #fff7ed;
+    color: #b45309;
+}
+
+.sync-status-banner.is-syncing {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.sync-status-banner.is-ok {
+    background: #ecfdf5;
+    color: #15803d;
+}
+
+.sync-status-banner.is-warning {
+    background: #fff7ed;
+    color: #c2410c;
+}
+
+.sync-status-banner.is-error {
+    background: #fef2f2;
+    color: #b91c1c;
 }
 
 .toolbar {
+    width: min(1100px, calc(100% - 32px));
+    margin: 0 auto 16px;
     text-align: center;
+}
+
+.filters-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+#searchInput,
+#dateFilter,
+#deliveredFilter {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fff;
 }
 
 .toolbar-buttons {
@@ -45,7 +106,13 @@ h1 {
     justify-content: center;
     flex-wrap: wrap;
     gap: 10px;
-    margin-top: 10px;
+    margin-top: 12px;
+}
+
+.results-summary {
+    margin: 12px 0 0;
+    color: #475569;
+    font-size: 14px;
 }
 
 button,
@@ -71,7 +138,6 @@ button:hover {
 
 .btn-search {
     background-color: #28a745;
-    color: #fff;
 }
 
 .btn-search:hover {
@@ -80,7 +146,6 @@ button:hover {
 
 .btn-export-excel {
     background-color: grey;
-    color: #fff;
 }
 
 .btn-export-excel:hover {
@@ -99,7 +164,6 @@ button:hover {
 .btn-delete,
 .btn-danger {
     background-color: #dc3545;
-    color: #fff;
 }
 
 .btn-delete:hover,
@@ -185,6 +249,19 @@ th {
     min-width: 70px;
 }
 
+#paginationControls,
+.pagination-controls {
+    text-align: center;
+    margin: 20px auto;
+}
+
+#paginationControls span,
+.pagination-controls span {
+    margin: 0 10px;
+    font-size: 14px;
+    color: #444;
+}
+
 a {
     text-decoration: none;
     color: #007BFF;
@@ -234,18 +311,6 @@ a:hover {
     border-radius: 50%;
     font-size: 16px;
     font-weight: bold;
-}
-
-.pagination {
-    text-align: center;
-    margin: 20px 0;
-}
-
-.pagination span,
-#paginationControls span {
-    margin: 0 10px;
-    font-size: 14px;
-    color: #444;
 }
 
 footer {
@@ -403,9 +468,8 @@ footer {
         width: 300px;
     }
 
-    #searchInput {
-        width: 95%;
-        margin: 5px auto;
+    .filters-grid {
+        grid-template-columns: 1fr;
     }
 
     button {
@@ -417,11 +481,6 @@ footer {
     th,
     td {
         padding: 8px;
-    }
-
-    #paginationControls button {
-        padding: 6px 10px;
-        font-size: 14px;
     }
 
     #popupImage {
@@ -450,10 +509,6 @@ footer {
 @media (max-width: 480px) {
     h1 {
         font-size: 18px;
-    }
-
-    #searchInput {
-        font-size: 14px;
     }
 
     button {

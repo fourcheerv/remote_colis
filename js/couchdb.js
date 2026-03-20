@@ -9,11 +9,58 @@ let sortOrder = 'desc';
 let editModalPhotos = [];
 let editModalSignature = '';
 
+const updateSyncStatus = (state, message) => {
+    const banner = document.getElementById('syncStatusBanner');
+    const text = document.getElementById('syncStatusText');
+    if (!banner || !text) return;
+
+    banner.classList.remove('is-pending', 'is-syncing', 'is-ok', 'is-warning', 'is-error');
+    banner.classList.add(state);
+    text.textContent = message;
+};
+
+updateSyncStatus('is-syncing', 'Synchronisation initiale avec CouchDB en cours...');
+
 localDB.sync(remoteDB, { live: true, retry: true })
+    .on('active', () => {
+        updateSyncStatus('is-syncing', 'Synchronisation en cours avec CouchDB...');
+    })
     .on('change', () => {
+        updateSyncStatus('is-syncing', 'Mise à jour des données en cours...');
         loadData();
     })
-    .on('error', console.error);
+    .on('paused', (error) => {
+        if (error) {
+            updateSyncStatus('is-warning', 'Synchronisation en pause. Nouvelle tentative automatique...');
+            return;
+        }
+
+        const isOffline = typeof navigator !== 'undefined' && navigator.onLine === false;
+        updateSyncStatus(
+            isOffline ? 'is-warning' : 'is-ok',
+            isOffline
+                ? 'Mode hors ligne. Les changements seront synchronisés quand la connexion reviendra.'
+                : 'Toutes les données sont synchronisées avec CouchDB.'
+        );
+    })
+    .on('error', (error) => {
+        console.error('Erreur de synchronisation :', error);
+        const isOffline = typeof navigator !== 'undefined' && navigator.onLine === false;
+        updateSyncStatus(
+            isOffline ? 'is-warning' : 'is-error',
+            isOffline
+                ? 'Connexion internet indisponible. Synchronisation en attente.'
+                : 'Erreur de synchronisation avec CouchDB. Nouvelle tentative automatique...'
+        );
+    });
+
+window.addEventListener('online', () => {
+    updateSyncStatus('is-pending', 'Connexion rétablie. Reprise de la synchronisation...');
+});
+
+window.addEventListener('offline', () => {
+    updateSyncStatus('is-warning', 'Mode hors ligne. Les changements seront synchronisés plus tard.');
+});
 
 const modalManager = {
     currentModal: null,
@@ -81,6 +128,16 @@ const formatDateTimeForStorage = (value) => {
     });
 };
 
+const formatDateOnly = (value) => {
+    const date = parseDate(value);
+    if (Number.isNaN(date.getTime())) return '';
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
 const escapeHtml = (value) => String(value ?? '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -139,19 +196,48 @@ const renderPhotoCollection = (photos, receiverName) => {
     )).join('');
 };
 
+const updateResultsSummary = () => {
+    const summary = document.getElementById('resultsSummary');
+    if (!summary) return;
+
+    const total = allSortedRows.length;
+    const filtered = filteredRows.length;
+    summary.textContent = `${filtered} résultat${filtered > 1 ? 's' : ''} affiché${filtered > 1 ? 's' : ''} sur ${total}`;
+};
+
 const applyFilters = () => {
     const query = document.getElementById('searchInput').value.trim().toLowerCase();
-    filteredRows = query
-        ? allSortedRows.filter((row) => getSearchableText(row.doc).includes(query))
-        : [...allSortedRows];
+    const dateFilter = document.getElementById('dateFilter').value;
+    const deliveredFilter = document.getElementById('deliveredFilter').value;
+
+    filteredRows = allSortedRows.filter((row) => {
+        const doc = row.doc;
+
+        if (query && !getSearchableText(doc).includes(query)) {
+            return false;
+        }
+
+        if (dateFilter && formatDateOnly(doc.deliveryDate) !== dateFilter) {
+            return false;
+        }
+
+        if (deliveredFilter && String(doc.delivered) !== deliveredFilter) {
+            return false;
+        }
+
+        return true;
+    });
 
     const totalPages = Math.max(1, Math.ceil(filteredRows.length / rowsPerPage));
     if (currentPage > totalPages) {
         currentPage = totalPages;
     }
 
+    updateResultsSummary();
     renderTable();
 };
+
+const getExportRows = () => filteredRows.map((row) => row.doc);
 
 const renderTable = () => {
     const tbody = document.querySelector('#dataTable tbody');
@@ -218,10 +304,19 @@ const loadData = async () => {
         applyFilters();
     } catch (error) {
         console.error('Erreur lors du chargement des données :', error);
+        updateSyncStatus('is-error', 'Impossible de charger les données locales.');
     }
 };
 
 const searchData = () => {
+    currentPage = 1;
+    applyFilters();
+};
+
+const resetFilters = () => {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('dateFilter').value = '';
+    document.getElementById('deliveredFilter').value = '';
     currentPage = 1;
     applyFilters();
 };
@@ -252,28 +347,26 @@ const deleteSelected = async () => {
 
 const exportToExcel = async () => {
     try {
-        const result = await localDB.allDocs({ include_docs: true });
+        const dataRows = getExportRows();
+        if (dataRows.length === 0) {
+            alert('Aucune donnée filtrée à exporter.');
+            return;
+        }
 
-        const sortedRows = result.rows.sort((a, b) => {
-            const dateA = parseDate(a.doc.deliveryDate);
-            const dateB = parseDate(b.doc.deliveryDate);
-            return dateB - dateA;
-        });
-
-        const data = sortedRows.map((row) => ({
-            ID: row.doc._id,
-            Destinataire: row.doc.recipientName || 'N/A',
-            Réceptionnaire: row.doc.receiverName || 'N/A',
-            Email: row.doc.serviceEmail || 'N/A',
-            'Nombre de colis': row.doc.packageCount || 0,
-            'Date de réception': row.doc.deliveryDate || 'Non défini',
-            'Colis livré': row.doc.delivered === 'true' ? 'Oui' : 'Non'
+        const data = dataRows.map((doc) => ({
+            ID: doc._id,
+            Destinataire: doc.recipientName || 'N/A',
+            Réceptionnaire: doc.receiverName || 'N/A',
+            Email: doc.serviceEmail || 'N/A',
+            'Nombre de colis': doc.packageCount || 0,
+            'Date de réception': doc.deliveryDate || 'Non défini',
+            'Colis livré': doc.delivered === 'true' ? 'Oui' : 'Non'
         }));
 
         const worksheet = XLSX.utils.json_to_sheet(data);
         const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, 'Données');
-        XLSX.writeFile(workbook, 'Export_Données.xlsx');
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Données filtrées');
+        XLSX.writeFile(workbook, 'Export_Donnees_Filtres.xlsx');
     } catch (error) {
         console.error('Erreur lors de l\'export :', error);
         alert('Une erreur est survenue lors de l\'export.');
@@ -282,11 +375,10 @@ const exportToExcel = async () => {
 
 const exportToZip = async () => {
     try {
-        const result = await localDB.allDocs({ include_docs: true });
-        const data = result.rows.map((row) => row.doc);
+        const data = getExportRows();
 
         if (data.length === 0) {
-            alert('Aucune donnée à exporter !');
+            alert('Aucune donnée filtrée à exporter.');
             return;
         }
 
@@ -319,8 +411,8 @@ const exportToZip = async () => {
         }
 
         zip.generateAsync({ type: 'blob' }).then((content) => {
-            saveAs(content, 'Receptions.zip');
-            alert('Fichier ZIP exporté avec succès !');
+            saveAs(content, 'Receptions_Filtres.zip');
+            alert('Fichier ZIP filtré exporté avec succès !');
         });
     } catch (error) {
         console.error('Erreur lors de l\'exportation ZIP :', error);
@@ -747,6 +839,9 @@ document.getElementById('selectAll').addEventListener('change', (event) => {
 
 document.getElementById('searchBtn').addEventListener('click', searchData);
 document.getElementById('searchInput').addEventListener('input', searchData);
+document.getElementById('dateFilter').addEventListener('change', searchData);
+document.getElementById('deliveredFilter').addEventListener('change', searchData);
+document.getElementById('resetFiltersBtn').addEventListener('click', resetFilters);
 document.getElementById('deleteSelectedBtn').addEventListener('click', deleteSelected);
 document.getElementById('exportBtn').addEventListener('click', exportToExcel);
 document.getElementById('exportZipBtn').addEventListener('click', exportToZip);

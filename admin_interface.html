@@ -18,14 +18,32 @@
         <h1>Gestion des Données sur CouchDB</h1>
     </header>
 
+    <section id="syncStatusBanner" class="sync-status-banner is-pending" role="status" aria-live="polite">
+        <div class="sync-status-indicator" aria-hidden="true"></div>
+        <div class="sync-status-copy">
+            <strong>Synchronisation CouchDB</strong>
+            <span id="syncStatusText">Initialisation de la synchronisation...</span>
+        </div>
+    </section>
+
     <section class="toolbar">
-        <input type="text" id="searchInput" placeholder="Rechercher par nom, email ou ID" />
+        <div class="filters-grid">
+            <input type="text" id="searchInput" placeholder="Rechercher par nom, email ou ID" />
+            <input type="date" id="dateFilter" aria-label="Filtrer par date de réception">
+            <select id="deliveredFilter" aria-label="Filtrer par statut de livraison">
+                <option value="">Tous les statuts</option>
+                <option value="true">Livrés</option>
+                <option value="false">Non livrés</option>
+            </select>
+        </div>
         <div class="toolbar-buttons">
             <button id="searchBtn" class="btn-search">Rechercher</button>
+            <button id="resetFiltersBtn" class="btn-secondary">Réinitialiser les filtres</button>
             <button id="exportBtn" class="btn-export-excel">Exporter vers Excel</button>
             <button id="exportZipBtn" class="btn-export-zip">Exporter sous forme de ZIP</button>
             <button id="deleteSelectedBtn" class="btn-delete">Supprimer les éléments sélectionnés</button>
         </div>
+        <p id="resultsSummary" class="results-summary">0 résultat</p>
     </section>
 
     <main>
@@ -51,7 +69,7 @@
         </div>
     </main>
 
-    <div id="paginationControls" style="margin-top: 1rem; text-align: center;"></div>
+    <div id="paginationControls" class="pagination-controls"></div>
 
     <footer class="footer">
         <a href="index.html">Retour à la page d'accueil</a>
