@@ -1,30 +1,208 @@
-// Initialisation de PouchDB pour la synchronisation avec CouchDB
 const localDB = new PouchDB('receptions');
 const remoteDB = new PouchDB('https://apikey-v2-237azo7t1nwttyu787vl2zuxfh5ywxrddnfhcujd2nbu:b7ce3f8c0a99a10c0825a4c1ff68fe62@ca3c9329-df98-4982-a3dd-ba2b294b02ef-bluemix.cloudantnosqldb.appdomain.cloud/receptions');
-//Pagination
+
 let currentPage = 1;
 const rowsPerPage = 20;
 let allSortedRows = [];
-
-// Tri initial
+let filteredRows = [];
 let sortOrder = 'desc';
+let editModalPhotos = [];
+let editModalSignature = '';
 
-// Synchronisation avec CouchDB
-localDB.sync(remoteDB, { live: true, retry: true }).on('error', console.error);
+localDB.sync(remoteDB, { live: true, retry: true })
+    .on('change', () => {
+        loadData();
+    })
+    .on('error', console.error);
 
-// Fonction pour charger les données
+const modalManager = {
+    currentModal: null,
+
+    openModal(content) {
+        this.closeCurrent();
+
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.innerHTML = content;
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                resetEditAssets();
+                this.closeCurrent();
+            }
+        });
+
+        document.body.appendChild(modal);
+        this.currentModal = modal;
+        return modal;
+    },
+
+    closeCurrent() {
+        if (!this.currentModal) return;
+        this.currentModal.remove();
+        this.currentModal = null;
+    }
+};
 
 const parseDate = (str) => {
     if (!str) return new Date(0);
-    const [datePart, timePart] = str.split(' ');
+    const [datePart, timePart] = String(str).split(' ');
+    if (!datePart) return new Date(0);
+
     const [day, month, year] = datePart.split('/');
+    if (!day || !month || !year) return new Date(str);
+
     return new Date(`${year}-${month}-${day}T${timePart || '00:00'}:00`);
 };
 
-const loadData = async () => {
-    const tbody = document.querySelector("#dataTable tbody");
-    tbody.innerHTML = "";
+const formatDateTimeForInput = (value) => {
+    const date = parseDate(value);
+    if (Number.isNaN(date.getTime())) return '';
 
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
+
+const formatDateTimeForStorage = (value) => {
+    if (!value) return '';
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '';
+
+    return date.toLocaleString('fr-FR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+};
+
+const escapeHtml = (value) => String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
+const compresserImage = (file, callback) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        const image = new Image();
+        image.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = 800;
+            canvas.height = (image.height / image.width) * 800;
+            canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
+            canvas.toBlob(callback, 'image/jpeg', 0.7);
+        };
+        image.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+};
+
+const blobToDataUrl = (blob) => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+});
+
+const resetEditAssets = () => {
+    editModalPhotos = [];
+    editModalSignature = '';
+};
+
+const getSearchableText = (doc) => [
+    doc._id,
+    doc.recipientName,
+    doc.receiverName,
+    doc.serviceEmail,
+    doc.deliveryDate,
+    doc.delivered
+].join(' ').toLowerCase();
+
+const renderImageButton = (src, alt) => `
+    <button type="button" class="image-preview" data-src="${escapeHtml(src)}" aria-label="Afficher ${escapeHtml(alt)}">
+        <img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" class="table-img">
+    </button>
+`;
+
+const renderPhotoCollection = (photos, receiverName) => {
+    if (!photos || photos.length === 0) return 'Aucune';
+
+    return photos.map((photo, index) => (
+        renderImageButton(photo, `Photo ${index + 1} de ${receiverName || 'N/A'}`)
+    )).join('');
+};
+
+const applyFilters = () => {
+    const query = document.getElementById('searchInput').value.trim().toLowerCase();
+    filteredRows = query
+        ? allSortedRows.filter((row) => getSearchableText(row.doc).includes(query))
+        : [...allSortedRows];
+
+    const totalPages = Math.max(1, Math.ceil(filteredRows.length / rowsPerPage));
+    if (currentPage > totalPages) {
+        currentPage = totalPages;
+    }
+
+    renderTable();
+};
+
+const renderTable = () => {
+    const tbody = document.querySelector('#dataTable tbody');
+    tbody.innerHTML = '';
+
+    const start = (currentPage - 1) * rowsPerPage;
+    const pageRows = filteredRows.slice(start, start + rowsPerPage);
+
+    if (pageRows.length === 0) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = '<td colspan="11">Aucune donnée trouvée.</td>';
+        tbody.appendChild(tr);
+        updatePaginationControls();
+        updateSelectAllState();
+        return;
+    }
+
+    pageRows.forEach((row) => {
+        const { _id, recipientName, receiverName, serviceEmail, packageCount, deliveryDate, signature, photos, delivered } = row.doc;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><input type="checkbox" class="selectRow" data-id="${escapeHtml(_id)}"></td>
+            <td>${escapeHtml(_id)}</td>
+            <td>${escapeHtml(recipientName || 'N/A')}</td>
+            <td>${escapeHtml(receiverName || 'N/A')}</td>
+            <td>${escapeHtml(serviceEmail || 'N/A')}</td>
+            <td>${escapeHtml(packageCount ?? 0)}</td>
+            <td>${escapeHtml(deliveryDate || 'Non défini')}</td>
+            <td>${signature ? renderImageButton(signature, `Signature de ${receiverName || 'N/A'}`) : 'Aucune'}</td>
+            <td>${renderPhotoCollection(photos || [], receiverName)}</td>
+            <td>
+                <select class="updateDeliveredStatus status-select" data-id="${escapeHtml(_id)}">
+                    <option value="true" ${delivered === 'true' ? 'selected' : ''}>Oui</option>
+                    <option value="false" ${delivered === 'false' ? 'selected' : ''}>Non</option>
+                </select>
+            </td>
+            <td>
+                <div class="action-buttons">
+                    <button type="button" class="btn-edit edit-btn" data-id="${escapeHtml(_id)}">Modifier</button>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    updatePaginationControls();
+    updateSelectAllState();
+};
+
+const loadData = async () => {
     try {
         const result = await localDB.allDocs({ include_docs: true });
 
@@ -34,94 +212,28 @@ const loadData = async () => {
             return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
         });
 
-        // Pagination
-        const start = (currentPage - 1) * rowsPerPage;
-        const end = start + rowsPerPage;
-        const pageRows = allSortedRows.slice(start, end);
-
-        // Met à jour l'en-tête du tri
-        document.getElementById("sortDeliveryDate").innerHTML =
+        document.getElementById('sortDeliveryDate').innerHTML =
             `Date de réception ${sortOrder === 'asc' ? '&#8593;' : '&#8595;'}`;
 
-        // Remplit le tableau
-        pageRows.forEach(row => {
-            const { _id, recipientName, receiverName, serviceEmail, packageCount, deliveryDate, signature, photos, delivered } = row.doc;
-
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-                <td><input type="checkbox" class="selectRow" data-id="${_id}"></td>
-                <td>${_id}</td>
-                <td>${recipientName || "N/A"}</td>
-                <td>${receiverName || "N/A"}</td>
-                <td>${serviceEmail || "N/A"}</td>
-                <td>${packageCount || 0}</td>
-                <td>${deliveryDate || "Non défini"}</td>
-                <td>
-                    ${signature ? 
-   `<img src="${signature}" alt="Signature de ${receiverName || 'N/A'}" class="table-img" tabindex="0" onclick="showImage('${signature}')">`
-   : "Aucune"}
-                </td>
-                <td>
-                    ${(photos || []).map((photo, i) => 
-   `<img src="${photo}" alt="Photo ${i + 1} de ${receiverName || 'N/A'}" class="table-img" tabindex="0" onclick="showImage('${photo}')">`
-).join("") || "Aucune"}
-
-                </td>
-                <td>
-                    <select class="updateDeliveredStatus" data-id="${_id}">
-                        <option value="true" ${delivered === "true" ? "selected" : ""}>Oui</option>
-                        <option value="false" ${delivered === "false" ? "selected" : ""}>Non</option>
-                    </select>
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
-
-        updatePaginationControls();
-
+        applyFilters();
     } catch (error) {
-        console.error("Erreur lors du chargement des données :", error);
+        console.error('Erreur lors du chargement des données :', error);
     }
 };
 
-// Mise à jour du statut de livraison
-document.addEventListener("change", async (event) => {
-    if (event.target.classList.contains("updateDeliveredStatus")) {
-        const docId = event.target.dataset.id;
-        const newValue = event.target.value;
-
-        try {
-            const doc = await localDB.get(docId);
-            doc.delivered = newValue;
-            await localDB.put(doc);
-            alert("Statut de livraison mis à jour avec succès !");
-        } catch (error) {
-            console.error("Erreur lors de la mise à jour :", error);
-            alert("Impossible de mettre à jour le statut.");
-        }
-    }
-});
-
-// Recherche dans le tableau
 const searchData = () => {
-    const query = document.getElementById("searchInput").value.toLowerCase();
-    const rows = document.querySelectorAll("#dataTable tbody tr");
-
-    rows.forEach(row => {
-        const rowText = row.textContent.toLowerCase();
-        row.style.display = rowText.includes(query) ? "" : "none";
-    });
+    currentPage = 1;
+    applyFilters();
 };
 
-// Supprimer les éléments sélectionnés
 const deleteSelected = async () => {
-    const checkboxes = document.querySelectorAll(".selectRow:checked");
+    const checkboxes = document.querySelectorAll('.selectRow:checked');
     if (checkboxes.length === 0) {
-        alert("Aucun élément sélectionné !");
+        alert('Aucun élément sélectionné !');
         return;
     }
 
-    const confirmed = confirm("Voulez-vous vraiment supprimer les éléments sélectionnés ?");
+    const confirmed = confirm('Voulez-vous vraiment supprimer les éléments sélectionnés ?');
     if (!confirmed) return;
 
     try {
@@ -129,52 +241,52 @@ const deleteSelected = async () => {
             const doc = await localDB.get(checkbox.dataset.id);
             await localDB.remove(doc);
         }
-        alert("Éléments supprimés avec succès !");
+
+        alert('Éléments supprimés avec succès !');
         loadData();
     } catch (error) {
-        console.error("Erreur lors de la suppression :", error);
-        alert("Une erreur est survenue lors de la suppression.");
+        console.error('Erreur lors de la suppression :', error);
+        alert('Une erreur est survenue lors de la suppression.');
     }
 };
 
-// Export Excel
 const exportToExcel = async () => {
     try {
         const result = await localDB.allDocs({ include_docs: true });
 
         const sortedRows = result.rows.sort((a, b) => {
-        const dateA = parseDate(a.doc.deliveryDate);
-        const dateB = parseDate(b.doc.deliveryDate);
-        return dateB - dateA;
+            const dateA = parseDate(a.doc.deliveryDate);
+            const dateB = parseDate(b.doc.deliveryDate);
+            return dateB - dateA;
         });
 
-        const data = sortedRows.map(row => ({
+        const data = sortedRows.map((row) => ({
             ID: row.doc._id,
-            Destinataire: row.doc.recipientName || "N/A",
-            Réceptionnaire: row.doc.receiverName || "N/A",
-            Email: row.doc.serviceEmail || "N/A",
-            "Nombre de colis": row.doc.packageCount || 0,
-            "Date de réception": row.doc.deliveryDate || "Non défini"
+            Destinataire: row.doc.recipientName || 'N/A',
+            Réceptionnaire: row.doc.receiverName || 'N/A',
+            Email: row.doc.serviceEmail || 'N/A',
+            'Nombre de colis': row.doc.packageCount || 0,
+            'Date de réception': row.doc.deliveryDate || 'Non défini',
+            'Colis livré': row.doc.delivered === 'true' ? 'Oui' : 'Non'
         }));
 
         const worksheet = XLSX.utils.json_to_sheet(data);
         const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Données");
-        XLSX.writeFile(workbook, "Export_Données.xlsx");
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Données');
+        XLSX.writeFile(workbook, 'Export_Données.xlsx');
     } catch (error) {
-        console.error("Erreur lors de l'export :", error);
-        alert("Une erreur est survenue lors de l'export.");
+        console.error('Erreur lors de l\'export :', error);
+        alert('Une erreur est survenue lors de l\'export.');
     }
 };
 
-// Export ZIP
 const exportToZip = async () => {
     try {
         const result = await localDB.allDocs({ include_docs: true });
-        const data = result.rows.map(row => row.doc);
+        const data = result.rows.map((row) => row.doc);
 
         if (data.length === 0) {
-            alert("Aucune donnée à exporter !");
+            alert('Aucune donnée à exporter !');
             return;
         }
 
@@ -189,124 +301,461 @@ const exportToZip = async () => {
                 serviceEmail: item.serviceEmail,
                 packageCount: item.packageCount,
                 deliveryDate: item.deliveryDate,
-                delivered: item.delivered,
+                delivered: item.delivered
             };
-            folder.file("info.json", JSON.stringify(jsonContent, null, 2));
+            folder.file('info.json', JSON.stringify(jsonContent, null, 2));
 
             if (item.signature) {
-                const signatureBlob = await fetch(item.signature).then(res => res.blob());
-                folder.file("signature.png", signatureBlob);
+                const signatureBlob = await fetch(item.signature).then((res) => res.blob());
+                folder.file('signature.png', signatureBlob);
             }
 
             if (item.photos) {
-                for (let i = 0; i < item.photos.length; i++) {
-                    const photoBlob = await fetch(item.photos[i]).then(res => res.blob());
-                    folder.file(`photo_${i + 1}.png`, photoBlob);
+                for (let index = 0; index < item.photos.length; index += 1) {
+                    const photoBlob = await fetch(item.photos[index]).then((res) => res.blob());
+                    folder.file(`photo_${index + 1}.png`, photoBlob);
                 }
             }
         }
 
-        zip.generateAsync({ type: "blob" }).then((content) => {
-            saveAs(content, "Receptions.zip");
-            alert("Fichier ZIP exporté avec succès !");
+        zip.generateAsync({ type: 'blob' }).then((content) => {
+            saveAs(content, 'Receptions.zip');
+            alert('Fichier ZIP exporté avec succès !');
         });
     } catch (error) {
-        console.error("Erreur lors de l'exportation ZIP :", error);
+        console.error('Erreur lors de l\'exportation ZIP :', error);
+        alert('Une erreur est survenue lors de l\'exportation ZIP.');
     }
 };
 
-// Affichage de l'image
 const showImage = (src) => {
-    const popup = document.getElementById("imagePopup");
-    const popupImage = document.getElementById("popupImage");
+    const popup = document.getElementById('imagePopup');
+    const popupImage = document.getElementById('popupImage');
     popupImage.src = src;
-    popup.style.display = "flex";
+    popup.style.display = 'flex';
 };
 
-// Fermer la pop-up d'image
-document.getElementById("closePopup").addEventListener("click", () => {
-    document.getElementById("imagePopup").style.display = "none";
-});
+const formatFieldName = (key) => {
+    const labels = {
+        _id: 'ID',
+        recipientName: 'Nom du destinataire',
+        receiverName: 'Nom du réceptionnaire',
+        serviceEmail: 'Email du réceptionnaire',
+        packageCount: 'Nombre de colis',
+        deliveryDate: 'Date de réception',
+        delivered: 'Colis livré ?'
+    };
 
-// Sélectionner tout
-document.getElementById("selectAll").addEventListener("change", (event) => {
-    const checkboxes = document.querySelectorAll(".selectRow");
-    checkboxes.forEach(checkbox => (checkbox.checked = event.target.checked));
-});
+    return labels[key] || key;
+};
 
-// Boutons
-document.getElementById("searchBtn").addEventListener("click", searchData);
-document.getElementById("deleteSelectedBtn").addEventListener("click", deleteSelected);
-document.getElementById("exportBtn").addEventListener("click", exportToExcel);
-document.getElementById("exportZipBtn").addEventListener("click", exportToZip);
+const getEditField = (key, value) => {
+    if (key === '_id') {
+        return `<input type="text" id="edit_${key}" class="form-control" data-field="${key}" value="${escapeHtml(value)}" readonly disabled>`;
+    }
 
-// Tri dynamique sur l'en-tête
-document.getElementById("sortDeliveryDate").addEventListener("click", () => {
-    sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
-    document.getElementById("sortDeliveryDate").innerHTML =
-        `Date de réception ${sortOrder === 'asc' ? '&#8593;' : '&#8595;'}`;
-    loadData();
-});
+    if (key === 'deliveryDate') {
+        return `<input type="datetime-local" id="edit_${key}" class="form-control" data-field="${key}" value="${escapeHtml(formatDateTimeForInput(value))}">`;
+    }
 
-// Chargement initial
-window.addEventListener("DOMContentLoaded", () => {
-    loadData();
-});
+    if (key === 'delivered') {
+        return `
+            <select id="edit_${key}" class="form-control" data-field="${key}">
+                <option value="true" ${value === 'true' ? 'selected' : ''}>Oui</option>
+                <option value="false" ${value === 'false' ? 'selected' : ''}>Non</option>
+            </select>
+        `;
+    }
 
+    if (key === 'packageCount') {
+        return `<input type="number" min="1" id="edit_${key}" class="form-control" data-field="${key}" value="${escapeHtml(value ?? 1)}">`;
+    }
 
-//Pagination
-const updatePaginationControls = () => {
-    const totalPages = Math.ceil(allSortedRows.length / rowsPerPage);
-    const container = document.getElementById("paginationControls");
-    container.innerHTML = "";
+    if (key === 'serviceEmail') {
+        return `<input type="email" id="edit_${key}" class="form-control" data-field="${key}" value="${escapeHtml(value || '')}">`;
+    }
 
-    // Bouton "Début"
-    const firstBtn = document.createElement("button");
-    firstBtn.textContent = "⏮ Début";
-    firstBtn.disabled = currentPage === 1;
-    firstBtn.addEventListener("click", () => {
-        currentPage = 1;
+    return `<input type="text" id="edit_${key}" class="form-control" data-field="${key}" value="${escapeHtml(value || '')}">`;
+};
+
+const generateEditFields = (doc) => {
+    const preferredOrder = ['_id', 'recipientName', 'receiverName', 'serviceEmail', 'packageCount', 'deliveryDate', 'delivered'];
+    const excludedKeys = new Set(['_rev', 'photos', 'signature']);
+
+    const extraKeys = Object.keys(doc).filter((key) => !preferredOrder.includes(key) && !excludedKeys.has(key) && !key.startsWith('_'));
+    const fieldOrder = [...preferredOrder.filter((key) => key === '_id' || Object.prototype.hasOwnProperty.call(doc, key)), ...extraKeys];
+
+    return fieldOrder.map((key) => `
+        <div class="form-group${String(doc[key] ?? '').length > 80 ? ' is-full' : ''}">
+            <label for="edit_${key}">${formatFieldName(key)}</label>
+            ${getEditField(key, doc[key])}
+        </div>
+    `).join('');
+};
+
+const renderModalPhotoPreviews = () => {
+    const container = document.getElementById('previewContainerModal');
+    const count = document.getElementById('photoCountModal');
+
+    if (!container || !count) return;
+
+    container.innerHTML = '';
+    count.textContent = editModalPhotos.length;
+
+    if (editModalPhotos.length === 0) {
+        container.innerHTML = '<div class="empty-state">Aucune photo enregistrée.</div>';
+        return;
+    }
+
+    editModalPhotos.forEach((photo, index) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'preview-image';
+
+        const image = document.createElement('img');
+        image.src = photo.dataUrl || photo;
+        image.alt = `Photo ${index + 1}`;
+
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'remove-button';
+        removeBtn.textContent = 'x';
+        removeBtn.addEventListener('click', (event) => {
+            event.preventDefault();
+            editModalPhotos.splice(index, 1);
+            renderModalPhotoPreviews();
+        });
+
+        wrapper.appendChild(image);
+        wrapper.appendChild(removeBtn);
+        container.appendChild(wrapper);
+    });
+};
+
+const renderSignaturePreview = () => {
+    const container = document.getElementById('signaturePreviewModal');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    if (!editModalSignature) {
+        container.innerHTML = '<div class="empty-state">Aucune signature enregistrée.</div>';
+        return;
+    }
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'signature-preview-item';
+
+    const image = document.createElement('img');
+    image.src = editModalSignature;
+    image.alt = 'Signature';
+
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'remove-button';
+    removeBtn.textContent = 'x';
+    removeBtn.addEventListener('click', (event) => {
+        event.preventDefault();
+        editModalSignature = '';
+        renderSignaturePreview();
+    });
+
+    wrapper.appendChild(image);
+    wrapper.appendChild(removeBtn);
+    container.appendChild(wrapper);
+};
+
+const handleModalFiles = (fileList) => {
+    const files = Array.from(fileList);
+    if (editModalPhotos.length + files.length > 3) {
+        alert('Maximum 3 photos !');
+        return;
+    }
+
+    files.forEach((file) => {
+        if (!file.type.startsWith('image/')) return;
+
+        compresserImage(file, async (blob) => {
+            const dataUrl = await blobToDataUrl(blob);
+            editModalPhotos.push({ dataUrl, existing: false });
+            renderModalPhotoPreviews();
+        });
+    });
+};
+
+const handleSignatureFile = (file) => {
+    if (!file || !file.type.startsWith('image/')) return;
+
+    compresserImage(file, async (blob) => {
+        editModalSignature = await blobToDataUrl(blob);
+        renderSignaturePreview();
+    });
+};
+
+const saveEditedDoc = async (docId) => {
+    try {
+        const doc = await localDB.get(docId);
+        const inputs = document.querySelectorAll('#editForm [data-field]');
+
+        inputs.forEach((input) => {
+            const key = input.dataset.field;
+            if (key === '_id') return;
+
+            if (key === 'deliveryDate') {
+                doc[key] = formatDateTimeForStorage(input.value);
+                return;
+            }
+
+            if (key === 'packageCount') {
+                const numericValue = Number(input.value);
+                doc[key] = Number.isFinite(numericValue) && numericValue > 0 ? numericValue : 1;
+                return;
+            }
+
+            doc[key] = input.value.trim();
+        });
+
+        doc.signature = editModalSignature || '';
+        doc.photos = editModalPhotos.map((photo) => photo.dataUrl || photo);
+
+        await localDB.put(doc);
+        alert('Modifications enregistrées avec succès !');
+        resetEditAssets();
+        modalManager.closeCurrent();
         loadData();
+    } catch (error) {
+        console.error('Erreur lors de la mise à jour :', error);
+        alert('Impossible de mettre à jour l\'entrée.');
+    }
+};
+
+const setupEditModal = (doc) => {
+    editModalPhotos = (doc.photos || []).map((photo) => ({ dataUrl: photo, existing: true }));
+    editModalSignature = doc.signature || '';
+
+    const modalContent = `
+        <div class="edit-modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Modifier l'entrée</h2>
+            <form id="editForm">
+                ${generateEditFields(doc)}
+
+                <div class="signature-section">
+                    <h3>Signature</h3>
+                    <div class="signature-actions">
+                        <button type="button" id="replaceSignatureBtn" class="btn-edit">Remplacer la signature</button>
+                        <button type="button" id="removeSignatureBtn" class="btn-secondary">Supprimer la signature</button>
+                        <input type="file" id="signatureInputModal" accept="image/*" style="display:none;">
+                    </div>
+                    <p class="signature-help">La signature actuelle peut être remplacée par une image.</p>
+                    <div id="signaturePreviewModal" class="signature-preview"></div>
+                </div>
+
+                <div class="photo-section">
+                    <h3>Photos</h3>
+                    <div class="photo-buttons">
+                        <button type="button" id="takePhotoBtnModal" class="btn-edit">Prendre une photo</button>
+                        <button type="button" id="chooseGalleryBtnModal" class="btn-secondary">Choisir depuis la galerie</button>
+                        <input type="file" id="cameraInputModal" accept="image/*" capture="environment" style="display:none;">
+                        <input type="file" id="galleryInputModal" accept="image/*" multiple style="display:none;">
+                    </div>
+                    <p class="photo-count">Photos : <span id="photoCountModal">0</span>/3</p>
+                    <div id="previewContainerModal" class="preview-container"></div>
+                </div>
+            </form>
+            <div class="modal-actions">
+                <button type="button" id="saveEditBtn" class="btn-edit">Enregistrer</button>
+                <button type="button" id="cancelEditBtn" class="btn-danger">Annuler</button>
+            </div>
+        </div>
+    `;
+
+    const modal = modalManager.openModal(modalContent);
+    renderModalPhotoPreviews();
+    renderSignaturePreview();
+
+    modal.querySelector('.close-btn').addEventListener('click', () => {
+        resetEditAssets();
+        modalManager.closeCurrent();
+    });
+
+    modal.querySelector('#cancelEditBtn').addEventListener('click', () => {
+        resetEditAssets();
+        modalManager.closeCurrent();
+    });
+
+    modal.querySelector('#saveEditBtn').addEventListener('click', async () => {
+        await saveEditedDoc(doc._id);
+    });
+
+    modal.querySelector('#takePhotoBtnModal').addEventListener('click', () => {
+        modal.querySelector('#cameraInputModal').click();
+    });
+
+    modal.querySelector('#chooseGalleryBtnModal').addEventListener('click', () => {
+        modal.querySelector('#galleryInputModal').click();
+    });
+
+    modal.querySelector('#cameraInputModal').addEventListener('change', (event) => {
+        handleModalFiles(event.target.files);
+        event.target.value = '';
+    });
+
+    modal.querySelector('#galleryInputModal').addEventListener('change', (event) => {
+        handleModalFiles(event.target.files);
+        event.target.value = '';
+    });
+
+    modal.querySelector('#replaceSignatureBtn').addEventListener('click', () => {
+        modal.querySelector('#signatureInputModal').click();
+    });
+
+    modal.querySelector('#removeSignatureBtn').addEventListener('click', () => {
+        editModalSignature = '';
+        renderSignaturePreview();
+    });
+
+    modal.querySelector('#signatureInputModal').addEventListener('change', (event) => {
+        handleSignatureFile(event.target.files[0]);
+        event.target.value = '';
+    });
+};
+
+const updateDeliveredStatus = async (docId, newValue) => {
+    try {
+        const doc = await localDB.get(docId);
+        doc.delivered = newValue;
+        await localDB.put(doc);
+        alert('Statut de livraison mis à jour avec succès !');
+        loadData();
+    } catch (error) {
+        console.error('Erreur lors de la mise à jour :', error);
+        alert('Impossible de mettre à jour le statut.');
+    }
+};
+
+const updatePaginationControls = () => {
+    const totalPages = Math.max(1, Math.ceil(filteredRows.length / rowsPerPage));
+    const container = document.getElementById('paginationControls');
+    container.innerHTML = '';
+
+    const firstBtn = document.createElement('button');
+    firstBtn.textContent = '⏮ Début';
+    firstBtn.disabled = currentPage === 1;
+    firstBtn.addEventListener('click', () => {
+        currentPage = 1;
+        renderTable();
     });
     container.appendChild(firstBtn);
 
-    // Précédent
-    const prevBtn = document.createElement("button");
-    prevBtn.textContent = "◀";
+    const prevBtn = document.createElement('button');
+    prevBtn.textContent = '◀';
     prevBtn.disabled = currentPage === 1;
-    prevBtn.addEventListener("click", () => {
+    prevBtn.addEventListener('click', () => {
         if (currentPage > 1) {
-            currentPage--;
-            loadData();
+            currentPage -= 1;
+            renderTable();
         }
     });
     container.appendChild(prevBtn);
 
-    // Infos de page
-    const pageInfo = document.createElement("span");
-    pageInfo.textContent = ` Page ${currentPage} / ${totalPages} `;
+    const pageInfo = document.createElement('span');
+    pageInfo.textContent = `Page ${currentPage} / ${totalPages}`;
     container.appendChild(pageInfo);
 
-    // Suivant
-    const nextBtn = document.createElement("button");
-    nextBtn.textContent = "▶";
+    const nextBtn = document.createElement('button');
+    nextBtn.textContent = '▶';
     nextBtn.disabled = currentPage === totalPages;
-    nextBtn.addEventListener("click", () => {
+    nextBtn.addEventListener('click', () => {
         if (currentPage < totalPages) {
-            currentPage++;
-            loadData();
+            currentPage += 1;
+            renderTable();
         }
     });
     container.appendChild(nextBtn);
 
-    // Bouton "Fin"
-    const lastBtn = document.createElement("button");
-    lastBtn.textContent = "Fin ⏭";
+    const lastBtn = document.createElement('button');
+    lastBtn.textContent = 'Fin ⏭';
     lastBtn.disabled = currentPage === totalPages;
-    lastBtn.addEventListener("click", () => {
+    lastBtn.addEventListener('click', () => {
         currentPage = totalPages;
-        loadData();
+        renderTable();
     });
     container.appendChild(lastBtn);
 };
 
+const updateSelectAllState = () => {
+    const selectAll = document.getElementById('selectAll');
+    const checkboxes = Array.from(document.querySelectorAll('.selectRow'));
+
+    if (checkboxes.length === 0) {
+        selectAll.checked = false;
+        selectAll.indeterminate = false;
+        return;
+    }
+
+    const checkedCount = checkboxes.filter((checkbox) => checkbox.checked).length;
+    selectAll.checked = checkedCount === checkboxes.length;
+    selectAll.indeterminate = checkedCount > 0 && checkedCount < checkboxes.length;
+};
+
+document.addEventListener('click', async (event) => {
+    const imageButton = event.target.closest('.image-preview');
+    if (imageButton) {
+        showImage(imageButton.dataset.src);
+        return;
+    }
+
+    const editButton = event.target.closest('.edit-btn');
+    if (editButton) {
+        try {
+            const doc = await localDB.get(editButton.dataset.id);
+            setupEditModal(doc);
+        } catch (error) {
+            console.error('Erreur lors de l\'ouverture de l\'édition :', error);
+            alert('Impossible de charger cette entrée.');
+        }
+    }
+});
+
+document.addEventListener('change', async (event) => {
+    if (event.target.classList.contains('updateDeliveredStatus')) {
+        await updateDeliveredStatus(event.target.dataset.id, event.target.value);
+        return;
+    }
+
+    if (event.target.classList.contains('selectRow')) {
+        updateSelectAllState();
+    }
+});
+
+document.getElementById('closePopup').addEventListener('click', () => {
+    document.getElementById('imagePopup').style.display = 'none';
+});
+
+document.getElementById('imagePopup').addEventListener('click', (event) => {
+    if (event.target.id === 'imagePopup') {
+        document.getElementById('imagePopup').style.display = 'none';
+    }
+});
+
+document.getElementById('selectAll').addEventListener('change', (event) => {
+    document.querySelectorAll('.selectRow').forEach((checkbox) => {
+        checkbox.checked = event.target.checked;
+    });
+    updateSelectAllState();
+});
+
+document.getElementById('searchBtn').addEventListener('click', searchData);
+document.getElementById('searchInput').addEventListener('input', searchData);
+document.getElementById('deleteSelectedBtn').addEventListener('click', deleteSelected);
+document.getElementById('exportBtn').addEventListener('click', exportToExcel);
+document.getElementById('exportZipBtn').addEventListener('click', exportToZip);
+
+document.getElementById('sortDeliveryDate').addEventListener('click', () => {
+    sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+    loadData();
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+    loadData();
+});
