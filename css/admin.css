@@ -85,60 +85,103 @@ main {
     gap: 14px;
     margin-top: 20px;
     margin-bottom: 18px;
-    padding: 16px 18px;
-    border-radius: var(--radius-lg);
-    background: var(--color-surface);
-    box-shadow: var(--shadow-soft);
-    border: 1px solid rgba(0, 61, 102, 0.08);
+    padding: 18px 20px;
+    border-radius: 20px;
+    border: 1px solid transparent;
+    box-shadow: 0 10px 28px rgba(0, 61, 102, 0.12);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.sync-status-banner::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, rgba(255, 255, 255, 0.18), transparent 48%);
+    pointer-events: none;
+}
+
+.sync-status-banner:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 32px rgba(0, 61, 102, 0.16);
 }
 
 .sync-status-indicator {
-    width: 16px;
-    height: 16px;
-    border-radius: 999px;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
     flex: 0 0 auto;
-    background: currentColor;
-    box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.22);
+    border: 1px solid rgba(255, 255, 255, 0.32);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    position: relative;
+    z-index: 1;
+}
+
+.sync-status-indicator::after {
+    content: "\27F3";
+    font-size: 1.45rem;
+    font-weight: 700;
+    line-height: 1;
+    color: currentColor;
 }
 
 .sync-status-copy {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 4px;
+    position: relative;
+    z-index: 1;
 }
 
 .sync-status-copy strong {
-    font-size: 0.98rem;
+    font-size: 1.05rem;
+    letter-spacing: 0.01em;
 }
 
 .sync-status-copy span {
     color: inherit;
-    opacity: 0.88;
-    font-size: 0.92rem;
+    opacity: 0.95;
+    font-size: 0.95rem;
+    line-height: 1.45;
+}
+
+.sync-status-banner.is-syncing .sync-status-indicator::after,
+.sync-status-banner.is-pending .sync-status-indicator::after {
+    animation: sync-rotate 1s linear infinite;
 }
 
 .sync-status-banner.is-pending {
-    background: #fff6e6;
-    color: #a76500;
+    background: linear-gradient(135deg, #fff6df, #ffe6b8);
+    border-color: #f1c46a;
+    color: #9a6700;
 }
 
 .sync-status-banner.is-syncing {
-    background: #eaf6fb;
-    color: var(--color-secondary);
+    background: linear-gradient(135deg, #e9f6ff, #cfeaff);
+    border-color: #84c4f3;
+    color: #0c81b4;
 }
 
 .sync-status-banner.is-ok {
-    background: #eaf8ee;
-    color: #228a3d;
+    background: linear-gradient(135deg, #ebfaf1, #d5f3e1);
+    border-color: #82d4a6;
+    color: #1f8f50;
 }
 
 .sync-status-banner.is-warning {
-    background: #fff3e8;
-    color: #c46b08;
+    background: linear-gradient(135deg, #fff8e1, #ffecc0);
+    border-color: #efcf72;
+    color: #a56700;
 }
 
 .sync-status-banner.is-error {
-    background: #fdecec;
+    background: linear-gradient(135deg, #fef1f1, #ffd8d8);
+    border-color: #efadb5;
     color: #c0392b;
 }
 

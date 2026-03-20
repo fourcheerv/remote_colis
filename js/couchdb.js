@@ -443,6 +443,48 @@ const formatFieldName = (key) => {
     };
     return labels[key] || key;
 };
+const sendEmailColisNonFromAdmin = async (doc) => {
+    if (!doc.serviceEmail) {
+        return {
+            sent: false,
+            skipped: true,
+            message: "Colis marque non livre, mais aucun email referent n'a ete renseigne."
+        };
+    }
+
+    if (typeof emailjs === 'undefined') {
+        throw new Error("EmailJS n'est pas disponible sur l'interface admin.");
+    }
+
+    emailjs.init('UFlNoLfp7PdWyrBak');
+    await emailjs.send('service_colis', 'template_colis_non', {
+        serviceEmail: doc.serviceEmail,
+        recipientName: doc.recipientName || '',
+        packageCount: doc.packageCount || 0,
+        receiverName: doc.receiverName || '',
+        message: "Le(les) colis n'a(ont) pas pu etre livre(s). Merci de contacter le service manutention pour le(les) recuperer."
+    });
+
+    return { sent: true };
+};
+
+const notifyUndeliveredTransition = async (previousDelivered, doc) => {
+    if (String(previousDelivered) === 'false' || String(doc.delivered) !== 'false') {
+        return null;
+    }
+
+    try {
+        return await sendEmailColisNonFromAdmin(doc);
+    } catch (error) {
+        console.error("Erreur lors de l'envoi de l'email admin :", error);
+        return {
+            sent: false,
+            skipped: false,
+            message: `Le statut a bien ete mis a jour, mais l'email n'a pas pu etre envoye : ${error.text || error.message || 'Erreur inconnue'}`
+        };
+    }
+};
+
 
 const getEditField = (key, value) => {
     if (key === '_id') {
@@ -559,6 +601,7 @@ const handleSignatureFile = (file) => {
 const saveEditedDoc = async (docId) => {
     try {
         const doc = await localDB.get(docId);
+        const previousDelivered = doc.delivered;
         const inputs = document.querySelectorAll('#editForm [data-field]');
         inputs.forEach((input) => {
             const key = input.dataset.field;
@@ -577,15 +620,25 @@ const saveEditedDoc = async (docId) => {
         doc.signature = editModalSignature || '';
         doc.photos = editModalPhotos.map((photo) => photo.dataUrl || photo);
         await localDB.put(doc);
-        alert('Modifications enregistrées avec succès !');
+
+        const emailResult = await notifyUndeliveredTransition(previousDelivered, doc);
+        if (emailResult?.sent) {
+            alert('Modifications enregistrees avec succes et email envoye au referent.');
+        } else if (emailResult?.message) {
+            alert(`Modifications enregistrees avec succes. ${emailResult.message}`);
+        } else {
+            alert('Modifications enregistrees avec succes !');
+        }
+
         resetEditAssets();
         modalManager.closeCurrent();
         loadData();
     } catch (error) {
-        console.error('Erreur lors de la mise à jour :', error);
-        alert('Impossible de mettre à jour l\'entrée.');
+        console.error('Erreur lors de la mise a jour :', error);
+        alert("Impossible de mettre a jour l'entree.");
     }
 };
+
 
 const openDetailsModal = (doc) => {
     const photosHtml = (doc.photos || []).length
@@ -672,15 +725,26 @@ const setupEditModal = (doc) => {
 const updateDeliveredStatus = async (docId, newValue) => {
     try {
         const doc = await localDB.get(docId);
+        const previousDelivered = doc.delivered;
         doc.delivered = newValue;
         await localDB.put(doc);
-        alert('Statut de livraison mis à jour avec succès !');
+
+        const emailResult = await notifyUndeliveredTransition(previousDelivered, doc);
+        if (emailResult?.sent) {
+            alert('Statut de livraison mis a jour avec succes et email envoye au referent.');
+        } else if (emailResult?.message) {
+            alert(`Statut de livraison mis a jour avec succes. ${emailResult.message}`);
+        } else {
+            alert('Statut de livraison mis a jour avec succes !');
+        }
+
         loadData();
     } catch (error) {
-        console.error('Erreur lors de la mise à jour :', error);
-        alert('Impossible de mettre à jour le statut.');
+        console.error('Erreur lors de la mise a jour :', error);
+        alert('Impossible de mettre a jour le statut.');
     }
 };
+
 
 const updatePaginationControls = () => {
     const totalPages = Math.max(1, Math.ceil(filteredRows.length / rowsPerPage));
